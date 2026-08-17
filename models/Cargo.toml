@@ -4,4 +4,16 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+anyhow = "1.0.104"
+config = "0.15.25"
+mongodb = "3.8.0"
 redis = { version = "1.6.0", features = ["tokio-comp", "aio"] }
+serde = "1.0.229"
+serde_json = "1.0.151"
+tracing = "0.1.44"
+tracing-subscriber = "0.3.23"
+
+[dev-dependencies]
+r2d2 = "0.8.10"
+rstest = { version = "0.26.1", features = ["async-timeout"] }
+tokio = "1.53.1"

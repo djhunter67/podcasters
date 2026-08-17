@@ -1,4 +1,4 @@
-use personal_journal::{settings, startup::Application, telemetry};
+use backend::{settings, startup::Application, telemetry};
 use std::io;
 use tracing::{error, info, warn};
 
