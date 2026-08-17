@@ -1,0 +1,28 @@
+{% extends "base.html" %} {% block title %} {{ title }} {% endblock %} {% block head %} {% endblock %} {% block individual_page_contents %}
+
+<section id="login">
+  <h1>LOGIN</h1>
+  <div id="login__center">
+    <div hx-ext="response-targets">
+    <form
+      id="user_login"
+      hx-post="/v1/login_user"
+      hx-target="body"
+      hx-swap="outerHTML"
+      hx-target-error="#error_response"
+      >
+      <label for="email_input">EMAIL:</label>
+      <input type="text" id="login__center__username" name="email_input" autocomplete="on" placeholder="EMAIL" >
+
+      <label for="password_input">PASSWORD:</label>
+      <input type="password" id="login__center__auth" name="password_input" autocomplete="on" placeholder="PASSWORD">
+      <button type="submit">SUBMIT</button>
+    </form>
+    </div>
+  </div>
+  <div id="error_response"></div>
+</section>
+
+
+{% call super() %} {% endblock %}
+

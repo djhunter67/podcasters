@@ -1,0 +1,22 @@
+{
+  "name": "Sunday Life Services",
+  "short_name": "Sunday Life",
+  "description": "Sunday Life Services personal web application",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1f2937",
+  "icons": [
+    {
+      "src": "/static/icon-192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/icon-512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

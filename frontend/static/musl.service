@@ -1,0 +1,24 @@
+[Unit]
+Description=Personal Journal Musl Web Application
+After=network.target
+
+[Service]
+Type=simple
+User=ripley
+WorkingDirectory=/home/ripley/
+
+# Environment Variables
+Environment="APP_MONGO__URI=mongodb://admin:secret_passers@10.20.20.205:27017/?authMechanism=SCRAM-SHA-256&directConnection=true&replicaSet=rs0"
+Environment="APP_REDIS__URI=redis://:secret_passers_redis@10.20.20.202:6379"
+Environment="APP_ENVIRONMENT=production"
+
+
+ExecStart=/home/ripley/personal_journal
+Restart=on-failure
+
+StandardOutput=journal
+StandardError=journal
+
+
+[Install]
+WantedBy=multi-user.target   

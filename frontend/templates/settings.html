@@ -1,0 +1,49 @@
+{% extends "base.html" %} {% block title %} {{ title }} {% endblock %} {% block head %} {% endblock %} {% block individual_page_contents %}
+
+<div id="settings">
+  <h1>SETTINGS</h1>
+  <div id="settings__center">
+    <form
+      id="password_reset"
+      enctype="multipart/form-data"
+      hx-post="/v1/settings_change"
+      hx-target="body"
+      hx-swap="outerHTML"
+      >
+      <label for="email_update">UPDATE EMAIL</label>
+      <input
+	type="text"
+	id="email_update"
+	name="email_update"
+	autocomplete="on"
+	placeholder="NEW EMAIL"
+	>
+      <label for="new_password">NEW PASSWORD:</label>
+      <input
+	type="password"
+	id="settings__center__new_auth"
+	name="new_password"
+	autocomplete="on"
+	placeholder="NEW PASSWORD"
+	>
+      <label for="new_password_2">NEW PASSWORD (REPEAT):</label>
+      <input
+	type="password"
+	id="login__center__new_auth_2"
+	name="new_password_2"
+	autocomplete="on"
+	placeholder="NEW PASSWORD (REPEAT)"
+	>
+      <label for="profile_image">PROFILE IMAGE</label>
+      <input
+	type="file"
+	id="profile_image"
+	name="profile_image"
+	accept="image/*"
+	>
+      <button type="submit">SUBMIT</button>
+    </form>
+  </div>
+  
+
+{% call super() %} {% endblock %}

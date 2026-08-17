@@ -1,0 +1,14 @@
+[Unit]
+Description=Sunday Life Services Actix Web App
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/opt/sundaylife
+ExecStart=/opt/sundaylife/app
+Restart=always
+Environment=RUST_LOG=info
+
+[Install]
+WantedBy=multi-user.target

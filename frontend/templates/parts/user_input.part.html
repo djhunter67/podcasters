@@ -1,0 +1,14 @@
+<section id="main__user_text">
+    <form
+      hx-post="/v1/submit_text"
+      hx-target="#card__{{ i }}"
+      hx-swap="outerHTML"
+      id="main__user_text__journaler"
+       />
+    <input id="main__user_text__journaler__title" type="text" name="title" placeholder="Place title here" value="test title" required />
+    <textarea id="main__user_text__journaler__body"name="body" placeholder="Enter your text here" />Test text that ensures this feature will work during development Test text that ensures this feature will work during developmentTest text that ensures this feature will work during development.  On this particular morning it twas very kindly a good morning.  After the morning of this great morning it war apparent how the day would unfold.  Unfolding the day was similar to protein folding.</textarea>
+<input id="main__user_text__journaler__author" type="text" name="author" placeholder="text author here" value="Hunter, Christerpher" required/>
+<input id="hidden_input" type="text" name="email" value={{user}} hidden>
+      <button type="submit">Submit</button>
+    </form>
+  </section>

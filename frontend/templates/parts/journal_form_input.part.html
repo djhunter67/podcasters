@@ -1,0 +1,27 @@
+<form
+  hx-post="/v1/update_text"
+  hx-swap="innerHTML"
+  hx-target="#main"
+  hx-trigger="click from:button, keydown[ctrlKey && key=='Enter'] from:textarea"
+  id="main__info_cards__journaler"
+  >
+  <input
+    id="main__info_cards__journaler__title"
+    type="text"
+    name="title"
+    placeholder="Place title here"
+    required
+    value="{{ content.get_title() }}"
+    >
+  <textarea
+    id="main__info_cards__journaler__body"
+    name="body"
+    placeholder="Enter your text here"
+    rows="9"
+    required
+    >{{ content.get_body() }}</textarea>
+  <input id="hidden_to_pass_the_post_oid" hidden name="_id" value="{{ content.get_post_id()  }}">
+  <input id="hidden_to_pass_the_author" hidden name="author" value="{{ content.get_author()  }}">
+  <button type="submit">Submit</button>
+</form>
+

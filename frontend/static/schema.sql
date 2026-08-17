@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS visitors (
+    id INTEGER PRIMARY KEY,
+);
+
+CREATE TABLE IF NOT EXISTS projects (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    linkTEXT NOT NULL,
+);

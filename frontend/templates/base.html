@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}{{ title }} - My Site{% endblock %}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="A Rust-powered personal journaling application">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ title }}">
+    <meta property="og:description" content="A Rust-powered personal journaling application">
+    <meta property="og:url" content="https://sundaylifeservices.com/">
+    <meta property="og:image" content="https://sundaylifeservices.com/static/link-preview">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627">
+    <meta property="og:image:alt" content="Personal journaling application icon featuring a vibrant feather pen">
+    <link rel="manifest" href="/static/manifest.webmanifest">
+    <meta name="theme-color" content="#1f2937">
+    <link rel="apple-touch-icon" href="/static/icon-192">
+    <link rel="icon" href="/static/icon-192" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="/static/stylesheet">
+    <script  type="text/javascript" defer src="/static/htmx"></script>
+    <script  type="text/javascript" defer src="/static/response-targets" defer></script>
+    <script  type="text/javascript" defer src="/static/sse"></script>
+    <script  type="text/javascript" defer src="/static/action_script" defer></script>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <header id="template__header">
+      <nav id="template__header__top">
+	{% include "parts/loading_spinner.html" %}
+	<button
+	  id="template__header__top__home"
+	  hx-get="/"
+	  hx-target="body"
+	  hx-swap="outerHTML"
+	  hx-trigger="click"
+	  hx-target-error="#error_template"
+	  >HOME
+	</button>
+	{% if is_logged_in %}
+	<button
+	  id="template__header__top__login"
+	  hx-get="/v1/logout"
+	  hx-target="body"
+	  hx-swap="outerHTML"
+	  hx-push-url="false"
+	  >
+	  LOGOUT
+	</button>
+	<button
+	  id="template__header__top__settings"
+	  hx-get="/v1/settings"
+	  hx-target="body"
+	  hx-swap="outerHTML"
+	  hx-trigger="click"
+	  >
+	</button>
+	{% endif %}
+	{% if !is_logged_in %}
+	<button
+	  id="template__header__top__login"
+	  hx-get="/v1/login"
+	  hx-target="body"
+	  hx-swap="outerHTML"
+	  hx-trigger="click"
+	  hx-indicator="#loading"	  
+	  >
+	  LOGIN
+	</button>	
+	<button
+	  id="template__header__top__signup"
+	  hx-get="/v1/register"
+	  hx-target="body"
+	  hx-swap="outerHTML"
+	  hx-trigger="click"
+	  >
+	  REGISTER
+	</button>
+	{% endif %}      
+      </nav>
+      <aside id="template__header__logo">
+	<img src="/static/rand_images/0" alt="Personal blog default logo" width="300px" height="350px">
+	<h1>WELCOME</h1><h3>{{ user_email  }}</h3>
+      </aside>
+    </header>
+    <main id="template__pages">
+      {% block individual_page_contents %}
+      {% endblock %}
+      
+      <div id="error_template">
+	{% block error_contents %}
+	{% endblock %}
+      </div>
+    </main>
+    <footer id="template__footer">
+      <section id="template__footer__main">
+	<button
+	  hx-get="/contact"
+	  hx-target="#main__info_cards"
+	  hx-swap="innerHTML"
+	  
+	  hx-trigger="click">
+	  CONTACT
+	</button>
+	<button
+	  hx-get="https://facebook.com"
+	  
+	  hx-target="_blank"
+	  hx-trigger="click">
+	  FACEBOOK
+	</button>
+	<button
+	  hx-get="https://x.com"
+	  
+	  hx-target="_top"
+	  hx-trigger="click">
+	  TWITTER
+	</button>
+	<button
+	  hx-get="https://instagram.com"
+	  
+	  hx-target="_top"
+	  hx-trigger="click">
+	  INSTAGRAM
+	</button>
+	<button
+	  hx-get="/about"
+	  
+	  hx-target="#main__info_cards"
+	  hx-swap="innerHTML"
+	  hx-trigger="click">
+	  ABOUT
+	</button>
+      </section>
+      <aside id="template__footer__version">
+	V.{{ version }}
+      </aside>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,49 @@
+$saddle-brown: hsla(23, 66%, 29%, 1);
+$rosy-taupe: hsla(9, 23%, 61%, 1);
+$lavender-veil: hsla(282, 79%, 94%, 1);
+$frosted-blue: hsla(194, 95%, 76%, 1);
+$pacific-blue: hsla(191, 59%, 55%, 1);
+
+$blue: hsl(200, 100%, 50%);
+$black: hsl(0, 0%, 0%);
+$white: hsl(0, 0%, 100%);
+$gray: hsl(0, 0%, 50%);
+$light-gray: hsl(0, 0%, 90%);
+$light-blue: hsl(200, 100%, 90%);
+$light-green: hsl(120, 100%, 90%);
+$light-red: hsl(0, 100%, 90%);
+$light-yellow: hsl(60, 100%, 90%);
+$dark-orange: hsl(10, 100%, 70%);
+
+#template__footer__main {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	background-color: $saddle-brown;
+	gap: 3em;
+
+	button {
+		background-color: $rosy-taupe;
+		color: $white;
+		border: none;
+		border-radius: 2rem;
+		padding: 8px 16px;
+		margin: 3rem;
+		font-size: 1.8rem;
+		cursor: pointer;
+		transition: all 0.3s ease;
+
+		&:hover {
+		    background-color: $frosted-blue;
+		    color: $black;
+		}
+	}
+}
+
+#template__footer__version {
+	margin-top: 5px;
+	font-size: 1.9rem;
+	color: $saddle-brown;
+	margin: auto 0;
+}

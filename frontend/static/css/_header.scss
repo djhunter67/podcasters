@@ -1,0 +1,62 @@
+// filled in in the style.scss file
+
+
+$blue: hsl(200, 100%, 50%);
+$black: hsl(0, 0%, 0%);
+$white: hsl(0, 0%, 100%);
+$gray: hsl(0, 0%, 50%);
+$light-gray: hsl(0, 0%, 90%);
+$light-blue: hsl(200, 100%, 90%);
+$light-green: hsl(120, 100%, 90%);
+$light-red: hsl(0, 100%, 90%);
+$light-yellow: hsl(60, 100%, 90%);
+$dark-orange: hsl(10, 100%, 70%);
+
+$saddle-brown: hsla(23, 66%, 29%, 1);
+$rosy-taupe: hsla(9, 23%, 61%, 1);
+$lavender-veil: hsla(282, 79%, 94%, 1);
+$frosted-blue: hsla(194, 95%, 76%, 1);
+$pacific-blue: hsla(191, 59%, 55%, 1);
+
+
+#template__header__top {
+	// 5 or more buttons
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 1em;
+	padding: 0 1em;
+
+	button {
+		grid-row: span;
+		font-size: 2em;
+		background-color: $dark-orange;
+		// padding: 1rem 0.25em;
+		border: $white 2px solid;
+		border-radius: 2em;
+	}
+}
+
+#template__header__logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 2em;
+    text-wrap: wrap;
+
+    img {
+	border-radius: 50%;
+	object-fit: cover;
+		   
+    }
+
+    h1 {
+	color: $dark-orange;
+    }
+
+    h3 {
+	color: $blue;
+	text-wrap: wrap;
+	padding: 0.5em 0;
+    }
+}

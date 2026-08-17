@@ -1,0 +1,32 @@
+
+#error {
+    background-color: blue;
+    &__block {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;
+
+	&__header {
+	    background-color: red;
+	    color: white;
+	    text-align: center;
+	}
+
+	&__body {
+	    button {
+		background-color: red;
+		color: white;
+		// raise the button a little bit to make it look better and more clickable
+		transform: translateY(-2px);
+
+		&:hover {
+		    background-color: darkred;
+		    transform: translateY(-1px);
+		    // time dilation
+		    transition: all 0.2s ease-in-out;
+		}
+	    }
+	}
+    }
+}
