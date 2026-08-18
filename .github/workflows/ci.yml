@@ -1,0 +1,105 @@
+name: Podcasters CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+  pull_request:
+    branches:
+      - main
+      - develop
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+  TEST_MONGODB_URI: mongodb://127.0.0.1:27017
+  TEST_MONGODB_DATABASE: podcasters_test
+  TEST_MONGODB_COLLECTION: users
+
+  TEST_REDIS_URI: redis://127.0.0.1:6379/
+
+  # These override the normal settings loader where application
+  # code still uses models::settings::get().
+  APP_ENVIRONMENT: development
+  APP_MONGO__URI: mongodb://127.0.0.1:27017
+  APP_MONGO__DB: podcasters_test
+  APP_MONGO__COLLECTION: users
+  APP_MONGO__REQUIRE_AUTH: "false"
+
+  APP_REDIS__URI: redis://127.0.0.1:6379/
+
+jobs:
+  test:
+    name: Rust Workspace Tests
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:8.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok' localhost:27017/test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+          --health-start-period 10s
+
+      redis:
+        image: redis:8
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+          --health-start-period 5s
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ". -> target"
+
+      - name: Show Rust versions
+        run: |
+          rustc --version
+          cargo --version
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Run Clippy
+        run: |
+          cargo clippy \
+            --workspace \
+            --all-targets \
+            --all-features \
+            -- \
+            -D warnings
+
+      - name: Check workspace
+        run: |
+          cargo check \
+            --workspace \
+            --all-targets \
+            --all-features
+
+      - name: Run workspace tests
+        run: |
+          cargo test \
+            --workspace \
+            --all-features \
+            --verbose

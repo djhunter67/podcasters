@@ -4,6 +4,8 @@ use actix_web::{self, App, HttpServer, http::KeepAlive, middleware, web};
 use shared::settings;
 use tracing::{instrument, warn};
 
+use crate::endpoints;
+
 pub const PARSE_COUNT: u8 = 9;
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -37,6 +39,7 @@ async fn run(
             .wrap(middleware::DefaultHeaders::new().add(("X-Version", env!("CARGO_PKG_VERSION")))) // Security consideration
             .app_data(db_redis.clone())
             .app_data(db_mongo.clone())
+            .service(web::scope("/v1").service(endpoints::health))
         // .service(
         //     web::scope("/static")
         //         .service(images::favicon)
