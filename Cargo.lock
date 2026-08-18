@@ -320,7 +320,6 @@ dependencies = [
  "chacha20",
  "config",
  "dotenvy",
- "frontend",
  "hex",
  "models",
  "rand 0.10.2",
@@ -914,6 +913,13 @@ version = "0.1.0"
 dependencies = [
  "actix-files",
  "actix-web",
+ "config",
+ "dotenvy",
+ "models",
+ "serde",
+ "serde_json",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

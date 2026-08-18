@@ -1,7 +1,7 @@
+use std::net;
+
 use crate::settings::Settings;
 use actix_web::{self, App, HttpServer, http::KeepAlive, middleware, web};
-use models;
-use std::net;
 use tracing::{instrument, warn};
 
 pub const PARSE_COUNT: u8 = 9;

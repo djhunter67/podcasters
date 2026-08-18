@@ -10,14 +10,14 @@ members = [
 	]
 resolver = "3"
 
-
-[[workspace.metadata.leptos]]
-name = "podcasters"
-bin-package = "backend"
-lib-package = "frontend"
-site-root = "target/site"
-site-pkg-dir = "pkg"
-site-addr = "127.0.0.1:3000"
-reload-port = 3001
-bin-features = ["ssr"]
-lib-features = ["hydrate"]
+[profile.release]
+overflow-checks = false
+lto = "fat"  # LTO can produce better optimized code; 'false', 'fat', 'thin', or 'off'
+codegen-units = 16  # Split crate into units to increase parallelism during compilation, may produce slower code; '1 - 256'
+panic = "abort"
+incremental = false  # Store cache data to disk in the 'target' dir for quicker recompilation
+opt-level = 3
+strip = "symbols"  # equivalent to strip = true
+rpath = false  
+debug-assertions = false
+debug = false
