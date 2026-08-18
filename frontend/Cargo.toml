@@ -8,15 +8,15 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 leptos = {version = "0.8", default-features = false }
-leptos_meta = { version = "0.8", default-features = false }
+leptos_meta = { version = "0.8.6", default-features = false }
 leptos_router = { version = "0.8", default-features = false }
 wasm-bindgen = "0.2.127"
 
 [features]
 hydrate = [
  "leptos/hydrate",
- "leptos_meta/hydrate",
- "leptos_router/hydrate"
+ # "leptos_meta/hydrate",
+ # "leptos_router/hydrate"
 ]
 
 ssr = [

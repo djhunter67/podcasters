@@ -85,7 +85,7 @@ async fn run(
             .app_data(db_redis.clone())
             .app_data(db_mongo.clone())
             .service(leptos_actix::handle_server_fns())
-            .leptos_routes(&conf.leptos_options, routes, frontend::App)
+            // .leptos_routes(&conf.leptos_options, routes, frontend::App)
             .service(leptos::Files::new(
                 "/pkg",
                 &conf.leptos_options.site_pkg_dir,
