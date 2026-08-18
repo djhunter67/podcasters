@@ -66,7 +66,7 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@nightly
         with:
-          components: rustfmt, clippy
+          components: rustfmt, clippy, rustc-codegen-cranelift
 
       - name: Cache Rust build artifacts
         uses: Swatinem/rust-cache@v2
@@ -77,6 +77,9 @@ jobs:
         run: |
           rustc --version
           cargo --version
+	  cargo clippy --version
+	  rustup show active-toolchain
+	  rustup component list --installed
 
       - name: Check formatting
         run: cargo fmt --all -- --check
