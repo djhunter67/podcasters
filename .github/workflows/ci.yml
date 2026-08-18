@@ -3,12 +3,12 @@ name: Podcasters CI
 on:
   push:
     branches:
-      - main
+      - trunk
       - develop
 
   pull_request:
     branches:
-      - main
+      - trunk
       - develop
 
 env:
