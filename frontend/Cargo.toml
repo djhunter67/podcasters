@@ -4,24 +4,46 @@ version = "0.1.0"
 edition = "2024"
 
 [lib]
-crate-type = ["cdylib", "rlib"]
+name = "frontend"
+path = "src/lib.rs"
 
 [dependencies]
-leptos = {version = "0.8", default-features = false }
-leptos_meta = { version = "0.8.6", default-features = false }
-leptos_router = { version = "0.8", default-features = false }
-wasm-bindgen = "0.2.127"
+actix-files = "0.6.10"
+actix-web = "4.14.1"
 
-[features]
-hydrate = [
- "leptos/hydrate",
- # "leptos_meta/hydrate",
- # "leptos_router/hydrate"
-]
 
-ssr = [
- "leptos/ssr",
- "leptos_meta/ssr",
- "leptos_router/ssr"
-]
+[lints.clippy]
+pedantic = { level = "deny", priority = 1 }
+wildcard_imports = "deny"
+must_use_candidate = "warn"
+enum_glob_use = "deny"
+nursery = { level = "deny", priority = 1 }
+unwrap_used = "deny"
 
+[profile.release]
+overflow-checks = false
+lto = "fat"  # LTO can produce better optimized code; 'false', 'fat', 'thin', or 'off'
+codegen-units = 16  # Split crate into units to increase parallelism during compilation, may produce slower code; '1 - 256'
+panic = "abort"
+incremental = false  # Store cache data to disk in the 'target' dir for quicker recompilation
+opt-level = 3
+strip = "symbols"  # equivalent to strip = true
+rpath = false  
+debug-assertions = false
+debug = false
+
+[profile.dev]
+overflow-checks = true
+opt-level = 0
+strip = "none"
+codegen-units = 256
+lto = "off"
+panic = "unwind"
+incremental = true
+debug = "line-tables-only"
+debug-assertions = false
+
+[profile.dev.build-override]
+opt-level = 0
+codegen-units = 256
+debug = false

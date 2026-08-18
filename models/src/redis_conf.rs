@@ -6,7 +6,7 @@ use redis::{AsyncCommands, aio};
 use serde::{Deserialize, Serialize};
 use tracing::instrument;
 
-use crate::mongo;
+use crate::mongo_conf;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserSession {
@@ -71,7 +71,7 @@ pub async fn authenticated_user_id(
     let user_id = match user_id {
         None => {
             tracing::error!("Cache-Miss: {user_session}");
-            let mongo_client = mongo::establish_connection(mongo_client)
+            let mongo_client = mongo_conf::establish_connection(mongo_client)
                 .await
                 .map_err(|_| AuthenticationError::InvalidSession)?;
 

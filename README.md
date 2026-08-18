@@ -464,7 +464,6 @@ This application Will feature Podcasting 2.0 support.
   
 ### Milestone 6 - Android
 - Create Tauri Android application.
-- Reuse Leptos UI.
 - Login.
 - Library.
 - Playback.
@@ -518,7 +517,7 @@ This application Will feature Podcasting 2.0 support.
 - EPIC-007: User library
 - EPIC-008: Playback engine
 - EPIC-009: Playback synchronization
-- EPIC-010: Leptos web client
+- EPIC-010: HTMX and Actix web client
 - EPIC-011: Audio normalization
 - EPIC-012: Smart playback speed
 - EPIC-013: Billing
@@ -551,8 +550,8 @@ This application Will feature Podcasting 2.0 support.
   - Define `/api/v1`.
   - Implement podcast feed ingestion.
   - Implement Podcasting 2.0 normalization.
-  - Establish the Leptos frontend.
-  - Connect Leptos to the Actix API.
+  - Establish the HTMX frontend.
+  - Connect Askama to the Actix API.
   - Produce the first usable podcast page.
   - Produce the first working player.
   - Then build the Android shell.

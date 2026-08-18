@@ -1,9 +1,7 @@
 use crate::settings::Settings;
 use actix_web::{self, App, HttpServer, http::KeepAlive, middleware, web};
-use mongodb::options::ClientOptions;
-use redis::aio::{self, ConnectionManagerConfig};
+use models;
 use std::net;
-use std::time::Duration;
 use tracing::{instrument, warn};
 
 pub const PARSE_COUNT: u8 = 9;
@@ -19,58 +17,66 @@ async fn run(
     listener: std::net::TcpListener,
     settings: Settings,
 ) -> Result<actix_web::dev::Server, std::io::Error> {
-    let redis_client: redis::Client = match redis::Client::open(settings.redis.uri.clone()) {
-        Ok(conn) => conn,
-        Err(err) => {
-            tracing::error!("Unable to connect to the cache layer: {err:#?}");
-            panic!("Application cannot start: {err:#?}")
-            // try to connect to a locally running instance of redis
-        }
-    };
+    // let redis_client: redis::Client = match redis::Client::open(settings.redis.uri.clone()) {
+    //     Ok(conn) => conn,
+    //     Err(err) => {
+    //         tracing::error!("Unable to connect to the cache layer: {err:#?}");
+    //         panic!("Application cannot start: {err:#?}")
+    //         // try to connect to a locally running instance of redis
+    //     }
+    // };
 
-    let redis_config = ConnectionManagerConfig::new()
-        .set_connection_timeout(Some(Duration::from_secs(2))) // Time to establish TCP connection
-        .set_response_timeout(Some(Duration::from_secs(1))) // Time to wait for command response
-        .set_exponent_base(2.) // Exponential backoff base
-        .set_number_of_retries(3); // Max retries before failing
+    // let redis_config = ConnectionManagerConfig::new()
+    //     .set_connection_timeout(Some(Duration::from_secs(2))) // Time to establish TCP connection
+    //     .set_response_timeout(Some(Duration::from_secs(1))) // Time to wait for command response
+    //     .set_exponent_base(2.) // Exponential backoff base
+    //     .set_number_of_retries(3); // Max retries before failing
 
-    let redis_pool: redis::aio::ConnectionManager =
-        match aio::ConnectionManager::new_with_config(redis_client, redis_config).await {
-            Ok(conn) => conn,
-            Err(err) => {
-                tracing::error!("Unable to connect to the cache layer: {err:#?}");
-                panic!("Application cannot start: {err:#?}")
-            }
-        };
+    // let redis_pool: redis::aio::ConnectionManager =
+    //     match aio::ConnectionManager::new_with_config(redis_client, redis_config).await {
+    //         Ok(conn) => conn,
+    //         Err(err) => {
+    //             tracing::error!("Unable to connect to the cache layer: {err:#?}");
+    //             panic!("Application cannot start: {err:#?}")
+    //         }
+    //     };
 
-    let mongo_options: ClientOptions = match ClientOptions::parse(&settings.mongo.uri).await {
-        Ok(mut conn) => {
-            let mongo_settings = settings.mongo;
+    // let mongo_options: ClientOptions = match ClientOptions::parse(&settings.mongo.uri).await {
+    //     Ok(mut conn) => {
+    //         let mongo_settings = settings.mongo;
 
-            conn.connect_timeout = Some(Duration::from_secs(
-                mongo_settings.connection_timeout.into(),
-            ));
-            conn.server_selection_timeout = Some(Duration::from_secs(4));
-            conn.app_name = Some(mongo_settings.db);
-            conn
-        }
-        Err(err) => {
-            tracing::error!("Unable to connect to the database: {err:#?}",);
-            ClientOptions::parse("mongodb://localhost:27017")
-                .await
-                .expect("Unable to procure the database")
-        }
-    };
+    //         conn.connect_timeout = Some(Duration::from_secs(
+    //             mongo_settings.connection_timeout.into(),
+    //         ));
+    //         conn.server_selection_timeout = Some(Duration::from_secs(4));
+    //         conn.app_name = Some(mongo_settings.db);
+    //         conn
+    //     }
+    //     Err(err) => {
+    //         tracing::error!("Unable to connect to the database: {err:#?}",);
+    //         ClientOptions::parse("mongodb://localhost:27017")
+    //             .await
+    //             .expect("Unable to procure the database")
+    //     }
+    // };
 
-    let mongo_pool: mongodb::Client = match mongodb::Client::with_options(mongo_options) {
-        Ok(conn) => conn,
-        Err(err) => {
-            tracing::error!("Unable to connect to the database: {err:#?}");
-            panic!("Application cannot start: {err:#?}")
-        }
-    };
+    // let mongo_pool: mongodb::Client = match mongodb::Client::with_options(mongo_options) {
+    //     Ok(conn) => conn,
+    //     Err(err) => {
+    //         tracing::error!("Unable to connect to the database: {err:#?}");
+    //         panic!("Application cannot start: {err:#?}")
+    //     }
+    // };
 
     // let static_files: fs::Files = fs::Files::new("/static", ".").show_files_listing();
+
+    let (redis_pool, mongo_pool) = match models::init_db().await {
+        Ok((red, mong)) => (red, mong),
+        Err(err) => {
+            tracing::error!(err);
+            panic!("Unable to init the app due to the lack of a DB connection");
+        }
+    };
 
     // Connect to the MongoDB database
     let db_redis = web::Data::new(redis_pool);
@@ -84,12 +90,6 @@ async fn run(
             .wrap(middleware::DefaultHeaders::new().add(("X-Version", env!("CARGO_PKG_VERSION")))) // Security consideration
             .app_data(db_redis.clone())
             .app_data(db_mongo.clone())
-            .service(leptos_actix::handle_server_fns())
-            // .leptos_routes(&conf.leptos_options, routes, frontend::App)
-            .service(leptos::Files::new(
-                "/pkg",
-                &conf.leptos_options.site_pkg_dir,
-            ))
         // .service(
         //     web::scope("/static")
         //         .service(images::favicon)

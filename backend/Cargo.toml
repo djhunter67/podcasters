@@ -4,37 +4,54 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-actix-web = { version = "4.14.1", optional = true }
-actix-files = { version = "0.6.10", optional = true}
-leptos = { version = "0.8", default-features = false, features = ["hydrate", "ssr"] }
-leptos_actix = { version = "0.8", optional = true }
-leptos_meta = { version = "0.8.6", default-features = false }
-leptos_router = { version = "0.8", default-features = false }
+actix-web = "4.14.1" 
 frontend = { path = "../frontend" }
-mongodb = "3.8.0"
 rand = "0.10.2"
-redis = { version = "1.6.0", features = ["aio", "connection-manager", "tokio-comp"] }
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
 anyhow = "1.0.104"
-config = "0.15.25"
 models = { version = "0.1.0", path = "../models" }
 serde = "1.0.229"
 serde_json = "1.0.151"
-futures = "0.3.34"
 base64 = "0.23.1"
 chacha20 = "0.10.1"
+config = "0.15.25"
 hex = "0.4.3"
 dotenvy = "0.15.7"
 
-[features]
-ssr = [
-  "dep:actix-files",
-  "dep:leptos_actix",
-  "dep:actix-web",
-  "dep:leptos_actix",
-  "leptos/ssr",
-  "leptos_meta/ssr",
-  "leptos_router/ssr",
-  "frontend/ssr",
-]
+
+[lints.clippy]
+pedantic = { level = "deny", priority = 1 }
+wildcard_imports = "deny"
+must_use_candidate = "warn"
+enum_glob_use = "deny"
+nursery = { level = "deny", priority = 1 }
+unwrap_used = "deny"
+
+[profile.release]
+overflow-checks = false
+lto = "fat"  # LTO can produce better optimized code; 'false', 'fat', 'thin', or 'off'
+codegen-units = 16  # Split crate into units to increase parallelism during compilation, may produce slower code; '1 - 256'
+panic = "abort"
+incremental = false  # Store cache data to disk in the 'target' dir for quicker recompilation
+opt-level = 3
+strip = "symbols"  # equivalent to strip = true
+rpath = false  
+debug-assertions = false
+debug = false
+
+[profile.dev]
+overflow-checks = true
+opt-level = 0
+strip = "none"
+codegen-units = 256
+lto = "off"
+panic = "unwind"
+incremental = true
+debug = "line-tables-only"
+debug-assertions = false
+
+[profile.dev.build-override]
+opt-level = 0
+codegen-units = 256
+debug = false

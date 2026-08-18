@@ -1,9 +1,13 @@
 [workspace]
-members = ["audio",
-	"backend", "billing",
+members = [
+	"audio",
+	"backend",
+	"billing",
 	"frontend",
-	"models"
-, "podcasting", "shared"]
+	"models",
+	"podcasting",
+	"shared"
+	]
 resolver = "3"
 
 
