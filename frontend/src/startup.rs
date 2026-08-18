@@ -1,7 +1,7 @@
 use std::net;
 
-use crate::settings::Settings;
 use actix_web::{self, App, HttpServer, http::KeepAlive, middleware, web};
+use shared::settings;
 use tracing::{instrument, warn};
 
 pub const PARSE_COUNT: u8 = 9;
@@ -15,7 +15,7 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 )]
 async fn run(
     listener: std::net::TcpListener,
-    settings: Settings,
+    settings: settings::Settings,
 ) -> Result<actix_web::dev::Server, std::io::Error> {
     let (redis_pool, mongo_pool) = match models::init_db().await {
         Ok((red, mong)) => (red, mong),
@@ -120,7 +120,7 @@ impl Application {
         target = "demo_web_app",
         skip(settings)
     )]
-    pub async fn build(settings: &mut crate::settings::Settings) -> Result<Self, std::io::Error> {
+    pub async fn build(settings: &mut settings::Settings) -> Result<Self, std::io::Error> {
         tracing::info!("Buidling the main application");
 
         let app_address = format!(

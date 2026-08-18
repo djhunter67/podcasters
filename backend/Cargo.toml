@@ -17,4 +17,5 @@ chacha20 = "0.10.1"
 config = "0.15.25"
 hex = "0.4.3"
 dotenvy = "0.15.7"
+shared = { version = "0.1.0", path = "../shared" }
 

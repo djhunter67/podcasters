@@ -1,6 +1,6 @@
-use backend::{settings, startup::Application, telemetry};
+use backend::{startup::Application, telemetry};
+use shared::settings;
 use std::io;
-use tracing::{error, info, warn};
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
@@ -11,26 +11,26 @@ async fn main() -> io::Result<()> {
     let mut settings = match settings::get() {
         Ok(settings) => settings,
         Err(err) => {
-            println!("Failed to load settings: {err}");
-            panic!("Failed to load settings");
+            eprintln!("Failed to load settings: {err}");
+            panic!("Failed to load settings: {err:#?}");
         }
     };
 
     let subscriber = telemetry::get_subcriber(settings.clone().debug);
     telemetry::init_subscriber(subscriber);
 
-    info!("Building the application");
+    tracing::info!("Building the application");
     let application = match Application::build(&mut settings).await {
         Ok(app) => app,
         Err(err) => {
-            error!("Failed to build application: {err}");
-            panic!("Failed to build application");
+            tracing::error!("Failed to build application: {err}");
+            panic!("Failed to build application: {err:#?}");
         }
     };
 
-    info!("Listening on port: {}", application.port());
+    tracing::info!("Listening on port: {}", application.port());
     application.run_until_stopped().await?;
-    warn!("Shutting down");
+    tracing::warn!("Shutting down");
 
     Ok(())
 }

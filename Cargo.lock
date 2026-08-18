@@ -325,6 +325,7 @@ dependencies = [
  "rand 0.10.2",
  "serde",
  "serde_json",
+ "shared",
  "tracing",
  "tracing-subscriber",
 ]
@@ -918,6 +919,7 @@ dependencies = [
  "models",
  "serde",
  "serde_json",
+ "shared",
  "tracing",
  "tracing-subscriber",
 ]
@@ -1634,6 +1636,7 @@ dependencies = [
  "rstest",
  "serde",
  "serde_json",
+ "shared",
  "tokio",
  "tracing",
  "tracing-subscriber",
@@ -2448,6 +2451,12 @@ dependencies = [
 [[package]]
 name = "shared"
 version = "0.1.0"
+dependencies = [
+ "config",
+ "serde",
+ "tracing",
+ "tracing-subscriber",
+]
 
 [[package]]
 name = "shlex"

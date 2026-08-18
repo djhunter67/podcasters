@@ -1,6 +1,7 @@
-use crate::settings::Settings;
+use crate::api;
 use actix_web::{self, App, HttpServer, http::KeepAlive, middleware, web};
 use models;
+use shared::settings;
 use std::net;
 use tracing::{instrument, warn};
 
@@ -15,7 +16,7 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 )]
 async fn run(
     listener: std::net::TcpListener,
-    settings: Settings,
+    settings: settings::Settings,
 ) -> Result<actix_web::dev::Server, std::io::Error> {
     let (redis_pool, mongo_pool) = match models::init_db().await {
         Ok((red, mong)) => (red, mong),
@@ -37,6 +38,7 @@ async fn run(
             .wrap(middleware::DefaultHeaders::new().add(("X-Version", env!("CARGO_PKG_VERSION")))) // Security consideration
             .app_data(db_redis.clone())
             .app_data(db_mongo.clone())
+            .service(web::scope("/v1").service(api::health))
         // .service(
         //     web::scope("/static")
         //         .service(images::favicon)
@@ -120,7 +122,7 @@ impl Application {
         target = "demo_web_app",
         skip(settings)
     )]
-    pub async fn build(settings: &mut crate::settings::Settings) -> Result<Self, std::io::Error> {
+    pub async fn build(settings: &mut settings::Settings) -> Result<Self, std::io::Error> {
         tracing::info!("Buidling the main application");
 
         let app_address = format!(

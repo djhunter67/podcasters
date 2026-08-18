@@ -1,4 +1,5 @@
-use frontend::{settings, startup::Application, telemetry};
+use frontend::{startup::Application, telemetry};
+use shared::settings;
 use std::io;
 use tracing::{error, info, warn};
 
@@ -12,7 +13,7 @@ async fn main() -> io::Result<()> {
         Ok(settings) => settings,
         Err(err) => {
             println!("Failed to load settings: {err}");
-            panic!("Failed to load settings");
+            panic!("Failed to load settings: {err:#?}");
         }
     };
 

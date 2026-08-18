@@ -2,6 +2,7 @@ use std::time;
 
 use mongodb::options::ClientOptions;
 use redis::aio::{self, ConnectionManagerConfig};
+use shared::settings;
 
 pub mod billing;
 pub mod bookmark;
@@ -11,7 +12,6 @@ pub mod episode;
 pub mod indexes;
 pub mod mongo_conf;
 pub mod redis_conf;
-mod settings;
 
 struct Users {}
 struct AuthSession {}
