@@ -77,9 +77,9 @@ jobs:
         run: |
           rustc --version
 	  cargo --version
-	  cargo clippy --version
-	  rustup show active-toolchain
-	  rustup component list --installed
+          cargo clippy --version
+          rustup show active-toolchain
+          rustup component list --installed
 
       - name: Check formatting
         run: cargo fmt --all -- --check
