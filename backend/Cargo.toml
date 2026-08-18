@@ -19,3 +19,6 @@ hex = "0.4.3"
 dotenvy = "0.15.7"
 shared = { version = "0.1.0", path = "../shared" }
 
+[dev-dependencies]
+rstest = "0.26.1"
+

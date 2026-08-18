@@ -4,7 +4,11 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+base64 = "0.23.1"
+chacha20 = "0.10.1"
 config = "0.15.25"
+hex = "0.4.3"
+rand = "0.10.2"
 serde = { version = "1.0.229", features = ["derive"] }
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }

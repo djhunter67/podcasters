@@ -18,8 +18,3 @@ redis:
   pool_timeout_seconds: 1
   pool_expire_seconds: 60
 
-sqlite:
-  path: "senzor.db"
-  schema: "static/schema.sql"
-  pool_size: 1
-  connection_timeout: 1

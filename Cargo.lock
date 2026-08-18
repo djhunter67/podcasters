@@ -323,6 +323,7 @@ dependencies = [
  "hex",
  "models",
  "rand 0.10.2",
+ "rstest",
  "serde",
  "serde_json",
  "shared",
@@ -2057,9 +2058,8 @@ checksum = "63b8176103e19a2643978565ca18b50549f6101881c443590420e4dc998a3c69"
 
 [[package]]
 name = "redis"
-version = "1.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e37a4ca5c6ca42aa3e6df2fd32b987a65d32a4c2159a6f3fe0fd1df306a2658f"
+version = "2.0.0-rc.1"
+source = "git+https://github.com/redis-rs/redis-rs.git?branch=2.0.x#91f97c836be01396dfdd1150616d59a75bf7c5ac"
 dependencies = [
  "arc-swap",
  "arcstr",
@@ -2452,7 +2452,11 @@ dependencies = [
 name = "shared"
 version = "0.1.0"
 dependencies = [
+ "base64 0.23.1",
+ "chacha20",
  "config",
+ "hex",
+ "rand 0.10.2",
  "serde",
  "tracing",
  "tracing-subscriber",

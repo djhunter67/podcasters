@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-pub struct EpisodeSummary {
+pub struct _EpisodeSummary {
     pub id: EpisodeId,
     pub podcast_id: PodcastId,
     pub title: String,
@@ -17,7 +17,7 @@ pub struct DateTime<T>
 where
     T: Sized,
 {
-    item: T,
+    _item: T,
 }
 
 pub enum Utc {}

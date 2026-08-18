@@ -1,12 +1,6 @@
 //! Initialize and return a connection to the ``MongoDb`` database.
 
-use mongodb::{
-    IndexModel,
-    bson::{DateTime as BsonDateTime, doc, oid::ObjectId},
-    options::IndexOptions,
-};
-use serde::{Deserialize, Serialize};
-use tracing::{info, instrument};
+use tracing::instrument;
 
 use crate::settings;
 
@@ -24,7 +18,7 @@ use crate::settings;
 /// # Panics
 ///  - If the connection application settings are unavaible
 pub async fn establish_connection(manager: &mongodb::Client) -> anyhow::Result<mongodb::Database> {
-    info!("Get mongo connection pool");
+    tracing::info!("Get mongo connection pool");
     let settings = settings::get().expect("Application settings are unavailable");
     Ok(manager.database(&settings.mongo.db))
 }

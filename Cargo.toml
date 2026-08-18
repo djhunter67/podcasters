@@ -21,3 +21,28 @@ strip = "symbols"  # equivalent to strip = true
 rpath = false  
 debug-assertions = false
 debug = false
+
+[workspace.lints.clippy]
+pedantic = { level = "deny", priority = 1 }
+wildcard_imports = "deny"
+must_use_candidate = "warn"
+enum_glob_use = "deny"
+nursery = { level = "deny", priority = 1 }
+unwrap_used = "deny"
+
+[profile.dev]
+overflow-checks = true
+opt-level = 0
+strip = "none"
+codegen-units = 256
+lto = "off"
+panic = "unwind"
+incremental = true
+debug = "line-tables-only"
+debug-assertions = false
+
+[profile.dev.build-override]
+opt-level = 0
+codegen-units = 256
+debug = false
+

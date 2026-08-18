@@ -13,17 +13,17 @@ pub mod indexes;
 pub mod mongo_conf;
 pub mod redis_conf;
 
-struct Users {}
-struct AuthSession {}
-struct Devices {}
-struct Podcasts {}
-struct Episodes {}
-struct Subscriptions {}
-enum PlaybackStates {}
-struct PlayList {}
-struct Bookmarks {}
-struct BillingCustomers {}
-struct Entitlements {}
+struct _Users {}
+struct _AuthSession {}
+struct _Devices {}
+struct _Podcasts {}
+struct _Episodes {}
+struct _Subscriptions {}
+enum _PlaybackStates {}
+struct _PlayList {}
+struct _Bookmarks {}
+struct _BillingCustomers {}
+struct _Entitlements {}
 
 /// # Errors
 ///

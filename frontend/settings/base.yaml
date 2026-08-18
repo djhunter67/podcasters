@@ -1,5 +1,5 @@
 application:
-  port: 8123
+  port: 3000
 
 mongo:
  uri: ""
@@ -17,9 +17,3 @@ redis:
   pool_max_idle: 8
   pool_timeout_seconds: 1
   pool_expire_seconds: 60
-
-sqlite:
-  path: "senzor.db"
-  schema: "static/schema.sql"
-  pool_size: 1
-  connection_timeout: 1
