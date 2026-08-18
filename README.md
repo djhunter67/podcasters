@@ -145,7 +145,7 @@ This application Will feature Podcasting 2.0 support.
 - But I would not create that binary yet.
 - Build it when Phase 2 proves the data model.
 
-#### Podcasting 2.0
+### Podcasting 2.0
 - This will be first-class from the beginning.
 - Podcasting 2.0 currently defines namespace functionality such as chapters, transcripts, people, soundbites, live items, and other extensions.
 - Our podcasting crate should therefore model:
@@ -155,7 +155,7 @@ This application Will feature Podcasting 2.0 support.
 - Important rule: never throw away metadata merely because our UI doesn't support it yet.
 - That gives us forward compatibility.
 
-#### Audio Subsystem
+### Audio Subsystem
 - Audio processing stays on-device first.
 - audio should define something conceptually similar to:
   - AudioProcessor
@@ -169,7 +169,7 @@ This application Will feature Podcasting 2.0 support.
    - Browser/WASM adapter.
 - Backend processing remains our fallback, not the primary design.
 
-#### Playback synchronization
+### Playback synchronization
 - Every playing episode gets a persisted state containing approximately:
   - User ID.
   - Episode ID.
@@ -189,7 +189,7 @@ This application Will feature Podcasting 2.0 support.
   - Periodic interval.
   - Application exit where possible.
   
-#### Conflict Resolution
+### Conflict Resolution
 - User listens on phone.
 - Then opens web.
 - Both may contain playback updates.
@@ -201,7 +201,7 @@ This application Will feature Podcasting 2.0 support.
   - Most recent valid state wins.
 - Later we can improve that for offline playback.
 
-#### Authentication architecture
+### Authentication architecture
 - Keep the existing self-rolled authentication system.
 - Refactor it behind an authentication service rather than replacing it.
 - Target authentication roadmap:
@@ -221,7 +221,7 @@ This application Will feature Podcasting 2.0 support.
   - “What may you do?”
 
 
-#### Session and devices
+### Session and devices
 - Each login should eventually become an identifiable session.
 - User should be able to see:
   - Arch Linux -- Chrome
@@ -230,7 +230,7 @@ This application Will feature Podcasting 2.0 support.
 - And revoke individual sessions.
 - That becomes especially important for a synchronized podcast application.
 
-#### Billing architecture
+### Billing architecture
 - First release
   - Billing may exist architecturally
   - Premium gates may contain zero production features
@@ -246,7 +246,7 @@ This application Will feature Podcasting 2.0 support.
   - Cloud generated summaries or transcripts
 - We can decide that from actual cost and user behavior rather than guessing now.
 
-#### Billing abstraction
+### Billing abstraction
 - `billing` should normalize providers into our own states.
 - Providers:
   - Stripe
