@@ -262,3 +262,305 @@ This application Will feature Podcasting 2.0 support.
 - It should ask:
   - "Does user X have entitlement Y?"
   
+### Search 
+- Initial search:
+  - External podcast discovery API
+  - Database metadata
+  - Cache Layer
+- Later:
+  - Dedicate full-text search engine if required
+- Do not introduce Elasticserach/OpenSearch/Meilisearch on day one.
+- We should first establish
+  - Actual podcast count
+  - Actual query volume
+  - Search quality requirements
+  
+  
+
+### AI
+- AI should not be added simply so the application can advert 'AI.'
+- Good future candidates
+  - Episode summaries
+  - Transcript semantic search
+  - "Where did they discuss Rust?"
+  - Chapter suggestions
+  - Topic extractions
+  - Podcast Recommendations
+  - Question answering over an episode
+- The multi-GPU Arch workstation could eventually become useful as a development/inference environment, but production architecture should not require that machine.
+- AI should sit behind an abstraction such as:
+  - `AiProvider`
+  - `TranscriptionProvider`
+  - `EmbeddingProvider`
+- That lets us run:
+  - Local models
+  - Hosted models
+  - GPU workers
+  
+### Open-source architecture
+- Repository
+  - Application source
+  - Tests
+  - Infrastructure templates
+  - Database migration/index configuration
+  - Example configuration
+- Never commit:
+  - Database production URI
+  - Cache layer credentials
+  - Stripe Keys
+  - JWT/private signing keys
+  - Apple signing credentials
+  - OAuth secrets
+  - API secrets
+- Provide:
+  - `.env.example`
+- Never:
+  - `.env`
+
+### Application configuration
+- Sections:
+  - Server.
+  - MongoDB.
+  - Redis.
+  - Authentication.
+  - Billing.
+  - External podcast index.
+  - Email.
+  - AI.
+  - Logging.
+- Validate configuration during startup.
+- Fail immediately when required production configuration is missing.
+
+### Observability
+- Standardize on Rust `tracing`
+- Every request gets:
+  - Request ID.
+  - Structured logs.
+  - Duration.
+  - Status.
+- Eventually collect:
+  - Request latency.
+  - API error rates.
+  - Feed refresh failures.
+  - Cache hit rate.
+  - MongoDB latency.
+  - Worker queue depth.
+  - Playback sync failures.
+  - Authentication failures.
+  
+### Testing
+- Unit tests
+  - Domain logic.
+  - Feed parsing.
+  - Podcasting 2.0.
+  - Authentication.
+  - Billing state.
+  - Playback reconciliation.
+- Integration tests
+  - Actix endpoints.
+  - MongoDB repositories.
+  - Redis cache.
+  - Auth middleware.
+- Feed fixtures
+  - These will become extremely important.
+  - Maintain real-world sanitized RSS samples demonstrating:
+	- Basic RSS.
+	- Malformed RSS.
+	- Podcasting 2.0.
+	- Chapters.
+	- Transcripts.
+	- Soundbites.
+	- Redirects.
+	- Missing GUIDs.
+- Actix provides application testing helpers specifically for testing handlers, extractors, middleware, and applications.
+### CI/CD
+- Every pull request:
+  - cargo fmt --check
+  - cargo clippy
+  - cargo test --workspace
+  - Build backend.
+  - Build frontend.
+  - Dependency/security audit.
+  - WASM frontend build.
+- Main branch:
+  - Build deployment artifact/container.
+  - Integration tests.
+  - Deploy staging.
+  - Production deployment after defined promotion.
+- Android/iOS pipelines come later.
+
+## Short-term engineering goals - Milestone 0
+- Architecture foundation
+  - Finalize workspace.
+  - Introduce shared.
+  - Introduce podcasting.
+  - Introduce audio.
+  - Configure workspace dependencies.
+  - Establish coding conventions.
+  - Establish CI.
+- Definition of done
+  - cargo test --workspace works from repository root.
+  - Every crate builds.
+  - CI is green.
+
+### Milestone 1 - Backend foundation
+- Complete:
+  - Actix application state.
+  - Mongo connection.
+  - Redis connection.
+  - Error model.
+  - API version routing.
+  - Authentication integration.
+  - Health endpoint.
+- First useful endpoint:
+  - `GET /api/v1/health`
+- Then:
+  - `/auth`
+  - `/me`
+  
+### Milestone 2 - Podcast data
+- Implement:
+  - Podcast model.
+  - Episode model.
+  - Feed parser abstraction.
+  - RSS retrieval.
+  - Podcasting 2.0 parsing.
+  - Mongo persistence.
+- Goal:
+  - Given a feed URL, Podcasters can ingest it and return normalized podcast + episode JSON.
+
+### Milestone 3 - Web frontend
+- Build:
+  - Shell/navigation.
+  - Authentication.
+  - Podcast page.
+  - Episode list.
+  - Library.
+  - Basic search.
+  - Audio player.
+
+### Milestone 4 - First usable Podcasters release
+- User can:
+  - Register/login.
+  - Search.
+  - Subscribe.
+  - View library.
+  - View podcast.
+  - Play episode.
+  - Change playback speed.
+  - Resume episode.
+  - Unsubscribe.
+- At this milestone, it is officially a podcast application instead of an architecture project.
+
+### Milestone 5 - Podcasting 2.0
+- Add UI for:
+  - Chapters.
+  - Transcripts.
+  - People.
+  - Soundbites.
+- Then:
+  - Additional namespace tags incrementally.
+  
+### Milestone 6 - Android
+- Create Tauri Android application.
+- Reuse Leptos UI.
+- Login.
+- Library.
+- Playback.
+- Download.
+- Background playback.
+- Device media controls.
+- Sync.
+- Tauri's current mobile development workflow supports Android-specific dev commands and Android Studio integration when native troubleshooting is required.
+
+### Milestone 7 - iOS
+- Move same application to the MacBook.
+- Generate/maintain Tauri iOS project.
+- Build in Xcode.
+- Implement iOS audio adapter.
+- Background playback.
+- Media controls.
+- Downloads.
+- TestFlight.
+- App Store.
+
+## Long-term
+- Year-one direction
+  - Excellent podcast playback.
+  - Reliable synchronization.
+  - Podcasting 2.0 leadership.
+  - Android/iOS parity.
+  - Strong search.
+  - Large normalized podcast catalog.
+  - Production observability.
+  - Billing ready.
+  - Email/passkey/2FA authentication.
+- Longer term
+  - Own crawler.
+  - Independent podcast index.
+  - Advanced discovery.
+  - Offline-first synchronization.
+  - AI transcript search.
+  - AI summaries.
+  - Native CarPlay.
+  - Android Auto.
+  - Desktop Tauri builds if demand exists.
+  - Creator-facing functionality if strategically justified.
+  
+## Engineering backlog epics
+- EPIC-001: Workspace foundation
+- EPIC-002: Authentication modernization
+- EPIC-003: Podcast feed ingestion
+- EPIC-004: Podcasting 2.0
+- EPIC-005: Podcast catalog
+- EPIC-006: Search and discovery
+- EPIC-007: User library
+- EPIC-008: Playback engine
+- EPIC-009: Playback synchronization
+- EPIC-010: Leptos web client
+- EPIC-011: Audio normalization
+- EPIC-012: Smart playback speed
+- EPIC-013: Billing
+- EPIC-014: Android
+- EPIC-015: iOS
+- EPIC-016: Notifications
+- EPIC-017: Observability
+- EPIC-018: Podcast crawler
+- EPIC-019: AI platform
+
+## Technical-debt rules
+- No unwrap() in normal production request paths unless an invariant makes failure impossible and it is documented.
+- No Mongo queries directly from Actix handlers.
+- No business logic in templates/components.
+- No billing-provider-specific logic outside billing.
+- No JavaScript added simply because a tutorial uses JavaScript.
+- No new infrastructure service without an identified requirement.
+- No microservice extraction simply because a module becomes large.
+- No platform-specific fork of shared business logic unless unavoidable.
+- No secrets in Git.
+- No breaking API modification after clients depend on an endpoint without API-version consideration.
+
+## Immediate implementation order
+- The recommended  next engineering work be exactly this order:
+  - Clean up the root workspace Cargo.toml.
+  - Establish `shared`.
+  - Establish `podcasting`.
+  - Establish backend module layout.
+  - Define the first Database podcast/episode models.
+  - Define `/api/v1`.
+  - Implement podcast feed ingestion.
+  - Implement Podcasting 2.0 normalization.
+  - Establish the Leptos frontend.
+  - Connect Leptos to the Actix API.
+  - Produce the first usable podcast page.
+  - Produce the first working player.
+  - Then build the Android shell.
+  - Then iOS.
+- One decision that should be deliberately postponed is the exact premium feature set.
+  - You currently don't have a feature you believe deserves a paywall.
+  - That's useful information.
+  - We will make `billing` and entitlements structurally correct now, but we will not degrade the free product merely to manufacture a premium tier.
+  - Once we see which features create genuine ongoing cost or unusually high value, we can make that decision from evidence.
+- The next concrete engineering task recommended is the Cargo workspace itself.
+  - We should take your current root `Cargo.toml`, `backend`, `frontend`, `models`, and `billing` crates and turn the architecture above into the actual initial workspace structure.
+  - From there, the first implementation target should be: feed URL → Rust parser → normalized - `Podcast`/`Episode` → Database → `/api/v1/podcasts/{id}`. That gives every subsequent frontend and mobile task a real foundation.
