@@ -6,3 +6,14 @@ members = ["audio",
 , "podcasting", "shared"]
 resolver = "3"
 
+
+[[workspace.metadata.leptos]]
+name = "podcasters"
+bin-package = "backend"
+lib-package = "frontend"
+site-root = "target/site"
+site-pkg-dir = "pkg"
+site-addr = "127.0.0.1:3000"
+reload-port = 3001
+bin-features = ["ssr"]
+lib-features = ["hydrate"]

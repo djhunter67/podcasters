@@ -3,4 +3,25 @@ name = "frontend"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
+leptos = {version = "0.8", default-features = false }
+leptos_meta = { version = "0.8", default-features = false }
+leptos_router = { version = "0.8", default-features = false }
+wasm-bindgen = "0.2.127"
+
+[features]
+hydrate = [
+ "leptos/hydrate",
+ "leptos_meta/hydrate",
+ "leptos_router/hydrate"
+]
+
+ssr = [
+ "leptos/ssr",
+ "leptos_meta/ssr",
+ "leptos_router/ssr"
+]
+

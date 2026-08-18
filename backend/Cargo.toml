@@ -5,6 +5,11 @@ edition = "2024"
 
 [dependencies]
 actix-web = "4.14.1"
+leptos = { version = "0.8", default-features = false }
+leptos_actix = { version = "0.8", optional = true }
+leptos_meta = { version = "0.8", default-features = false }
+leptos_router = { version = "0.8", default-features = false }
+frontend = { path = "../frontend" }
 mongodb = "3.8.0"
 rand = "0.10.2"
 redis = { version = "1.6.0", features = ["aio", "connection-manager", "tokio-comp"] }
@@ -20,3 +25,13 @@ base64 = "0.23.1"
 chacha20 = "0.10.1"
 hex = "0.4.3"
 dotenvy = "0.15.7"
+
+[features]
+ssr = [
+  "dep:actix-files",
+  "dep:leptos_actix",
+  "leptos/ssr",
+  "leptos_meta/ssr",
+  "leptos_router/ssr",
+  "front/ssr",
+]

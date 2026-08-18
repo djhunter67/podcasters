@@ -84,6 +84,12 @@ async fn run(
             .wrap(middleware::DefaultHeaders::new().add(("X-Version", env!("CARGO_PKG_VERSION")))) // Security consideration
             .app_data(db_redis.clone())
             .app_data(db_mongo.clone())
+            .service(leptos_actix::handle_server_fns())
+            .leptos_routes(&conf.leptos_options, routes, frontend::App)
+            .service(leptos::Files::new(
+                "/pkg",
+                &conf.leptos_options.site_pkg_dir,
+            ))
         // .service(
         //     web::scope("/static")
         //         .service(images::favicon)
