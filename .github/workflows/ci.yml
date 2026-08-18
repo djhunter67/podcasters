@@ -76,7 +76,7 @@ jobs:
       - name: Show Rust versions
         run: |
           rustc --version
-	  cargo --version
+          cargo --version
           cargo clippy --version
           rustup show active-toolchain
           rustup component list --installed
