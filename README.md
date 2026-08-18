@@ -389,7 +389,8 @@ This application Will feature Podcasting 2.0 support.
   - Production deployment after defined promotion.
 - Android/iOS pipelines come later.
 
-## Short-term engineering goals - Milestone 0
+## Short-term engineering goals 
+### Milestone 0
 - Architecture foundation
   - Finalize workspace.
   - Introduce shared.
