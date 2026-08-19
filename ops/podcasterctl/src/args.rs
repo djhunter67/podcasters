@@ -35,11 +35,13 @@ pub struct Podcasterctl {
     /// ✓ API health
     /// ✓ frontend health
     #[clap(subcommand)]
-    pub doctor: PodcasterctlCommands,
+    pub commands: PodcasterctlCommands,
 }
 
 #[derive(Debug, Subcommand)]
 pub enum PodcasterctlCommands {
+    /// Start and stop as necessary to diagnose
+    Doctor,
     /// Project State
     Dev(ProjectState),
 
@@ -69,7 +71,7 @@ pub enum PodcasterctlCommands {
 pub struct ProjectState {
     /// ``podcastersctl dev up``
     #[clap(subcommand)]
-    state: StateSubcommand,
+    pub state: StateSubcommand,
 }
 
 #[derive(Debug, Subcommand)]
