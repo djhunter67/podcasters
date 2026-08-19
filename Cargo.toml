@@ -5,7 +5,7 @@ members = [
 	"billing",
 	"frontend",
 	"models",
-	"ops/podcasterctl",
+	"ops/podcastersctl",
 	"podcasting",
 	"shared"
 	]

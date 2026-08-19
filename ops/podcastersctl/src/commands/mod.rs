@@ -1,6 +1,8 @@
 use clap::{Parser, Subcommand};
 
-use crate::{backup, ci, config, deploy, diagnostics, kubernetes, mongo, redis, smoke, version};
+use crate::{
+    backup, ci, config, deploy, diagnostics, incident, kubernetes, mongo, redis, smoke, version,
+};
 
 #[derive(Debug, Parser)]
 #[clap(author, version, about)]
@@ -78,5 +80,5 @@ pub enum PodcasterctlCommands {
     Version(version::VerState),
 
     /// Produce a report of the current ``Production Assessment``
-    Incident,
+    Incident(incident::IncidentState),
 }

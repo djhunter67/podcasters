@@ -9,9 +9,9 @@ pub struct RedisState {
 
 #[derive(Debug, Subcommand)]
 pub enum RedisSubcommand {
-    /// # Presents information regarding the cache layer:
+    /// Presents information regarding the cache layer
     Check,
-    /// Get the Redis status
+    /// Cache layer uptime, key count, memory, hit rate, and server version.
     Status,
     /// Shows the output of ```redis-cli KEYS \*``` for the session provided
     Keys(Session),

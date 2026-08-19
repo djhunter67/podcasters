@@ -4,19 +4,21 @@ mod commands;
 mod config;
 mod deploy;
 mod diagnostics;
+mod incident;
 mod kubernetes;
 mod mongo;
 mod redis;
 mod smoke;
 mod version;
 
-use backup::BackupSubcommand;
+use backup::{BackupSubcommand, Creator};
 use ci::CiSubcommand;
 use clap::Parser;
 use commands::{Podcasterctl, PodcasterctlCommands};
 use config::ConfigSubcommand;
 use deploy::DeploySubcommand;
 use diagnostics::{DevSubcommand, DiagSubcommand};
+use incident::IncidentSubcommand;
 use kubernetes::KubSubcommand;
 use mongo::MongoSubcommand;
 use redis::{RedisIntegration, RedisSession, RedisSubcommand};
@@ -132,11 +134,25 @@ fn main() {
             KubSubcommand::Events => {
                 println!("Get the latest events of the cluster");
             }
+            KubSubcommand::Inspect(val) => {
+                println!("The val passed in: {}", val.inspect);
+            }
         },
         PodcasterctlCommands::Backup(backup) => match backup.backup {
-            BackupSubcommand::Create => {
-                println!("Tar the entire project and compress at the maximum compression");
-            }
+            BackupSubcommand::Create(to_create) => match to_create.create {
+                Creator::Mongodb => {
+                    println!("Create the backup of the database");
+                }
+                Creator::Redis => {
+                    println!("Creating the backup of the cache layer");
+                }
+                Creator::Configuration => {
+                    println!("Creating the backup of the application configuration");
+                }
+                Creator::All => {
+                    println!("Backup and compress the database, cache layer and the configuration");
+                }
+            },
             BackupSubcommand::Verify => {
                 println!("Copy and then uncompress, untar, and validate that the project builds and passes all test");
             }
@@ -157,8 +173,19 @@ fn main() {
                 }
             }
         }
-        PodcasterctlCommands::Incident => {
-            println!("Parse the log for an ERROR or a PANIC and create a parseable report.");
-        }
+        PodcasterctlCommands::Incident(incident) => match incident.incident {
+            IncidentSubcommand::Asess => {
+                println!("Asses the incident");
+            }
+            IncidentSubcommand::Collect => {
+                println!("Collect the error report");
+            }
+            IncidentSubcommand::Compare => {
+                println!("Compare the latest `incident` report w/ the report just prior");
+            }
+            IncidentSubcommand::Timeline => {
+                println!("Prepare and show the timeline of `incident` reports");
+            }
+        },
     }
 }

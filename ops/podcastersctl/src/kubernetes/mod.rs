@@ -16,4 +16,11 @@ pub enum KubSubcommand {
     Nodes,
     /// Get the events of the cluster
     Events,
+    /// Inspection of the command passed in
+    Inspect(Inspector),
+}
+
+#[derive(Debug, Args)]
+pub struct Inspector {
+    pub inspect: String,
 }
