@@ -390,7 +390,7 @@ This application Will feature Podcasting 2.0 support.
 - Android/iOS pipelines come later.
 
 ## Short-term engineering goals 
-### Milestone 0
+### [ ] Milestone 0
 - Architecture foundation
   - Finalize workspace.
   - Introduce shared.
@@ -404,7 +404,7 @@ This application Will feature Podcasting 2.0 support.
   - Every crate builds.
   - CI is green.
 
-### Milestone 1 - Backend foundation
+### [ ] Milestone 1 - Backend foundation
 - Complete:
   - Actix application state.
   - Mongo connection.
@@ -419,7 +419,7 @@ This application Will feature Podcasting 2.0 support.
   - `/auth`
   - `/me`
   
-### Milestone 2 - Podcast data
+### [ ] Milestone] 2 - Podcast data
 - Implement:
   - Podcast model.
   - Episode model.
@@ -430,7 +430,7 @@ This application Will feature Podcasting 2.0 support.
 - Goal:
   - Given a feed URL, Podcasters can ingest it and return normalized podcast + episode JSON.
 
-### Milestone 3 - Web frontend
+### [ ] Milestone] 3 - Web frontend
 - Build:
   - Shell/navigation.
   - Authentication.
@@ -440,7 +440,7 @@ This application Will feature Podcasting 2.0 support.
   - Basic search.
   - Audio player.
 
-### Milestone 4 - First usable Podcasters release
+### [ ] Milestone] 4 - First usable Podcasters release
 - User can:
   - Register/login.
   - Search.
@@ -453,7 +453,7 @@ This application Will feature Podcasting 2.0 support.
   - Unsubscribe.
 - At this milestone, it is officially a podcast application instead of an architecture project.
 
-### Milestone 5 - Podcasting 2.0
+### [ ] Milestone] 5 - Podcasting 2.0
 - Add UI for:
   - Chapters.
   - Transcripts.
@@ -462,7 +462,7 @@ This application Will feature Podcasting 2.0 support.
 - Then:
   - Additional namespace tags incrementally.
   
-### Milestone 6 - Android
+### [ ] Milestone] 6 - Android
 - Create Tauri Android application.
 - Login.
 - Library.
@@ -473,7 +473,7 @@ This application Will feature Podcasting 2.0 support.
 - Sync.
 - Tauri's current mobile development workflow supports Android-specific dev commands and Android Studio integration when native troubleshooting is required.
 
-### Milestone 7 - iOS
+### [ ] Milestone] 7 - iOS
 - Move same application to the MacBook.
 - Generate/maintain Tauri iOS project.
 - Build in Xcode.
