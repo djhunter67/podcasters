@@ -392,20 +392,20 @@ This application Will feature Podcasting 2.0 support.
 ## Short-term engineering goals 
 ### Milestone 0
 - Architecture foundation
-- [ ] Finalize workspace.
-- [ ] Introduce shared.
-- [ ] Introduce podcasting.
-- [ ] Introduce audio.
-- [ ] Configure workspace dependencies.
-- [ ] Establish coding conventions.
-- [ ] Establish CI.
+- [X] Finalize workspace.
+- [X] Introduce shared.
+- [X] Introduce podcasting.
+- [X] Introduce audio.
+- [X] Configure workspace dependencies.
+- [X] Establish coding conventions.
+- [X] Establish CI.
 - Definition of done
   - cargo test --workspace works from repository root.
   - Every crate builds.
   - CI is green.
   
 ### Milestone 0.5 - Engineering Platform Foundation
-- [ ] Create ops/podcastersctl crate
+- [X] Create ops/podcastersctl crate
 - [ ] Implement doctor
 - [ ] Implement config validate
 - [ ] Implement Mongo health check
@@ -418,17 +418,17 @@ This application Will feature Podcasting 2.0 support.
 ### Milestone 1 - Backend foundation
 - Complete:
   - [ ] Actix application state.
-  - [ ] Mongo connection.
-  - [ ] Redis connection.
+  - [X] Mongo connection.
+  - [X] Redis connection.
   - [ ] Error model.
   - [ ] API version routing.
   - [ ] Authentication integration.
-  - [ ] Health endpoint.
+  - [X] Health endpoint.
 - First useful endpoint:
-  - `GET /api/v1/health`
+  - [x] `GET /api/v1/health`
 - Then:
-  - `/auth`
-  - `/me`
+  - [ ] `/auth`
+  - [ ] `/me`
   
 ### Milestone 2 - Podcast data
 - Implement:
