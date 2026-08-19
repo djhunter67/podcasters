@@ -49,7 +49,7 @@ jobs:
           --health-start-period 10s
 
       redis:
-        image: redis:8
+        image: redis:latest
         ports:
           - 6379:6379
         options: >-

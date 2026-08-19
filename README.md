@@ -392,27 +392,38 @@ This application Will feature Podcasting 2.0 support.
 ## Short-term engineering goals 
 ### Milestone 0
 - Architecture foundation
-[ ] - Finalize workspace.
-[ ] - Introduce shared.
-[ ] - Introduce podcasting.
-[ ] - Introduce audio.
-[ ] - Configure workspace dependencies.
-[ ] - Establish coding conventions.
-[ ] - Establish CI.
+- [ ] Finalize workspace.
+- [ ] Introduce shared.
+- [ ] Introduce podcasting.
+- [ ] Introduce audio.
+- [ ] Configure workspace dependencies.
+- [ ] Establish coding conventions.
+- [ ] Establish CI.
 - Definition of done
   - cargo test --workspace works from repository root.
   - Every crate builds.
   - CI is green.
+  
+### Milestone 0.5 - Engineering Platform Foundation
+- [ ] Create ops/podcastersctl crate
+- [ ] Implement doctor
+- [ ] Implement config validate
+- [ ] Implement Mongo health check
+- [ ] Implement Redis health check
+- [ ] Implement build/version metadata
+- [ ] Have CI execute podcastersctl doctor
+- [ ] Establish tracing field conventions
+- [ ] Establish OpenTelemetry boundary
 
 ### Milestone 1 - Backend foundation
 - Complete:
-  - Actix application state.
-  - Mongo connection.
-  - Redis connection.
-  - Error model.
-  - API version routing.
-  - Authentication integration.
-  - Health endpoint.
+  - [ ] Actix application state.
+  - [ ] Mongo connection.
+  - [ ] Redis connection.
+  - [ ] Error model.
+  - [ ] API version routing.
+  - [ ] Authentication integration.
+  - [ ] Health endpoint.
 - First useful endpoint:
   - `GET /api/v1/health`
 - Then:
@@ -421,91 +432,92 @@ This application Will feature Podcasting 2.0 support.
   
 ### Milestone 2 - Podcast data
 - Implement:
-  - Podcast model.
-  - Episode model.
-  - Feed parser abstraction.
-  - RSS retrieval.
-  - Podcasting 2.0 parsing.
-  - Mongo persistence.
+  - [ ] Podcast model.
+  - [ ] Episode model.
+  - [ ] Feed parser abstraction.
+  - [ ] RSS retrieval.
+  - [ ] Podcasting 2.0 parsing.
+  - [ ] Mongo persistence.
 - Goal:
   - Given a feed URL, Podcasters can ingest it and return normalized podcast + episode JSON.
 
 ### Milestone 3 - Web frontend
 - Build:
-  - Shell/navigation.
-  - Authentication.
-  - Podcast page.
-  - Episode list.
-  - Library.
-  - Basic search.
-  - Audio player.
-
+  - [ ] Shell/navigation.
+  - [ ] Authentication.
+  - [ ] Podcast page.
+  - [ ] Episode list.
+  - [ ] Library.
+  - [ ] Basic search.
+  - [ ] Audio player.
+  
 ### Milestone 4 - First usable Podcasters release
 - User can:
-  - Register/login.
-  - Search.
-  - Subscribe.
-  - View library.
-  - View podcast.
-  - Play episode.
-  - Change playback speed.
-  - Resume episode.
-  - Unsubscribe.
+  - [ ] Register/login.
+  - [ ] Search.
+  - [ ] Subscribe.
+  - [ ] View library.
+  - [ ] View podcast.
+  - [ ] Play episode.
+  - [ ] Change playback speed.
+  - [ ] Resume episode.
+  - [ ] Unsubscribe.
 - At this milestone, it is officially a podcast application instead of an architecture project.
 
 ### Milestone 5 - Podcasting 2.0
 - Add UI for:
-  - Chapters.
-  - Transcripts.
-  - People.
-  - Soundbites.
+  - [ ] Chapters.
+  - [ ] Transcripts.
+  - [ ] People.
+  - [ ] Soundbites.
 - Then:
-  - Additional namespace tags incrementally.
+  - [ ] Additional namespace tags incrementally.
   
 ### Milestone 6 - Android
-- Create Tauri Android application.
-- Login.
-- Library.
-- Playback.
-- Download.
-- Background playback.
-- Device media controls.
-- Sync.
+- [ ] Create Tauri Android application.
+- [ ] Login.
+- [ ] Library.
+- [ ] Playback.
+- [ ] Download.
+- [ ] Background playback.
+- [ ] Device media controls.
+- [ ] Sync.
 - Tauri's current mobile development workflow supports Android-specific dev commands and Android Studio integration when native troubleshooting is required.
 
 ### Milestone 7 - iOS
-- Move same application to the MacBook.
-- Generate/maintain Tauri iOS project.
-- Build in Xcode.
-- Implement iOS audio adapter.
-- Background playback.
-- Media controls.
-- Downloads.
-- TestFlight.
-- App Store.
+- [ ] Move same application to the MacBook.
+- [ ] Generate/maintain Tauri iOS project.
+- [ ] Build in Xcode.
+- [ ] Implement iOS audio adapter.
+- [ ] Background playback.
+- [ ] Media controls.
+- [ ] Downloads.
+- [ ] TestFlight.
+- [ ] App Store.
 
 ## Long-term
 - Year-one direction
-  - Excellent podcast playback.
-  - Reliable synchronization.
-  - Podcasting 2.0 leadership.
-  - Android/iOS parity.
-  - Strong search.
-  - Large normalized podcast catalog.
-  - Production observability.
-  - Billing ready.
-  - Email/passkey/2FA authentication.
+  - [ ] podcasterctl command line Dev-ops tool
+  - [ ] Excellent podcast playback.
+  - [ ] Reliable synchronization.
+  - [ ] Podcasting 2.0 leadership.
+  - [ ] Android/iOS parity.
+  - [ ] Strong search.
+  - [ ] Large normalized podcast catalog.
+  - [ ] Production observability.
+  - [ ] Billing ready.
+  - [ ] Email/passkey/2FA authentication.
 - Longer term
-  - Own crawler.
-  - Independent podcast index.
-  - Advanced discovery.
-  - Offline-first synchronization.
-  - AI transcript search.
-  - AI summaries.
-  - Native CarPlay.
-  - Android Auto.
-  - Desktop Tauri builds if demand exists.
-  - Creator-facing functionality if strategically justified.
+  - [ ] Own crawler.
+  - [ ] Independent podcast index.
+  - [ ] Advanced discovery.
+  - [ ] Offline-first synchronization.
+  - [ ] AI transcript search.
+  - [ ] AI summaries.
+  - [ ] Native CarPlay.
+  - [ ] Android Auto.
+  - [ ] Desktop Tauri builds if demand exists.
+  - [ ] Creator-facing functionality if strategically justified.
   
 ## Engineering backlog epics
 - EPIC-001: Workspace foundation
@@ -540,27 +552,3 @@ This application Will feature Podcasting 2.0 support.
 - No secrets in Git.
 - No breaking API modification after clients depend on an endpoint without API-version consideration.
 
-## Immediate implementation order
-- The recommended  next engineering work be exactly this order:
-  - Clean up the root workspace Cargo.toml.
-  - Establish `shared`.
-  - Establish `podcasting`.
-  - Establish backend module layout.
-  - Define the first Database podcast/episode models.
-  - Define `/api/v1`.
-  - Implement podcast feed ingestion.
-  - Implement Podcasting 2.0 normalization.
-  - Establish the HTMX frontend.
-  - Connect Askama to the Actix API.
-  - Produce the first usable podcast page.
-  - Produce the first working player.
-  - Then build the Android shell.
-  - Then iOS.
-- One decision that should be deliberately postponed is the exact premium feature set.
-  - You currently don't have a feature you believe deserves a paywall.
-  - That's useful information.
-  - We will make `billing` and entitlements structurally correct now, but we will not degrade the free product merely to manufacture a premium tier.
-  - Once we see which features create genuine ongoing cost or unusually high value, we can make that decision from evidence.
-- The next concrete engineering task recommended is the Cargo workspace itself.
-  - We should take your current root `Cargo.toml`, `backend`, `frontend`, `models`, and `billing` crates and turn the architecture above into the actual initial workspace structure.
-  - From there, the first implementation target should be: feed URL → Rust parser → normalized - `Podcast`/`Episode` → Database → `/api/v1/podcasts/{id}`. That gives every subsequent frontend and mobile task a real foundation.
