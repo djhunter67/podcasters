@@ -14,7 +14,7 @@ mod version;
 use backup::{BackupSubcommand, Creator};
 use ci::CiSubcommand;
 use clap::Parser;
-use commands::{Podcasterctl, PodcasterctlCommands};
+use commands::{Podcastersctl, PodcastersctlCommands};
 use config::ConfigSubcommand;
 use deploy::DeploySubcommand;
 use diagnostics::{DevSubcommand, DiagSubcommand};
@@ -26,13 +26,13 @@ use smoke::{SmokeSubcommand, Staging};
 use version::VerSubcommand;
 
 fn main() {
-    let args = Podcasterctl::parse();
+    let args = Podcastersctl::parse();
 
     match args.commands {
-        PodcasterctlCommands::Doctor => {
+        PodcastersctlCommands::Doctor => {
             println!("Doctor called");
         }
-        PodcasterctlCommands::Dev(cmd) => {
+        PodcastersctlCommands::Dev(cmd) => {
             // println!("The DOWN command called: {cmd:#?}");
             match cmd.dev {
                 DevSubcommand::Up => {
@@ -49,7 +49,7 @@ fn main() {
                 }
             }
         }
-        PodcasterctlCommands::Mongo(mongo_arg) => match mongo_arg.mongo {
+        PodcastersctlCommands::Mongo(mongo_arg) => match mongo_arg.mongo {
             MongoSubcommand::Check => {
                 println!("Compare the live database w/ the application desired state");
             }
@@ -60,7 +60,7 @@ fn main() {
                 println!("Create whats missing in the live instance of the Database");
             }
         },
-        PodcasterctlCommands::Redis(redis_arg) => match redis_arg.redis {
+        PodcastersctlCommands::Redis(redis_arg) => match redis_arg.redis {
             RedisSubcommand::Check => {
                 println!("Compare the keys in the cache with the expected values");
             }
@@ -78,7 +78,7 @@ fn main() {
                 }
             },
         },
-        PodcasterctlCommands::Ci(ci) => {
+        PodcastersctlCommands::Ci(ci) => {
             println!("The Continuous Integration command called");
             match ci.ci {
                 CiSubcommand::Verify => {
@@ -89,7 +89,7 @@ fn main() {
                 }
             }
         }
-        PodcasterctlCommands::Config(config) => match config.config {
+        PodcastersctlCommands::Config(config) => match config.config {
             ConfigSubcommand::Validate => {
                 println!("Validating the project configuration");
             }
@@ -97,7 +97,7 @@ fn main() {
                 println!("Showing the configuration for the project");
             }
         },
-        PodcasterctlCommands::Smoke(smoke) => match smoke.smoke {
+        PodcastersctlCommands::Smoke(smoke) => match smoke.smoke {
             SmokeSubcommand::Environment(environ) => match environ.staging {
                 Staging::Debug => {
                     println!("Debug environment chosen");
@@ -107,7 +107,7 @@ fn main() {
                 }
             },
         },
-        PodcasterctlCommands::Deploy(deploy) => match deploy.deploy {
+        PodcastersctlCommands::Deploy(deploy) => match deploy.deploy {
             DeploySubcommand::Status => {
                 println!("Get the status of the mobile and web applications");
             }
@@ -121,7 +121,7 @@ fn main() {
                 println!("Rollback the currently deployed instance for all applications");
             }
         },
-        PodcasterctlCommands::Kubernetes(kube) => match kube.kubernetes {
+        PodcastersctlCommands::Kubernetes(kube) => match kube.kubernetes {
             KubSubcommand::Status => {
                 println!("Get the status of the cluster");
             }
@@ -138,7 +138,7 @@ fn main() {
                 println!("The val passed in: {}", val.inspect);
             }
         },
-        PodcasterctlCommands::Backup(backup) => match backup.backup {
+        PodcastersctlCommands::Backup(backup) => match backup.backup {
             BackupSubcommand::Create(to_create) => match to_create.create {
                 Creator::Mongodb => {
                     println!("Create the backup of the database");
@@ -160,12 +160,12 @@ fn main() {
                 println!("Restore all of the project, restore secrets, and deploy to the branch `backup-restore`");
             }
         },
-        PodcasterctlCommands::Diagnostics(diag) => match diag.collect {
+        PodcastersctlCommands::Diagnostics(diag) => match diag.collect {
             DiagSubcommand::Collect => {
                 println!("The diagnostics collection has been kicked off");
             }
         },
-        PodcasterctlCommands::Version(version) => {
+        PodcastersctlCommands::Version(version) => {
             println!("The version of the various dependencies");
             match version.version {
                 VerSubcommand::Production => {
@@ -173,7 +173,7 @@ fn main() {
                 }
             }
         }
-        PodcasterctlCommands::Incident(incident) => match incident.incident {
+        PodcastersctlCommands::Incident(incident) => match incident.incident {
             IncidentSubcommand::Asess => {
                 println!("Asses the incident");
             }

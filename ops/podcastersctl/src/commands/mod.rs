@@ -6,7 +6,7 @@ use crate::{
 
 #[derive(Debug, Parser)]
 #[clap(author, version, about)]
-pub struct Podcasterctl {
+pub struct Podcastersctl {
     /// Rust
     ///   - ✓ nightly-2026-08-18
     ///   - ✓ rustfmt
@@ -39,11 +39,11 @@ pub struct Podcasterctl {
     /// ✓ API health
     /// ✓ frontend health
     #[clap(subcommand)]
-    pub commands: PodcasterctlCommands,
+    pub commands: PodcastersctlCommands,
 }
 
 #[derive(Debug, Subcommand)]
-pub enum PodcasterctlCommands {
+pub enum PodcastersctlCommands {
     /// Start and stop as necessary to diagnose
     Doctor,
     /// Project State
