@@ -400,9 +400,9 @@ This application Will feature Podcasting 2.0 support.
 - [X] Establish coding conventions.
 - [X] Establish CI.
 - Definition of done
-  - cargo test --workspace works from repository root.
-  - Every crate builds.
-  - CI is green.
+  - [X] cargo test --workspace works from repository root.
+  - [X] Every crate builds.
+  - [X] CI is green.
   
 ### Milestone 0.5 - Engineering Platform Foundation
 - [X] Create ops/podcastersctl crate
