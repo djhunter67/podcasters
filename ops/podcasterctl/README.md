@@ -274,28 +274,28 @@ Suggested next command:
 
 
 ## Milestone 0
-`podcastersctl doctor`
-`podcastersctl version`
-`podcastersctl config validate`
-`podcastersctl mongo check`
-`podcastersctl redis check`
+- `podcastersctl doctor`
+- `podcastersctl version`
+- `podcastersctl config validate`
+- `podcastersctl mongo check`
+- `podcastersctl redis check`
 
 ## Milestone 1
-`podcastersctl dev up`
-`podcastersctl dev down`
-`podcastersctl ci verify`
-`podcastersctl smoke`
+- `podcastersctl dev up`
+- `podcastersctl dev down`
+- `podcastersctl ci verify`
+- `podcastersctl smoke`
 
 ## Milestone 2
-`podcastersctl mongo reconcile`
-`podcastersctl diagnostics collect`
+- `podcastersctl mongo reconcile`
+- `podcastersctl diagnostics collect`
 	
 ## Milestone 3
 - After kubernetes deployment begins
 
-`podcastersctl k8s status`
-`podcastersctl deploy`
-`podcastersctl rollback`
+- `podcastersctl k8s status`
+- `podcastersctl deploy`
+- `podcastersctl rollback`
 
 ## Road Map
 - Evaluate a Rust Kubernetes controller/operator after the deployment lifecycle is well understood.
