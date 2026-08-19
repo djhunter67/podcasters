@@ -1,12 +1,26 @@
+mod backup;
 mod ci;
 mod commands;
+mod config;
+mod deploy;
 mod diagnostics;
+mod kubernetes;
+mod mongo;
+mod redis;
+mod smoke;
 mod version;
 
+use backup::BackupSubcommand;
 use ci::CiSubcommand;
 use clap::Parser;
 use commands::{Podcasterctl, PodcasterctlCommands};
+use config::ConfigSubcommand;
+use deploy::DeploySubcommand;
 use diagnostics::{DevSubcommand, DiagSubcommand};
+use kubernetes::KubSubcommand;
+use mongo::MongoSubcommand;
+use redis::{RedisIntegration, RedisSession, RedisSubcommand};
+use smoke::{SmokeSubcommand, Staging};
 use version::VerSubcommand;
 
 fn main() {
@@ -33,9 +47,35 @@ fn main() {
                 }
             }
         }
-        PodcasterctlCommands::Database => {
-            println!("The Database command executed");
-        }
+        PodcasterctlCommands::Mongo(mongo_arg) => match mongo_arg.mongo {
+            MongoSubcommand::Check => {
+                println!("Compare the live database w/ the application desired state");
+            }
+            MongoSubcommand::Status => {
+                println!("Check the status the MongoDb instance");
+            }
+            MongoSubcommand::Reconcile => {
+                println!("Create whats missing in the live instance of the Database");
+            }
+        },
+        PodcasterctlCommands::Redis(redis_arg) => match redis_arg.redis {
+            RedisSubcommand::Check => {
+                println!("Compare the keys in the cache with the expected values");
+            }
+            RedisSubcommand::Status => {
+                println!("Check the status of the cache layer; uptime, number of keys, version");
+            }
+            RedisSubcommand::Keys(key) => match key.session {
+                RedisSession::Session(val) => {
+                    println!("Get the keys for the session passed in?; Val: {val:#?}");
+                }
+            },
+            RedisSubcommand::Clear(clear) => match clear.integration {
+                RedisIntegration::IntegrationTest => {
+                    println!("Clearing the integration test results");
+                }
+            },
+        },
         PodcasterctlCommands::Ci(ci) => {
             println!("The Continuous Integration command called");
             match ci.ci {
@@ -47,9 +87,63 @@ fn main() {
                 }
             }
         }
-        PodcasterctlCommands::Smoke => {
-            println!("The Smoke command called");
-        }
+        PodcasterctlCommands::Config(config) => match config.config {
+            ConfigSubcommand::Validate => {
+                println!("Validating the project configuration");
+            }
+            ConfigSubcommand::Show => {
+                println!("Showing the configuration for the project");
+            }
+        },
+        PodcasterctlCommands::Smoke(smoke) => match smoke.smoke {
+            SmokeSubcommand::Environment(environ) => match environ.staging {
+                Staging::Debug => {
+                    println!("Debug environment chosen");
+                }
+                Staging::Production => {
+                    println!("Production environment chosen");
+                }
+            },
+        },
+        PodcasterctlCommands::Deploy(deploy) => match deploy.deploy {
+            DeploySubcommand::Status => {
+                println!("Get the status of the mobile and web applications");
+            }
+            DeploySubcommand::Staging => {
+                println!("Get the status of the staging branch or create it if it doesn't exist");
+            }
+            DeploySubcommand::Production => {
+                println!("Deploy the production branch");
+            }
+            DeploySubcommand::Rollback => {
+                println!("Rollback the currently deployed instance for all applications");
+            }
+        },
+        PodcasterctlCommands::Kubernetes(kube) => match kube.kubernetes {
+            KubSubcommand::Status => {
+                println!("Get the status of the cluster");
+            }
+            KubSubcommand::Pods => {
+                println!("Execute and show the output of `kubectl get pods -A`");
+            }
+            KubSubcommand::Nodes => {
+                println!("Execute and show the output of `kubectl get nodes -A`");
+            }
+            KubSubcommand::Events => {
+                println!("Get the latest events of the cluster");
+            }
+        },
+        PodcasterctlCommands::Backup(backup) => match backup.backup {
+            BackupSubcommand::Create => {
+                println!("Tar the entire project and compress at the maximum compression");
+            }
+            BackupSubcommand::Verify => {
+                println!("Copy and then uncompress, untar, and validate that the project builds and passes all test");
+            }
+            BackupSubcommand::Restore => {
+                println!("Restore all of the project, restore secrets, and deploy to the branch `backup-restore`");
+            }
+        },
         PodcasterctlCommands::Diagnostics(diag) => match diag.collect {
             DiagSubcommand::Collect => {
                 println!("The diagnostics collection has been kicked off");
@@ -65,9 +159,6 @@ fn main() {
         }
         PodcasterctlCommands::Incident => {
             println!("Parse the log for an ERROR or a PANIC and create a parseable report.");
-        }
-        PodcasterctlCommands::K8s => {
-            println!("All kubernetes command relative to the deployment of the Podcaster");
         }
     }
 }

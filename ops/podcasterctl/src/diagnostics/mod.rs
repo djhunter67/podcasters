@@ -38,7 +38,6 @@ use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
 pub struct DevState {
-    /// ``podcastersctl dev up``
     #[clap(subcommand)]
     pub dev: DevSubcommand,
 }

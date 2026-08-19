@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 
-use crate::{ci, diagnostics, version};
+use crate::{backup, ci, config, deploy, diagnostics, kubernetes, mongo, redis, smoke, version};
 
 #[derive(Debug, Parser)]
 #[clap(author, version, about)]
@@ -47,14 +47,29 @@ pub enum PodcasterctlCommands {
     /// Project State
     Dev(diagnostics::DevState),
 
-    /// Database information
-    Database,
+    /// `MongoDb` information
+    Mongo(mongo::MongoState),
+
+    /// `Redis` information
+    Redis(redis::RedisState),
 
     /// Continuous Integration
     Ci(ci::CiState),
 
+    /// Project configuration
+    Config(config::ConfigState),
+
     /// Health Check
-    Smoke,
+    Smoke(smoke::SmokeState),
+
+    /// Deploy, Check, or Rollback the application
+    Deploy(deploy::DeployState),
+
+    /// Kubernetes commands
+    Kubernetes(kubernetes::KubState),
+
+    /// Backup various parts of the application
+    Backup(backup::BackupState),
 
     /// Produce a diagnostics file
     Diagnostics(diagnostics::DiagState),
@@ -64,7 +79,4 @@ pub enum PodcasterctlCommands {
 
     /// Produce a report of the current ``Production Assessment``
     Incident,
-
-    /// Kubernetes commands
-    K8s,
 }
