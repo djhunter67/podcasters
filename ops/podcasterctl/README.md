@@ -225,14 +225,16 @@ Ex.
 - Example endpoint:
   `GET /v1/version`
   
-  ```{
+  ```
+  {
   "version": "0.1.0",
   "commit": "768bc15",
   "built_at": "2026-08-19T11:22:18Z",
   "rustc": "nightly-2026-08-18",
   "target": "x86_64-unknown-linux-gnu"
-	  }```
-	  
+  }
+```
+
 - This eliminates:
 "Which build is actually running?"
 
@@ -272,28 +274,28 @@ Suggested next command:
 
 
 ## Milestone 0
-`podcastersctl doctor
-podcastersctl version
-podcastersctl config validate
-podcastersctl mongo check
-podcastersctl redis check`
+`podcastersctl doctor`
+`podcastersctl version`
+`podcastersctl config validate`
+`podcastersctl mongo check`
+`podcastersctl redis check`
 
 ## Milestone 1
-`podcastersctl dev up
-podcastersctl dev down
-podcastersctl ci verify
-podcastersctl smoke`
+`podcastersctl dev up`
+`podcastersctl dev down`
+`podcastersctl ci verify`
+`podcastersctl smoke`
 
 ## Milestone 2
-`podcastersctl mongo reconcile
-	podcastersctl diagnostics collect`
+`podcastersctl mongo reconcile`
+`podcastersctl diagnostics collect`
 	
 ## Milestone 3
 - After kubernetes deployment begins
 
-`podcastersctl k8s status
-podcastersctl deploy
-podcastersctl rollback`
+`podcastersctl k8s status`
+`podcastersctl deploy`
+`podcastersctl rollback`
 
 ## Road Map
 - Evaluate a Rust Kubernetes controller/operator after the deployment lifecycle is well understood.
