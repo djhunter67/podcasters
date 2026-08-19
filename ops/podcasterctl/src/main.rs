@@ -1,5 +1,10 @@
 mod args;
 
+use args::Podcasterctl;
+use clap::Parser;
+
 fn main() {
-    println!("Hello, world!");
+    let args = Podcasterctl::parse();
+
+    println!("{args:#?}");
 }
