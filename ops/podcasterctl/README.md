@@ -88,12 +88,12 @@
 Overall: HEALTHY
 
 ## podcastersctl dev
-podcastersctl dev up
-podcastersctl dev down
-podcastersctl dev status
-podcastersctl dev reset
+- podcastersctl dev up
+- podcastersctl dev down
+- podcastersctl dev status
+- podcastersctl dev reset
 
-The command `dev up` could: 
+- The command `dev up` could: 
 	- Verify docker
 	- start development MongoDB
 	- Start development Redis
@@ -104,64 +104,64 @@ The command `dev up` could:
 	
 	
 ## podcastersctl [database] <command>
-podcastersctl mongo status
-podcastersctl mongo check
-podcastersctl mongo reconcile
+- podcastersctl mongo status
+- podcastersctl mongo check
+- podcastersctl mongo reconcile
 
-`check` could: 
-users
-  ✓ email unique index
-  ✓ created_at index
+- `check` could: 
+	- users
+		- ✓ email unique index
+		- ✓ created_at index
 
-podcasts
-  ✓ feed_url unique index
-  ✓ title text index
+	- podcasts
+		- ✓ feed_url unique index
+		- ✓ title text index
 
-episodes
-  ✓ podcast_id index
-  ✗ published_at index missing
+	- episodes
+		- ✓ podcast_id index
+		-  ✗ published_at index missing
 
-podcastersctl mongo reconcile
-- Creates whats missing
-- This is akin to establishing migration before millions of documents are a reality
+- `podcastersctl mongo reconcile`
+  - Creates whats missing
+  - This is akin to establishing migration before millions of documents are a reality
 	
-podcastersctl redis status
-podcastersctl redis stats
-podcastersctl redis keys --namespace session
-podcastersctl redis clear --namespace integration-test
+- `podcastersctl redis status`
+- `podcastersctl redis stats`
+- `podcastersctl redis keys --namespace session`
+- `podcastersctl redis clear --namespace integration-test`
 
 - Production-destructive commands should require explicit safeguards
 
 Ex.
-- podcastersctl redis clear --environment production
+- `podcastersctl redis clear --environment production`
 
 - Refusing destructive operation.
 
 	- Use:
-		-  --confirm-production
+		-  `--confirm-production`
 
 ## podcastersctl ci verify
 
 - Which will run:
-format
-clippy
-workspace check
-unit tests
-integration tests
-Mongo health
-Redis health
-backend smoke test
-frontend smoke test
+  - format
+  - clippy
+  - workspace check
+  - unit tests
+  - integration tests
+  - Mongo health
+  - Redis health
+  - backend smoke test
+  - frontend smoke test
 
 	- Then CI is not the only place where CI behavior exists
 	
 	
 - On my workstation:
-`podcastersctl ci verify`
+  - `podcastersctl ci verify`
 - On your workstation:
-`podcastersctl ci verify`
+  - `podcastersctl ci verify`
 - On the self-hosted GitHub runner (before the CI from GitHub runs):
-`podcastersctl ci verify`
+  - `podcastersctl ci verify`
 
 ## podcasterctl smoke
 `podcasterctl smoke --environment staging`
