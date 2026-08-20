@@ -1,4 +1,4 @@
-#![allow(clippy::unwrap)]
+#![allow(clippy::unwrap_used)]
 use mongodb::{
     Client,
     bson::{Document, doc, oid::ObjectId},
