@@ -8,25 +8,25 @@ pub struct MongoState {
 
 #[derive(Debug, Subcommand)]
 pub enum MongoSubcommand {
-    /// Presents information in the following format:
+    /// # Presents information in the following format:
     ///
     /// Users:
     ///
-    ///   - email unique index
+    ///   -  ✓ email unique index
     ///
-    ///   - "created_at" index
+    ///   -  ✓ `created_at` index
     ///
     /// Podcasts:
     ///
-    ///    - "feed_url" unique index
+    ///    - ✓ `feed_url` unique index
     ///
-    ///    - "title" text index
+    ///    - ✓ title text index
     ///
     /// Episodes:
     ///
-    ///    - "podcast_id" index
+    ///    - ✓ `podcast_id` index
     ///
-    ///    - "published_at" index missing
+    ///     - ✗ `published_at` index missing
     ///
     Check,
     /// Get the mongo status
