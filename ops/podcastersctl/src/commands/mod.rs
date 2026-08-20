@@ -7,37 +7,6 @@ use crate::{
 #[derive(Debug, Parser)]
 #[clap(author, version, about)]
 pub struct Podcastersctl {
-    /// Rust
-    ///   - ✓ nightly-2026-08-18
-    ///   - ✓ rustfmt
-    ///   - ✓ clippy
-    ///   - ✓ rustc-codegen-cranelift
-
-    ///     `Docker`
-    ///
-    /// ✓ daemon reachable
-    /// ✓ current user may create containers
-
-    /// ``MongoDB``
-    ///
-    /// ✓ ``mongodb://127.0.0.1:27017``
-    /// ✓ ping
-    /// ✓ database: ``podcasters_test``
-    /// Redis
-    ///
-    /// ✓ ``redis://127.0.0.1:6379``
-    /// ✓ PONG
-    /// Kubernetes
-    ///
-    /// ✓ context: homelab
-    /// ✓ cluster reachable
-    /// ✓ nodes: 3/3 Ready
-    /// Podcasters
-    ///
-    /// ✓ backend configuration
-    /// ✓ frontend configuration
-    /// ✓ API health
-    /// ✓ frontend health
     #[clap(subcommand)]
     pub commands: PodcastersctlCommands,
 }
@@ -81,4 +50,166 @@ pub enum PodcastersctlCommands {
 
     /// Produce a report of the current ``Production Assessment``
     Incident(incident::IncidentState),
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::commands;
+    use clap::Parser as _;
+    use rstest::rstest;
+
+    #[rstest]
+    #[case(&["podcastersctl", "doctor"])]
+    #[case(&["podcastersctl", "dev", "up"])]
+    #[case(&["podcastersctl", "dev", "down"])]
+    #[case(&["podcastersctl", "dev", "status"])]
+    #[case(&["podcastersctl", "dev", "reset"])]
+    #[case(&["podcastersctl", "mongo", "check"])]
+    #[case(&["podcastersctl", "mongo", "status"])]
+    #[case(&[
+        "podcastersctl",
+        "mongo",
+        "reconcile"
+    ])]
+    #[case(&["podcastersctl", "redis", "check"])]
+    #[case(&["podcastersctl", "redis", "status"])]
+    #[case(&["podcastersctl", "ci", "verify"])]
+    #[case(&[
+        "podcastersctl",
+        "ci",
+        "integration"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "config",
+        "validate"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "config",
+        "show"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "deploy",
+        "status"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "deploy",
+        "staging"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "deploy",
+        "production"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "deploy",
+        "rollback"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "kubernetes",
+        "status"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "kubernetes",
+        "pods"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "kubernetes",
+        "nodes"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "kubernetes",
+        "events"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "backup",
+        "create",
+	"mongodb"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "backup",
+        "create",
+	"redis"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "backup",
+        "create",
+	"configuration"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "backup",
+        "create",
+	"all"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "backup",
+        "verify"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "backup",
+        "restore"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "diagnostics",
+        "collect"
+    ])]
+    #[case(&[
+        "podcastersctl",
+        "version",
+        "production"
+    ])]
+    #[case(&["podcastersctl", "incident", "asess"])]
+    #[case(&["podcastersctl", "incident", "collect"])]
+    #[case(&["podcastersctl", "incident", "compare"])]
+    #[case(&["podcastersctl", "incident", "timeline"])]
+    fn valid_command_line_parses(#[case] args: &[&str]) {
+        let result = commands::Podcastersctl::try_parse_from(args);
+
+        assert!(
+            result.is_ok(),
+            "Expected command to parse: {args:?}\n\
+             Error: {result:#?}"
+        );
+    }
+
+    #[rstest]
+    #[case(&[
+    "podcasterctl",
+    "not-a-command"
+])]
+    #[case(&[
+    "podcasterctl",
+    "mongo",
+    "not-a-command"
+])]
+    #[case(&[
+    "podcasterctl",
+    "deploy",
+    "not-a-command"
+])]
+    #[case(&[
+    "podcasterctl",
+    "kubernetes",
+    "not-a-command"
+])]
+    fn invalid_command_line_is_rejected(#[case] args: &[&str]) {
+        let result = commands::Podcastersctl::try_parse_from(args);
+
+        assert!(result.is_err(), "Expected command to fail: {args:?}");
+    }
 }
