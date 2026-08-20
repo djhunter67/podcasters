@@ -9,6 +9,9 @@ pub fn database_from_name(manager: &mongodb::Client, database_name: &str) -> mon
     manager.database(database_name)
 }
 
+/// # Errors
+///
+///    - Returns an error if the settings are erroneously unavailable
 #[must_use = "The connection pool must be used to interact with the database"]
 #[instrument(
     name = "Get Connection Pool for MongoDb",
@@ -19,7 +22,8 @@ pub fn database_from_name(manager: &mongodb::Client, database_name: &str) -> mon
 pub async fn establish_connection(manager: &mongodb::Client) -> anyhow::Result<mongodb::Database> {
     tracing::info!("Get mongo connection pool");
 
-    let settings = settings::get().expect("Application settings are unavailable");
+    let settings = settings::get()?;
+    // .expect("Application settings are unavailable");
 
     Ok(database_from_name(manager, &settings.mongo.db))
 }

@@ -30,6 +30,6 @@ pub enum Creator {
     Redis,
     /// Backup all of the configuration
     Configuration,
-    /// MongoDb, Redis, Application Config
+    /// `MongoDb`, `Redis`, Application Config
     All,
 }

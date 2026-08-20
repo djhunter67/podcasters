@@ -31,6 +31,11 @@ fn parse_cached_user_session(value: &str) -> Result<ObjectId, AuthenticationErro
     ObjectId::parse_str(&session.oid).map_err(|_| AuthenticationError::InvalidSession)
 }
 
+/// # Errors
+///
+///    - Will Error if the session key is missing returning a `Missingsession`
+///    - Will Error if the session is invalid returning a `Invalidsession`
+///    - Will Error if the user is not `Authenticated`
 pub async fn authenticated_user_id(
     session_cookie: &str,
     mongo_client: &mongodb::Client,
@@ -52,30 +57,28 @@ pub async fn authenticated_user_id(
         .await
         .map_err(|_| AuthenticationError::Redis)?;
 
-    match cached_user {
-        Some(session_json) => parse_cached_user_session(&session_json),
+    if let Some(session_json) = cached_user {
+        parse_cached_user_session(&session_json)
+    } else {
+        let mongo_database = mongo_conf::establish_connection(mongo_client)
+            .await
+            .map_err(|_| AuthenticationError::InvalidSession)?;
 
-        None => {
-            let mongo_database = mongo_conf::establish_connection(mongo_client)
-                .await
-                .map_err(|_| AuthenticationError::InvalidSession)?;
+        let filter = mongodb::bson::doc! {
+            "email": &user_email
+        };
 
-            let filter = mongodb::bson::doc! {
-                "email": &user_email
-            };
+        let user_doc = mongo_database
+            .collection::<mongodb::bson::Document>("development")
+            .find_one(filter)
+            .await
+            .map_err(|_| AuthenticationError::InvalidSession)?;
 
-            let user_doc = mongo_database
-                .collection::<mongodb::bson::Document>("development")
-                .find_one(filter)
-                .await
-                .map_err(|_| AuthenticationError::InvalidSession)?;
+        let user_doc = user_doc.ok_or(AuthenticationError::MissingSession)?;
 
-            let user_doc = user_doc.ok_or(AuthenticationError::MissingSession)?;
-
-            user_doc
-                .get_object_id("_id")
-                .map_err(|_| AuthenticationError::InvalidSession)
-        }
+        user_doc
+            .get_object_id("_id")
+            .map_err(|_| AuthenticationError::InvalidSession)
     }
 }
 

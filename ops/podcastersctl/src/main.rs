@@ -25,6 +25,7 @@ use redis::{RedisIntegration, RedisSession, RedisSubcommand};
 use smoke::{SmokeSubcommand, Staging};
 use version::VerSubcommand;
 
+#[allow(clippy::too_many_lines)]
 fn main() {
     let args = Podcastersctl::parse();
 
