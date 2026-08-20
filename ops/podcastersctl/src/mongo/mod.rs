@@ -26,7 +26,7 @@ pub enum MongoSubcommand {
     ///
     ///    - ✓ `podcast_id` index
     ///
-    ///     - ✗ `published_at` index missing
+    ///    - ✗ `published_at` index missing
     ///
     Check,
     /// Get the mongo status
