@@ -1,3 +1,4 @@
+#![allow(clippy::unwrap_used)]
 use assert_cmd::Command;
 use predicates::prelude::*;
 
@@ -23,4 +24,15 @@ fn version_command_succeeds() {
         .assert()
         .success()
         .stdout(predicate::str::contains(env!("CARGO_PKG_VERSION")));
+}
+
+#[test]
+fn doctor_dispatches_correctly() {
+    let mut command = Command::cargo_bin("podcastersctl").unwrap();
+
+    command
+        .arg("doctor")
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("Doctor called"));
 }

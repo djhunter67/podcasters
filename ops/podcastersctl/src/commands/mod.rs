@@ -1,3 +1,8 @@
+pub mod command_tree;
+mod dev;
+mod doctor;
+mod mongo_arg;
+mod redis_arg;
 use clap::{Parser, Subcommand};
 
 use crate::{
