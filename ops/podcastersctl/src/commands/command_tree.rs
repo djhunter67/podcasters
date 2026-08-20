@@ -5,12 +5,9 @@ use super::{
 
 use crate::commands::PodcastersctlCommands;
 
-#[allow(clippy::too_many_lines)]
 pub fn run(args: Podcastersctl) {
     match args.commands {
-        PodcastersctlCommands::Doctor => {
-            doctor_arg::execute();
-        }
+        PodcastersctlCommands::Doctor => doctor_arg::execute(),
         PodcastersctlCommands::Dev(cmd) => dev_arg::execute(&cmd),
         PodcastersctlCommands::Mongo(mongo_arg) => mongo_arg::execute(&mongo_arg),
         PodcastersctlCommands::Redis(redis_arg) => redis_arg::execute(&redis_arg),
