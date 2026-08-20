@@ -10,9 +10,9 @@ pub struct MongoState {
 pub enum MongoSubcommand {
     /// Presents information in the following format:
     ///
-    /// Users
+    /// Users:
     ///
-    ///   email unique index
+    ///   - email unique index
     ///
     ///   - "created_at" index
     ///
@@ -22,7 +22,7 @@ pub enum MongoSubcommand {
     ///
     ///    - "title" text index
     ///
-    /// Episodes
+    /// Episodes:
     ///
     ///    - "podcast_id" index
     ///
