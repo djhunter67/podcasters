@@ -17,9 +17,9 @@ pub fn run(args: Podcastersctl) {
         PodcastersctlCommands::Doctor => {
             doctor::execute();
         }
-        PodcastersctlCommands::Dev(cmd) => dev::execute(cmd),
-        PodcastersctlCommands::Mongo(mongo_arg) => mongo_arg::execute(mongo_arg),
-        PodcastersctlCommands::Redis(redis_arg) => redis_arg::execute(redis_arg),
+        PodcastersctlCommands::Dev(cmd) => dev::execute(&cmd),
+        PodcastersctlCommands::Mongo(mongo_arg) => mongo_arg::execute(&mongo_arg),
+        PodcastersctlCommands::Redis(redis_arg) => redis_arg::execute(&redis_arg),
         PodcastersctlCommands::Ci(ci) => {
             println!("The Continuous Integration command called");
             match ci.ci {

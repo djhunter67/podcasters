@@ -1,7 +1,7 @@
 use crate::mongo::{self, MongoSubcommand};
 
-pub fn execute(mongo_arg: mongo::MongoState) {
-    match mongo_arg.mongo {
+pub fn execute(mongo_arg: &mongo::MongoState) {
+    match &mongo_arg.mongo {
         MongoSubcommand::Check => {
             println!("Compare the live database w/ the application desired state");
         }
