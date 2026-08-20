@@ -406,6 +406,7 @@ This application Will feature Podcasting 2.0 support.
   
 ### Milestone 0.5 - Engineering Platform Foundation
 - [X] Create ops/podcastersctl crate
+- [X] Skeleton structure for the command-line application
 - [ ] Implement doctor
 - [ ] Implement config validate
 - [ ] Implement Mongo health check

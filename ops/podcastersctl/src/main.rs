@@ -154,10 +154,14 @@ fn main() {
                 }
             },
             BackupSubcommand::Verify => {
-                println!("Copy and then uncompress, untar, and validate that the project builds and passes all test");
+                println!(
+                    "Copy and then uncompress, untar, and validate that the project builds and passes all test"
+                );
             }
             BackupSubcommand::Restore => {
-                println!("Restore all of the project, restore secrets, and deploy to the branch `backup-restore`");
+                println!(
+                    "Restore all of the project, restore secrets, and deploy to the branch `backup-restore`"
+                );
             }
         },
         PodcastersctlCommands::Diagnostics(diag) => match diag.collect {
