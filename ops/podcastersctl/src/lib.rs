@@ -1,0 +1,12 @@
+mod backup;
+mod ci;
+pub mod commands;
+mod config;
+mod deploy;
+mod diagnostics;
+mod incident;
+mod kubernetes;
+mod mongo;
+mod redis;
+mod smoke;
+mod version;

@@ -3,6 +3,14 @@ name = "podcastersctl"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+name = "podcastersctl"
+path = "src/lib.rs"
+
+[[bin]]
+name = "podcastersctl"
+path = "src/main.rs"
+
 [dependencies]
 anyhow = "1.0.104"
 clap = { version = "4.6.6", features = ["derive", "unstable-markdown"] }

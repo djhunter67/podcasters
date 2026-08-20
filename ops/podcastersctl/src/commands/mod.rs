@@ -1,8 +1,18 @@
+mod backup_arg;
+mod ci_arg;
 pub mod command_tree;
-mod dev;
-mod doctor;
+mod config_arg;
+mod deploy_arg;
+mod dev_arg;
+mod diag_arg;
+mod doctor_arg;
+mod exit_codes;
+mod incident_arg;
+mod kube_arg;
 mod mongo_arg;
 mod redis_arg;
+mod smoke_arg;
+mod version_arg;
 use clap::{Parser, Subcommand};
 
 use crate::{
