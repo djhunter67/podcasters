@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used)]
+
 use models::redis_conf::{UserSession, authenticated_user_id};
 use redis::{AsyncCommands, aio::ConnectionManager};
 
