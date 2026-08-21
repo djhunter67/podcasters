@@ -2680,6 +2680,7 @@ dependencies = [
  "config",
  "hex",
  "rand 0.10.2",
+ "rstest",
  "serde",
  "tracing",
  "tracing-subscriber",
