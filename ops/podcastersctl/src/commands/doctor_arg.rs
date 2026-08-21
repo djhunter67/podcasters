@@ -2,15 +2,13 @@ use std::{env, fmt, fs, io::Read, process::Command};
 
 const RUSTUP_TOOLCHAIN_VAR: &str = "RUSTUP_TOOLCHAIN";
 pub fn execute() {
-    println!("Doctor called");
-
     // let rust_info = RustStatus::new();
 
     // RUST
     // Get the Rust toolchain
     let rust_info = RustStatus::new()
-        .format_workspace()
-        .expect("Issues formatting")
+        // .format_workspace()
+        // .expect("Issues formatting")
         .format_workspace_check()
         .expect("Issuse checking the format")
         .get_directory_toolchain()
@@ -22,48 +20,7 @@ pub fn execute() {
         .get_compiler()
         .expect("Failure to query compiler");
 
-    // Get the output of rustfmt
-
-    // Get the output of clippy
-
-    // Get the current compiler
-
     println!("{rust_info}");
-
-    // DOCKER
-    // Is the daemon reachable?
-
-    // Can the current user create containers
-
-    // MONGODB
-    // Is MONGODB reachable
-
-    // Get the result of PING
-
-    // Does the database for mongo testing exist? database: podcasters_test
-
-    //REDIS
-    // Is REDIS reachable
-
-    // Get the result of PING
-
-    // KUBERNETES
-    // Get the kubernetes context
-
-    // Is the cluster reachable
-
-    // How many nodes are there versus how many nodes expected
-
-    // PODCASTERS
-    // Backend configuration
-
-    // Frontend configuration
-
-    // API health
-
-    // frontend health
-
-    // OVERALL report
 }
 
 struct RustStatus {
@@ -111,17 +68,21 @@ impl RustStatus {
             ])
             .output()?;
         let otpt = String::from_utf8(output.stdout)?;
-        self.rustfmt = otpt;
+        if otpt.is_empty() {
+            self.rustfmt = String::from("pass");
+        } else {
+            self.rustfmt = String::from("fail");
+        }
+
         Ok(self)
     }
 
-    fn format_workspace(mut self) -> anyhow::Result<Self> {
-        let output = Command::new("cargo").args(["fmt", "--all"]).output()?;
-        let otpt = String::from_utf8(output.stdout)?;
+    // fn format_workspace(mut self) -> anyhow::Result<Self> {
+    //     let output = Command::new("cargo").args(["fmt", "--all"]).output()?;
+    //     let otpt = String::from_utf8(output.stdout)?;
 
-        self.rustfmt = otpt;
-        Ok(self)
-    }
+    //     Ok(self)
+    // }
 
     /// cargo clippy --workspace --all-targets --all-features -- -D warnings
     fn clippy_it(mut self) -> anyhow::Result<Self> {
@@ -136,9 +97,13 @@ impl RustStatus {
                 "warnings",
             ])
             .output()?;
-        let otpt = String::from_utf8(output.stdout)?;
+        let opt = String::from_utf8(output.stdout)?;
 
-        self.clippy = otpt;
+        self.clippy = if opt.is_empty() {
+            String::from("pass")
+        } else {
+            String::from("fail")
+        };
 
         Ok(self)
     }
@@ -156,17 +121,43 @@ impl RustStatus {
 
         let path = std::path::Path::new(&root);
 
-        for file in path.read_dir()? {
+        let mut final_path = String::new();
+        'outer: for file in path.read_dir()? {
             let directory = file?.file_name();
-            println!("File: {}", directory.to_string_lossy());
             if directory.eq(".cargo") {
                 let next_file = path.join(directory);
-
-                // get the file
+                for file in next_file.read_dir()? {
+                    let file_found = file?.file_name();
+                    if file_found.eq("config.toml") {
+                        final_path = next_file.join(file_found).to_string_lossy().to_string();
+                        break 'outer;
+                    }
+                }
             }
         }
 
-        self.compiler = "TBD".to_string();
+        let mut file_buf = Vec::new();
+
+        let file_handle = fs::File::open(final_path);
+
+        file_handle?.read_to_end(&mut file_buf)?;
+
+        let mut str_buf = String::new();
+        for mut line in file_buf.split(|chars| *chars == b'\n') {
+            // println!("line: {}", String::from_utf8_lossy(line));
+            if String::from_utf8_lossy(line).contains("codegen-backend") {
+                let _ = line.read_to_string(&mut str_buf);
+            }
+        }
+
+        self.compiler = str_buf
+            .split('=')
+            .next_back()
+            .expect("Fail to next")
+            .to_string()
+            .trim()
+            .trim_matches('"')
+            .to_string();
 
         Ok(self)
     }

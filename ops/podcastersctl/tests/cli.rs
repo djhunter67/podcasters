@@ -34,5 +34,8 @@ fn doctor_dispatches_correctly() {
         .arg("doctor")
         .assert()
         .success()
-        .stdout(predicate::str::contains("Doctor called"));
+        .stdout(predicate::str::starts_with("Toolchain:"))
+        .stdout(predicate::str::is_match("Rustfmt:").unwrap())
+        .stdout(predicate::str::is_match("Clippy:").unwrap())
+        .stdout(predicate::str::is_match("Compiler:").unwrap());
 }
