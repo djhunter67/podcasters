@@ -5,7 +5,6 @@ mod config_arg;
 mod deploy_arg;
 mod dev_arg;
 mod diag_arg;
-mod doctor_arg;
 mod exit_codes;
 mod incident_arg;
 mod kube_arg;
