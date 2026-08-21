@@ -42,7 +42,7 @@ pub fn execute(version: &version::VerState) {
         // The rustc version
         // The current rustup target
         VerSubcommand::Production => {
-            println!("The production version information is to be provided");
+            // println!("The production version information is to be provided");
             let b_ver = get_versioned("backend").unwrap_or_else(|err| format!("Error: {err:#?}"));
             let f_ver = get_versioned("frontend").unwrap_or_else(|err| format!("Error: {err:#?}"));
             let git_com = match get_commit_hash() {
