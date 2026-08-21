@@ -1,13 +1,16 @@
 use super::{
-    Podcastersctl, backup_arg, ci_arg, config_arg, deploy_arg, dev_arg, diag_arg, doctor_arg,
-    incident_arg, kube_arg, mongo_arg, redis_arg, smoke_arg, version_arg,
+    backup_arg, ci_arg, config_arg, deploy_arg, dev_arg, diag_arg, incident_arg, kube_arg,
+    mongo_arg, redis_arg, smoke_arg, Podcastersctl,
 };
 
-use crate::commands::PodcastersctlCommands;
+use crate::{
+    commands::{version_arg, PodcastersctlCommands},
+    doctor,
+};
 
 pub fn run(args: Podcastersctl) {
     match args.commands {
-        PodcastersctlCommands::Doctor => doctor_arg::execute(),
+        PodcastersctlCommands::Doctor => doctor::execute(),
         PodcastersctlCommands::Dev(cmd) => dev_arg::execute(&cmd),
         PodcastersctlCommands::Mongo(mongo_arg) => mongo_arg::execute(&mongo_arg),
         PodcastersctlCommands::Redis(redis_arg) => redis_arg::execute(&redis_arg),

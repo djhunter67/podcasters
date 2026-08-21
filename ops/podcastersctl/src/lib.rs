@@ -4,6 +4,7 @@ pub mod commands;
 mod config;
 mod deploy;
 mod diagnostics;
+mod doctor;
 mod incident;
 mod kubernetes;
 mod mongo;
