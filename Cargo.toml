@@ -11,6 +11,8 @@ members = [
 	]
 resolver = "3"
 
+exclude = ["shared/bump_version/dev_asset"]
+
 [profile.release]
 overflow-checks = false
 lto = "fat"  # LTO can produce better optimized code; 'false', 'fat', 'thin', or 'off'
