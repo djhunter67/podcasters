@@ -57,7 +57,8 @@ pub fn execute(version: &version::VerState) {
 
             let rustc = get_rustc_version().unwrap_or_else(|err| format!("Error: {err:#?}"));
 
-            let build_time = get_build_time().unwrap_or_else(|err| format!("Error: {err:#?}"));
+            let build_time =
+                get_build_time(false, "frontend").unwrap_or_else(|err| format!("Error: {err:#?}"));
 
             let result = Version::new(f_ver, b_ver, git_com, build_time, rustc, String::new());
 
@@ -99,10 +100,47 @@ fn get_rustc_version() -> anyhow::Result<String> {
 
     // println!("Output: {output}");
 
-    Ok(output.to_string())
+    Ok(output.trim().to_string())
 }
 
-fn get_build_time() -> anyhow::Result<String> {
+fn get_build_time(prod: bool, app: &str) -> anyhow::Result<String> {
+    let root = shell::find_worspace_root()?;
+    let target = if prod { "release" } else { "debug" };
+
+    let command = Command::new("ls")
+        .args(["-ght", format!("target/{target}").as_str()])
+        .current_dir(root)
+        .output()?;
+
+    let result = String::from_utf8_lossy(&command.stdout);
+
+    for line in result.lines() {
+        if line.split(' ').next_back().expect("Faild to split").eq(app) {
+            let target_line: Vec<String> = line
+                .split('\x20')
+                .map(std::string::ToString::to_string)
+                .collect();
+
+            let target_line = target_line.iter().rev().take(4).collect::<Vec<&String>>();
+
+            let target_line = target_line
+                .iter()
+                .skip(1)
+                .take(3)
+                .rev()
+                .collect::<Vec<&&String>>();
+
+            let target_line: String = target_line
+                .iter()
+                .map(|val| val.clone().to_owned().clone() + &String::from(" "))
+                // .map(|value| value.as_str())
+                .collect::<Vec<String>>()
+                .concat();
+
+            println!("Target Line: {target_line:#?}");
+        }
+    }
+
     Ok(String::from("Yesterday"))
 }
 
