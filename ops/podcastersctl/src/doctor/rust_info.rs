@@ -1,24 +1,4 @@
-use std::{fmt, fs, io::Read, process::Command};
-
-pub struct RustStatus {
-    pub toolchain: String,
-    pub rustfmt: String,
-    pub clippy: String,
-    pub compiler: String,
-    pub workspace_root: String,
-}
-
-impl RustStatus {
-    pub const fn new() -> Self {
-        Self {
-            toolchain: String::new(),
-            rustfmt: String::new(),
-            clippy: String::new(),
-            compiler: String::new(),
-            workspace_root: String::new(),
-        }
-    }
-}
+use std::{fs, io::Read, process::Command};
 
 pub fn get_directory_toolchain() -> anyhow::Result<String> {
     let output = Command::new("rustup")
@@ -116,14 +96,4 @@ pub fn get_compiler() -> anyhow::Result<String> {
         .trim()
         .trim_matches('"')
         .to_string())
-}
-
-impl fmt::Display for RustStatus {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "Toolchain: {}\nRustfmt: {}\nClippy: {}\nCompiler: {}\nWorkspace Root: {}",
-            self.toolchain, self.rustfmt, self.clippy, self.compiler, self.workspace_root
-        )
-    }
 }
