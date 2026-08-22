@@ -8,33 +8,13 @@ use crate::version::{self, VerSubcommand};
 struct Version {
     frontend: String,
     backend: String,
+    models: String,
     commit_hash: String,
     front_build_time: String,
     back_build_time: String,
+    models_build_time: String,
     rustc: String,
     rustup_target: String,
-}
-
-impl Version {
-    pub const fn new(
-        frontend: String,
-        backend: String,
-        commit_hash: String,
-        front_build_time: String,
-        back_build_time: String,
-        rustc: String,
-        rustup_target: String,
-    ) -> Self {
-        Self {
-            frontend,
-            backend,
-            commit_hash,
-            front_build_time,
-            back_build_time,
-            rustc,
-            rustup_target,
-        }
-    }
 }
 
 pub fn execute(version: &version::VerState) {
@@ -50,6 +30,8 @@ pub fn execute(version: &version::VerState) {
                 shell::get_versioned("backend").unwrap_or_else(|err| format!("Error: {err:#?}"));
             let f_ver =
                 shell::get_versioned("frontend").unwrap_or_else(|err| format!("Error: {err:#?}"));
+            let m_ver =
+                shell::get_versioned("models").unwrap_or_else(|err| format!("Error: {err:#?}"));
             let git_com = match get_commit_hash() {
                 Ok(val) => val,
                 Err(err) => {
@@ -66,17 +48,23 @@ pub fn execute(version: &version::VerState) {
             let back_build_time =
                 get_build_time(false, "backend").unwrap_or_else(|err| format!("Error: {err:#?}"));
 
+            let models_build_time =
+                get_build_time(false, "libmodels.d") // since a bin wont be built
+                    .unwrap_or_else(|err| format!("Error: {err:#?}"));
+
             let rustup_tgt = get_rustup_tgt().unwrap_or_else(|err| format!("Error: {err:#?}"));
 
-            let result = Version::new(
-                f_ver,
-                b_ver,
-                git_com,
+            let result = Version {
+                frontend: f_ver,
+                backend: b_ver,
+                models: m_ver,
+                commit_hash: git_com,
                 front_build_time,
                 back_build_time,
+                models_build_time,
                 rustc,
-                rustup_tgt,
-            );
+                rustup_target: rustup_tgt,
+            };
 
             println!("{result}");
         }
@@ -98,12 +86,14 @@ impl fmt::Display for Version {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "Frontend: {}\nBackend: {}\nCommit Hash: {}\nFrontend Build Time: {}\nBackend Build Time: {}\nRustc: {}\nRustup Target: {}",
+            "Frontend: {}\nBackend: {}\nModels: {}\nCommit Hash: {}\nFrontend Build Time: {}\nBackend Build Time: {}\nModels Build Time: {}\nRustc: {}\nRustup Target: {}",
             self.frontend,
             self.backend,
+            self.models,
             self.commit_hash,
             self.front_build_time,
             self.back_build_time,
+            self.models_build_time,
             self.rustc,
             self.rustup_target
         )
@@ -156,8 +146,6 @@ fn get_build_time(prod: bool, app: &str) -> anyhow::Result<String> {
                 .collect::<Vec<String>>()
                 .concat();
 
-            // println!("Target time: {target_line:#?}");
-
             return Ok(target_line);
         }
     }
@@ -170,7 +158,6 @@ fn get_rustup_tgt() -> anyhow::Result<String> {
         .output()?;
 
     let result = String::from_utf8_lossy(&command.stdout)
-        .to_string()
         .split(' ')
         .next()
         .unwrap_or("Error")

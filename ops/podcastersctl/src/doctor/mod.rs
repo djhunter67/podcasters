@@ -79,13 +79,6 @@ impl RustStatus {
         Ok(self)
     }
 
-    // fn format_workspace(mut self) -> anyhow::Result<Self> {
-    //     let output = Command::new("cargo").args(["fmt", "--all"]).output()?;
-    //     let otpt = String::from_utf8(output.stdout)?;
-
-    //     Ok(self)
-    // }
-
     /// cargo clippy --workspace --all-targets --all-features -- -D warnings
     fn clippy_it(mut self) -> anyhow::Result<Self> {
         let output = Command::new("cargo")
@@ -99,12 +92,14 @@ impl RustStatus {
                 "warnings",
             ])
             .output()?;
-        let opt = String::from_utf8(output.stdout)?;
+        let opt = String::from_utf8(output.stderr)?;
 
-        self.clippy = if opt.is_empty() {
-            String::from("pass")
-        } else {
+        // println!("Output contains error: {:#?}", opt.contains("\nerror"));
+
+        self.clippy = if opt.contains("\nerror") {
             String::from("fail")
+        } else {
+            String::from("pass")
         };
 
         Ok(self)

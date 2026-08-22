@@ -1,10 +1,10 @@
 use super::{
-    backup_arg, ci_arg, config_arg, deploy_arg, dev_arg, diag_arg, incident_arg, kube_arg,
-    mongo_arg, redis_arg, smoke_arg, Podcastersctl,
+    Podcastersctl, backup_arg, ci_arg, config_arg, deploy_arg, dev_arg, diag_arg, incident_arg,
+    kube_arg, mongo_arg, redis_arg, smoke_arg,
 };
 
 use crate::{
-    commands::{version_arg, PodcastersctlCommands},
+    commands::{PodcastersctlCommands, version_arg},
     doctor,
 };
 
