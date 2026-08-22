@@ -9,7 +9,8 @@ struct Version {
     frontend: String,
     backend: String,
     commit_hash: String,
-    build_time: String,
+    front_build_time: String,
+    back_build_time: String,
     rustc: String,
     rustup_target: String,
 }
@@ -19,7 +20,8 @@ impl Version {
         frontend: String,
         backend: String,
         commit_hash: String,
-        build_time: String,
+        front_build_time: String,
+        back_build_time: String,
         rustc: String,
         rustup_target: String,
     ) -> Self {
@@ -27,7 +29,8 @@ impl Version {
             frontend,
             backend,
             commit_hash,
-            build_time,
+            front_build_time,
+            back_build_time,
             rustc,
             rustup_target,
         }
@@ -57,10 +60,23 @@ pub fn execute(version: &version::VerState) {
 
             let rustc = get_rustc_version().unwrap_or_else(|err| format!("Error: {err:#?}"));
 
-            let build_time =
+            let front_build_time =
                 get_build_time(false, "frontend").unwrap_or_else(|err| format!("Error: {err:#?}"));
 
-            let result = Version::new(f_ver, b_ver, git_com, build_time, rustc, String::new());
+            let back_build_time =
+                get_build_time(false, "backend").unwrap_or_else(|err| format!("Error: {err:#?}"));
+
+            let rustup_tgt = get_rustup_tgt().unwrap_or_else(|err| format!("Error: {err:#?}"));
+
+            let result = Version::new(
+                f_ver,
+                b_ver,
+                git_com,
+                front_build_time,
+                back_build_time,
+                rustc,
+                rustup_tgt,
+            );
 
             println!("{result}");
         }
@@ -82,11 +98,12 @@ impl fmt::Display for Version {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "Frontend: {}\nBackend: {}\nCommit Hash: {}\nBuild Time: {}\nRustc: {}\nRustup Target: {}",
+            "Frontend: {}\nBackend: {}\nCommit Hash: {}\nFrontend Build Time: {}\nBackend Build Time: {}\nRustc: {}\nRustup Target: {}",
             self.frontend,
             self.backend,
             self.commit_hash,
-            self.build_time,
+            self.front_build_time,
+            self.back_build_time,
             self.rustc,
             self.rustup_target
         )
@@ -117,7 +134,7 @@ fn get_build_time(prod: bool, app: &str) -> anyhow::Result<String> {
     for line in result.lines() {
         if line.split(' ').next_back().expect("Faild to split").eq(app) {
             let target_line: Vec<String> = line
-                .split('\x20')
+                .split(' ')
                 .map(std::string::ToString::to_string)
                 .collect();
 
@@ -132,16 +149,34 @@ fn get_build_time(prod: bool, app: &str) -> anyhow::Result<String> {
 
             let target_line: String = target_line
                 .iter()
-                .map(|val| val.clone().to_owned().clone() + &String::from(" "))
-                // .map(|value| value.as_str())
+                .map(|val| val.as_str())
+                .collect::<Vec<&str>>()
+                .iter()
+                .map(|val| val.to_string() + &String::from(" "))
                 .collect::<Vec<String>>()
                 .concat();
 
-            println!("Target Line: {target_line:#?}");
+            // println!("Target time: {target_line:#?}");
+
+            return Ok(target_line);
         }
     }
+    Ok(String::from("Unknown"))
+}
 
-    Ok(String::from("Yesterday"))
+fn get_rustup_tgt() -> anyhow::Result<String> {
+    let command = Command::new("rustup")
+        .args(["show", "active-toolchain"])
+        .output()?;
+
+    let result = String::from_utf8_lossy(&command.stdout)
+        .to_string()
+        .split(' ')
+        .next()
+        .unwrap_or("Error")
+        .to_string();
+
+    Ok(result)
 }
 
 #[cfg(test)]
