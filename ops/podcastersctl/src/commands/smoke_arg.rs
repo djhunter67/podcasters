@@ -1,6 +1,6 @@
 use crate::smoke::{self, SmokeSubcommand, Staging};
 
-pub fn execute(smoke: &smoke::SmokeState) {
+pub fn execute(smoke: &smoke::SmokeState) -> anyhow::Result<()> {
     match &smoke.smoke {
         SmokeSubcommand::Environment(environ) => match environ.staging {
             Staging::Debug => {
@@ -11,4 +11,6 @@ pub fn execute(smoke: &smoke::SmokeState) {
             }
         },
     }
+
+    Ok(())
 }

@@ -1,6 +1,6 @@
 use crate::ci::{self, CiSubcommand};
 
-pub fn execute(ci: &ci::CiState) {
+pub fn execute(ci: &ci::CiState) -> anyhow::Result<()> {
     match ci.ci {
         CiSubcommand::Verify => {
             println!("Run the formats and what-not");
@@ -9,4 +9,6 @@ pub fn execute(ci: &ci::CiState) {
             println!("Run the integrations, not sure what this means, though.");
         }
     }
+
+    Ok(())
 }

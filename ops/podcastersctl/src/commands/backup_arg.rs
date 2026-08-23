@@ -1,6 +1,6 @@
 use crate::backup::{self, BackupSubcommand, Creator};
 
-pub fn execute(backup: &backup::BackupState) {
+pub fn execute(backup: &backup::BackupState) -> anyhow::Result<()> {
     match &backup.backup {
         BackupSubcommand::Create(to_create) => match to_create.create {
             Creator::Mongodb => {
@@ -27,4 +27,6 @@ pub fn execute(backup: &backup::BackupState) {
             );
         }
     }
+
+    Ok(())
 }

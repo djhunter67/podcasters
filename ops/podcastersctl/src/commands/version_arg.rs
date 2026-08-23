@@ -17,7 +17,7 @@ struct Version {
     rustup_target: String,
 }
 
-pub fn execute(version: &version::VerState) {
+pub fn execute(version: &version::VerState) -> anyhow::Result<()> {
     match &version.version {
         // Show version of the crate
         // Show the git commit hash
@@ -72,6 +72,8 @@ pub fn execute(version: &version::VerState) {
             println!("The current version information");
         }
     }
+
+    Ok(())
 }
 
 fn get_commit_hash() -> anyhow::Result<String> {

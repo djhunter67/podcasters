@@ -1,16 +1,20 @@
 mod docker_info;
+mod mongo;
+mod redis;
 mod rust_info;
 
 use std::fmt;
 
 use shared::shell;
 
+use crate::doctor::mongo::{connection_str, databases};
+
 const RUSTUP_TOOLCHAIN_VAR: &str = "RUSTUP_TOOLCHAIN";
-pub fn execute() {
+pub async fn execute() -> anyhow::Result<()> {
     // let rust_info = RustStatus::new();
 
     // RUST
-    let mut rust_info = RustStatus::new();
+    let mut rust_info = RustStatus::default();
     rust_info.rustfmt =
         rust_info::format_workspace_check().unwrap_or_else(|err| format!("Error: {err:#?}"));
     rust_info.toolchain =
@@ -23,17 +27,43 @@ pub fn execute() {
     // DOCKER
     let mut docker_info = DockerStatus::default();
 
-    docker_info.user_may_create_containers =
-        docker_info::is_docker_running().unwrap_or_else(|err| {
+    docker_info.user_may_create_containers = docker_info::can_user_create_containers()
+        .unwrap_or_else(|err| {
             eprintln!("Error checking Docker status: {err:#?}");
             false
         });
 
+    docker_info.container_reachable = docker_info::is_container_reachable().unwrap_or_else(|err| {
+        eprintln!("Error checking Docker status: {err:#?}");
+        false
+    });
+
+    // MONGODB
+    let mongo_info = MongoDb {
+        connection_str: connection_str().unwrap_or_else(|err| format!("Error: {err}")),
+        ping: mongo::ping("").await?,
+        db_databases: databases("").await?,
+    };
+
+    // REDIS
+    let redis_info = Redis {
+        connection_str: String::from("NONE"),
+        ping: redis::ping("").await?,
+    };
+
+    // OUTPUT
     println!("{rust_info}");
-    println!("\n\n");
+    println!("\n");
     println!("{docker_info}");
+    println!("\n");
+    println!("{mongo_info}");
+    println!("\n");
+    println!("{redis_info}");
+
+    Ok(())
 }
 
+#[derive(Default)]
 struct RustStatus {
     toolchain: String,
     rustfmt: String,
@@ -42,21 +72,33 @@ struct RustStatus {
     workspace_root: String,
 }
 
-impl RustStatus {
-    pub const fn new() -> Self {
-        Self {
-            toolchain: String::new(),
-            rustfmt: String::new(),
-            clippy: String::new(),
-            compiler: String::new(),
-            workspace_root: String::new(),
-        }
-    }
+#[derive(Default)]
+struct DockerStatus {
+    container_reachable: bool,
+    user_may_create_containers: bool,
 }
 
-struct DockerStatus {
-    container_reachable: String,
-    user_may_create_containers: bool,
+#[derive(Default)]
+struct MongoDb {
+    connection_str: String,
+    ping: bool,
+    db_databases: Vec<String>,
+}
+
+#[derive(Default)]
+struct Redis {
+    connection_str: String,
+    ping: bool,
+}
+
+impl fmt::Display for Redis {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "Connection str: {}\nPing: {}",
+            self.connection_str, self.ping
+        )
+    }
 }
 
 impl fmt::Display for RustStatus {
@@ -69,21 +111,22 @@ impl fmt::Display for RustStatus {
     }
 }
 
-impl Default for DockerStatus {
-    fn default() -> Self {
-        Self {
-            container_reachable: String::new(),
-            user_may_create_containers: false,
-        }
-    }
-}
-
 impl fmt::Display for DockerStatus {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "Docker container reachable: {}\nUser may create containers: {}",
             self.container_reachable, self.user_may_create_containers
+        )
+    }
+}
+
+impl fmt::Display for MongoDb {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "Connection str: {}\nPing: {}\nDatabases: {:#?}",
+            self.connection_str, self.ping, self.db_databases
         )
     }
 }

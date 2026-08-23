@@ -1,6 +1,6 @@
 use crate::incident::{self, IncidentSubcommand};
 
-pub fn execute(incident: &incident::IncidentState) {
+pub fn execute(incident: &incident::IncidentState) -> anyhow::Result<()> {
     match &incident.incident {
         IncidentSubcommand::Asess => {
             println!("Asses the incident");
@@ -19,4 +19,6 @@ pub fn execute(incident: &incident::IncidentState) {
             // ExitCode::Success
         }
     }
+
+    Ok(())
 }

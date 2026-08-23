@@ -1,6 +1,6 @@
 use crate::deploy::{self, DeploySubcommand};
 
-pub fn execute(deploy: &deploy::DeployState) {
+pub fn execute(deploy: &deploy::DeployState) -> anyhow::Result<()> {
     match &deploy.deploy {
         DeploySubcommand::Status => {
             println!("Get the status of the mobile and web applications");
@@ -15,4 +15,6 @@ pub fn execute(deploy: &deploy::DeployState) {
             println!("Rollback the currently deployed instance for all applications");
         }
     }
+
+    Ok(())
 }

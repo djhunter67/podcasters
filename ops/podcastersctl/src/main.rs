@@ -1,8 +1,12 @@
 use clap::Parser;
 use podcastersctl::commands::{Podcastersctl, command_tree};
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let args = Podcastersctl::parse();
 
-    command_tree::run(args);
+    match command_tree::run(args).await {
+        Ok(()) => (),
+        Err(err) => eprint!("{err:#?}"),
+    };
 }

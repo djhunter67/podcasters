@@ -1,6 +1,6 @@
 use crate::diagnostics::{self, DevSubcommand};
 
-pub fn execute(cmd: &diagnostics::DevState) {
+pub fn execute(cmd: &diagnostics::DevState) -> anyhow::Result<()> {
     match &cmd.dev {
         DevSubcommand::Up => {
             println!("Much to do about the 'UP' command");
@@ -14,5 +14,6 @@ pub fn execute(cmd: &diagnostics::DevState) {
         DevSubcommand::Reset => {
             println!("Turn off and then back on various dependencies");
         }
-    }
+    };
+    Ok(())
 }

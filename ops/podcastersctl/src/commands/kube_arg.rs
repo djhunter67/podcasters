@@ -1,6 +1,6 @@
 use crate::kubernetes::{self, KubSubcommand};
 
-pub fn execute(kube: &kubernetes::KubState) {
+pub fn execute(kube: &kubernetes::KubState) -> anyhow::Result<()> {
     match &kube.kubernetes {
         KubSubcommand::Status => {
             println!("Get the status of the cluster");
@@ -18,4 +18,6 @@ pub fn execute(kube: &kubernetes::KubState) {
             println!("The val passed in: {}", val.inspect);
         }
     }
+
+    Ok(())
 }

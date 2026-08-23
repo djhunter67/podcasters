@@ -1,6 +1,6 @@
 use crate::redis::{self, RedisIntegration, RedisSession, RedisSubcommand};
 
-pub fn execute(redis_arg: &redis::RedisState) {
+pub fn execute(redis_arg: &redis::RedisState) -> anyhow::Result<()> {
     match &redis_arg.redis {
         RedisSubcommand::Check => {
             println!("Compare the keys in the cache with the expected values");
@@ -19,4 +19,6 @@ pub fn execute(redis_arg: &redis::RedisState) {
             }
         },
     }
+
+    Ok(())
 }
