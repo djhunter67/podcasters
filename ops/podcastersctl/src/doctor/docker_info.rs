@@ -7,7 +7,7 @@ pub fn can_user_create_containers() -> anyhow::Result<bool> {
 pub fn is_container_reachable() -> anyhow::Result<bool> {
     let output = std::process::Command::new("docker").arg("info").output()?;
 
-    println!("{}", String::from_utf8_lossy(&output.stderr));
+    // println!("{}", String::from_utf8_lossy(&output.stderr));
 
     Ok(output.status.success())
 }

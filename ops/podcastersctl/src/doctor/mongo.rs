@@ -1,17 +1,24 @@
 use mongodb::{Client, bson::doc};
 
-pub fn connection_str() -> anyhow::Result<String> {
-    Ok(String::from("Unknown"))
-}
-
 pub async fn ping(connection_string: &str) -> anyhow::Result<bool> {
     let client = Client::with_uri_str(connection_string).await?;
 
-    client.database("admin").run_command(doc! {
-        "ping": 1
-    });
+    let results = client
+        .database("admin")
+        .run_command(doc! {
+            "ping": 1
+        })
+        .await?;
 
-    Ok(true)
+    // for result in &results {
+    //     println!("Result: {result:#?}");
+    // }
+
+    if results.contains_key("ok") {
+        return Ok(true);
+    }
+
+    Ok(false)
 }
 
 pub async fn databases(connection_string: &str) -> anyhow::Result<Vec<String>> {
@@ -19,9 +26,9 @@ pub async fn databases(connection_string: &str) -> anyhow::Result<Vec<String>> {
 
     let list_databases = client.list_database_names().await?;
 
-    for database in list_databases.iter() {
-        println!("Database: {database:#?}");
-    }
+    // for database in &list_databases {
+    // println!("Database: {database:#?}");
+    // }
 
-    Ok(vec![])
+    Ok(list_databases)
 }

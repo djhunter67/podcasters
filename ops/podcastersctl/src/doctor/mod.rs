@@ -7,7 +7,7 @@ use std::fmt;
 
 use shared::shell;
 
-use crate::doctor::mongo::{connection_str, databases};
+use crate::doctor::mongo::databases;
 
 const RUSTUP_TOOLCHAIN_VAR: &str = "RUSTUP_TOOLCHAIN";
 pub async fn execute() -> anyhow::Result<()> {
@@ -38,17 +38,21 @@ pub async fn execute() -> anyhow::Result<()> {
         false
     });
 
+    let mongo_conn = std::env::var("APP_MONGO__URI")?;
+
     // MONGODB
     let mongo_info = MongoDb {
-        connection_str: connection_str().unwrap_or_else(|err| format!("Error: {err}")),
-        ping: mongo::ping("").await?,
-        db_databases: databases("").await?,
+        connection_str: mongo_conn.clone(),
+        ping: mongo::ping(&mongo_conn).await?,
+        db_databases: databases(&mongo_conn).await?,
     };
+
+    let redis_conn = std::env::var("APP_REDIS__URI")?;
 
     // REDIS
     let redis_info = Redis {
-        connection_str: String::from("NONE"),
-        ping: redis::ping("").await?,
+        connection_str: redis_conn.clone(),
+        ping: redis::ping(&redis_conn).await?,
     };
 
     // OUTPUT
