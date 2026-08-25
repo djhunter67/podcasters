@@ -31,7 +31,7 @@ pub fn format_workspace_check() -> anyhow::Result<String> {
 }
 
 /// cargo clippy --workspace --all-targets --all-features -- -D warnings
-pub fn clippy_it() -> anyhow::Result<String> {
+pub fn clippy_it() -> anyhow::Result<bool> {
     let output = Command::new("cargo")
         .args([
             "clippy",
@@ -43,14 +43,16 @@ pub fn clippy_it() -> anyhow::Result<String> {
             "warnings",
         ])
         .output()?;
+    // .expect("Failed to get Clippy output");
     let opt = String::from_utf8(output.stderr)?;
+    // .expect("Failed to convert ascii to string");
 
     // println!("Output contains error: {:#?}", opt.contains("\nerror"));
 
     if opt.contains("\nerror") {
-        Ok(String::from("fail"))
+        Ok(false)
     } else {
-        Ok(String::from("pass"))
+        Ok(true)
     }
 }
 
@@ -92,7 +94,6 @@ pub fn get_compiler() -> anyhow::Result<String> {
         .split('=')
         .next_back()
         .expect("Fail to next")
-        .to_string()
         .trim()
         .trim_matches('"')
         .to_string())

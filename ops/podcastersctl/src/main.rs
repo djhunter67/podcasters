@@ -8,5 +8,5 @@ async fn main() {
     match command_tree::run(args).await {
         Ok(()) => (),
         Err(err) => eprint!("{err:#?}"),
-    };
+    }
 }

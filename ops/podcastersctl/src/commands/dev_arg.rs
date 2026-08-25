@@ -1,5 +1,6 @@
 use crate::diagnostics::{self, DevSubcommand};
 
+#[allow(clippy::unnecessary_wraps)]
 pub fn execute(cmd: &diagnostics::DevState) -> anyhow::Result<()> {
     match &cmd.dev {
         DevSubcommand::Up => {
@@ -14,6 +15,6 @@ pub fn execute(cmd: &diagnostics::DevState) -> anyhow::Result<()> {
         DevSubcommand::Reset => {
             println!("Turn off and then back on various dependencies");
         }
-    };
+    }
     Ok(())
 }

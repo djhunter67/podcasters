@@ -1,5 +1,6 @@
 use crate::incident::{self, IncidentSubcommand};
 
+#[allow(clippy::unnecessary_wraps)]
 pub fn execute(incident: &incident::IncidentState) -> anyhow::Result<()> {
     match &incident.incident {
         IncidentSubcommand::Asess => {

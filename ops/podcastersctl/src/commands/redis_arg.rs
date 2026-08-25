@@ -1,5 +1,6 @@
 use crate::redis::{self, RedisIntegration, RedisSession, RedisSubcommand};
 
+#[allow(clippy::unnecessary_wraps)]
 pub fn execute(redis_arg: &redis::RedisState) -> anyhow::Result<()> {
     match &redis_arg.redis {
         RedisSubcommand::Check => {

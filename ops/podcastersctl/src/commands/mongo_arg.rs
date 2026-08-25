@@ -1,5 +1,6 @@
 use crate::mongo::{self, MongoSubcommand};
 
+#[allow(clippy::unnecessary_wraps)]
 pub fn execute(mongo_arg: &mongo::MongoState) -> anyhow::Result<()> {
     match &mongo_arg.mongo {
         MongoSubcommand::Check => {
@@ -11,7 +12,7 @@ pub fn execute(mongo_arg: &mongo::MongoState) -> anyhow::Result<()> {
         MongoSubcommand::Reconcile => {
             println!("Create whats missing in the live instance of the Database");
         }
-    };
+    }
 
     Ok(())
 }

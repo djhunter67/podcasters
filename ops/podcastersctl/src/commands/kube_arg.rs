@@ -1,5 +1,6 @@
 use crate::kubernetes::{self, KubSubcommand};
 
+#[allow(clippy::unnecessary_wraps)]
 pub fn execute(kube: &kubernetes::KubState) -> anyhow::Result<()> {
     match &kube.kubernetes {
         KubSubcommand::Status => {

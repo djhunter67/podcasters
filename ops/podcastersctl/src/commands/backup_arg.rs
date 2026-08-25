@@ -1,5 +1,6 @@
 use crate::backup::{self, BackupSubcommand, Creator};
 
+#[allow(clippy::unnecessary_wraps)]
 pub fn execute(backup: &backup::BackupState) -> anyhow::Result<()> {
     match &backup.backup {
         BackupSubcommand::Create(to_create) => match to_create.create {

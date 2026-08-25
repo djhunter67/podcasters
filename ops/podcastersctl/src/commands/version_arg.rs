@@ -17,6 +17,7 @@ struct Version {
     rustup_target: String,
 }
 
+#[allow(clippy::unnecessary_wraps)]
 pub fn execute(version: &version::VerState) -> anyhow::Result<()> {
     match &version.version {
         // Show version of the crate

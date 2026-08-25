@@ -1,5 +1,6 @@
 use crate::deploy::{self, DeploySubcommand};
 
+#[allow(clippy::unnecessary_wraps)]
 pub fn execute(deploy: &deploy::DeployState) -> anyhow::Result<()> {
     match &deploy.deploy {
         DeploySubcommand::Status => {

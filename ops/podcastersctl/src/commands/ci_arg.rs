@@ -1,5 +1,6 @@
 use crate::ci::{self, CiSubcommand};
 
+#[allow(clippy::unnecessary_wraps)]
 pub fn execute(ci: &ci::CiState) -> anyhow::Result<()> {
     match ci.ci {
         CiSubcommand::Verify => {
