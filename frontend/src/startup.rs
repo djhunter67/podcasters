@@ -4,7 +4,10 @@ use actix_web::{self, App, HttpServer, http::KeepAlive, middleware, web};
 use shared::settings;
 use tracing::{instrument, warn};
 
-use crate::endpoints;
+use crate::{
+    endpoints::{self, discover, index, podcasts},
+    images,
+};
 
 pub const PARSE_COUNT: u8 = 9;
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -39,32 +42,33 @@ async fn run(
             .wrap(middleware::DefaultHeaders::new().add(("X-Version", env!("CARGO_PKG_VERSION")))) // Security consideration
             .app_data(db_redis.clone())
             .app_data(db_mongo.clone())
-            .service(web::scope("/v1").service(endpoints::health))
-        // .service(
-        //     web::scope("/static")
-        //         .service(images::favicon)
-        //         .service(images::icon_192)
-        //         .service(images::icon_512)
-        //         .service(images::icon_large)
-        //         .service(images::link_preview)
-        //         .service(images::manifest)
-        //         .service(images::logomain)
-        //         .service(images::usmc_patrolling)
-        //         .service(images::stylesheet)
-        //         .service(images::source_map)
-        //         .service(images::htmx)
-        //         .service(images::response_targets)
-        //         .service(images::sse)
-        //         .service(images::action_script)
-        //         .service(images::prof_headshot)
-        //         .service(images::spinner)
-        //         .service(images::github)
-        //         .service(images::linkedin)
-        //         .service(images::settings_icon)
-        //         .service(images::random_images),
-        // )
-        // .service(index::index)
-        // .service(health::health_check)
+            .service(
+                web::scope("/static")
+                    .service(images::favicon)
+                    .service(images::icon_192)
+                    .service(images::icon_512)
+                    .service(images::icon_large)
+                    .service(images::link_preview)
+                    .service(images::manifest)
+                    .service(images::logomain)
+                    .service(images::usmc_patrolling)
+                    .service(images::stylesheet)
+                    .service(images::source_map)
+                    .service(images::htmx)
+                    .service(images::response_targets)
+                    .service(images::sse)
+                    .service(images::action_script)
+                    .service(images::prof_headshot)
+                    .service(images::spinner)
+                    .service(images::github)
+                    .service(images::linkedin)
+                    .service(images::settings_icon)
+                    .service(images::random_images),
+            )
+            .service(index::index)
+            .service(endpoints::health)
+            .service(podcasts::podcasts)
+            .service(discover::discover)
         // .service(endpoints::bs_logic::schedule)
         // .service(endpoints::bs_logic::testimonials)
         // .service(endpoints::bs_logic::finances)

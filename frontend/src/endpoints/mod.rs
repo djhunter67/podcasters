@@ -1,3 +1,8 @@
+pub mod discover;
+pub mod index;
+pub mod podcasts;
+pub mod templates;
+
 #[actix_web::get("/health")]
 #[tracing::instrument(
     name = "Health endpoint",

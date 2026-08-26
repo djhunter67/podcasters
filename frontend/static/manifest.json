@@ -1,7 +1,7 @@
 {
-  "name": "Sunday Life Services",
-  "short_name": "Sunday Life",
-  "description": "Sunday Life Services personal web application",
+  "name": "Podcasters",
+  "short_name": "Podcasters",
+  "description": "Podcasting application for all platforms",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

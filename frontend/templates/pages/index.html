@@ -1,0 +1,10 @@
+{% extends "base.html" %} {% block title %} {{ title }} {{ version  }} {% endblock %}
+{% block head %} {% endblock %}
+{% block contents %}
+<div id="main">
+  <section id="main__podcasts">    
+    {% include "fragments/podcasts_content.html" %}
+    👤
+  </section>
+</div>
+{% endblock %}
