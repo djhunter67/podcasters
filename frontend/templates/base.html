@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}{{ title }}{% endblock %}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="A Rust-powered personal journaling application">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content={{ title }}>
+    <meta property="og:description" content="A Rust-powered personal journaling application">
+    <meta property="og:url" content="https://sundaylifeservices.com/">
+    <meta property="og:image" content="https://sundaylifeservices.com/static/link-preview">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="627">
+    <meta property="og:image:alt" content="Personal journaling application icon featuring a vibrant feather pen">
+    <link rel="manifest" href="/static/manifest.webmanifest">
+    <meta name="theme-color" content="#1f2937">
+    <link rel="apple-touch-icon" href="/static/icon-192">
+    <link rel="icon" href="/static/icon-192" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="/static/stylesheet">
+    <script  type="text/javascript" defer src="/static/htmx"></script>
+    <script  type="text/javascript" defer src="/static/response-targets" defer></script>
+    <script  type="text/javascript" defer src="/static/sse"></script>
+    <script  type="text/javascript" defer src="/static/action_script" defer></script>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <header id="template__header">
+      HEADER
+    </header>
+    <main id="template__pages">
+      MAIN
+      {% block content %}
+      {% endblock %}
+    </main>
+    <div id="error_template">
+      ERROR
+      {% block error_contents %}
+      {% endblock %}
+    </div>
+    <footer id="template__footer">
+      FOOTER
+    </footer>
+  </body>
+</html>
