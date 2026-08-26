@@ -1,0 +1,50 @@
+
+#sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 2rem;
+    gap: 2rem;
+
+    img {
+	max-height: 19px;
+	max-width: 19px;
+	border-radius: 5rem;
+    }
+
+    button {
+	border-radius: var(--radius-md);
+	background-color: var(--teal-400);
+	transition: background-color 300ms ease;
+	padding: 0.39rem;
+	// font-size: large;
+	font-weight: 300;
+	max-width: 6rem;
+
+	&:hover {
+	    background-color: var(--teal-500);
+	}
+    }
+
+    &__top {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+	margin-bottom: 2rem;
+    }
+    &__mid {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+	margin-bottom: 2rem;
+    }
+    &__bottom {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+    }
+
+    
+
+    
+}

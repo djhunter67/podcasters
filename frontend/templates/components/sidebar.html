@@ -1,58 +1,56 @@
 <aside id="sidebar">
   <img src="/static/icon-192" alt="Sidebar logo">
-  <button
-    hx-get="/"
-    hx-target="#main"
-    hx-swap="outerHTML transition: true"   
-    >HOME
-  </button>
-  <button
-    hx-get="/discover"
-    hx-target="#main"
-    hx-swap="innerHTML transition:true"
-    hx-push-url="true"
-    >DISCOVER
-  </button>
-  <button
-    hx-get="/podcasts"
-    hx-target="#main"
-    hx-swap="innerHTML transition:true"
-    hx-push-url="true"
-    >PODCASTS
-  </button>
-  <button
-    hx-get="/episodes"
-    hx-target="#main"
-    hx-swap="innerHTML transition:true"
-    hx-push-url="true"
-    >EPISODES
-  </button>
-  <button
-    hx-get="/queue"
-    hx-target="#main"
-    hx-swap="innerHTML transition:true"
-    hx-push-url="true"
-    >QUEUE
-  </button>
-  <button
-    hx-get="/history"
-    hx-target="#main"
-    hx-swap="innerHTML transition:true"
-    hx-push-url="true"
-    >HISTORY
-  </button>
+  <div id="sidebar__top">
+    <button
+      hx-get="/"
+      hx-target="body"
+      hx-swap="outerHTML transition: true"   
+      >HOME
+    </button>
+    <button
+      hx-get="/discover"
+      hx-target="#main"
+      hx-swap="innerHTML transition:true"
+      >DISCOVER
+    </button>
+    <button
+      hx-get="/podcasts"
+      hx-target="#main"
+      hx-swap="innerHTML transition:true"
+      >PODCASTS
+    </button>
+    <button
+      hx-get="/episodes"
+      hx-target="#main"
+      hx-swap="innerHTML transition:true"
+      >EPISODES
+    </button>
+  </div>
+  <div id="sidebar__mid">
+    <button
+      hx-get="/queue"
+      hx-target="#main"
+      hx-swap="innerHTML transition:true"
+      >QUEUE
+    </button>
+    <button
+      hx-get="/history"
+      hx-target="#main"
+      hx-swap="innerHTML transition:true"
+      >HISTORY
+    </button>
+  </div>
+  <div id="sidebar__bottom">
   <button
     hx-get="/playlist"
     hx-target="#main"
     hx-swap="innerHTML transition:true"
-    hx-push-url="true"
     >PLAYLIST
   </button>
   <button
     hx-get="/profile"
     hx-target="#main"
     hx-swap="innerHTML transition:true"
-    hx-push-url="true"
     >PROFILE
   </button>  
 </aside>

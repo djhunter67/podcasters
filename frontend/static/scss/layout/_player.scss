@@ -1,0 +1,67 @@
+#player {
+	background-color: var(--bg-player);
+
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.25rem 1rem;
+
+	&__art {
+		img {
+			border-radius: 50%;
+			object-fit: cover;
+			max-height: 19px;
+			max-width: 19px;
+		}
+	}
+
+	&__title {
+		font-weight: 700;
+		font-size: large;
+		text-align: center;
+	}
+
+	&__player {
+		background-color: purple;
+		color: blue;
+	}
+
+	&__timeline {
+		// animate a timeline
+		/* Define the animation name and duration */
+		animation-name: fadeIn;
+		animation-duration: 2s;
+
+		/* Repeat indefinitely */
+		animation-iteration-count: infinite;
+
+		/* Optional: Loop direction (alternate, reverse, normal) */
+		animation-direction: alternate;
+
+		/* Optional: Timing function for smoother transitions */
+		animation-timing-function: ease-in-out;
+	}
+
+	&__speed {
+	    span {
+		font-size: large;
+	    }
+	}
+
+	&__fingerprint {
+	    background-color: black;
+	}
+
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+		}
+
+		to {
+			opacity: 1;
+		}
+
+	}
+}

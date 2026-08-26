@@ -2,9 +2,33 @@
 {% block head %} {% endblock %}
 {% block contents %}
 <div id="main">
+  <header id="main__header">
+    <button
+      hx-get="/podcasts"
+      hx-swap="#main"
+      hx-target="innerHTML"
+      >PODCASTS
+    </button>
+    <div id="main__header__right">
+      <button
+	hx-get="/category"
+	hx-swap="#main"
+	hx-target="innerHTML"
+	>Category
+      </button>
+      <button
+	hx-get="/sort"
+	hx-swap="#main"
+	hx-target="innerHTML"
+	>SORT
+      </button>
+    </div>
+  </header>
+  <div id="main__search_bar">
+    <input type="text" placeholder="🔍 Search podcasts">
+  </div>
   <section id="main__podcasts">    
     {% include "fragments/podcasts_content.html" %}
-    👤
   </section>
 </div>
 {% endblock %}

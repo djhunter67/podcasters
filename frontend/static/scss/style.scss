@@ -6,8 +6,8 @@
 	--bg-sidebar: #0d1316;
 	--bg-surface: #121a1e;
 	--bg-surface-hover: #172328;
-	--bg-header: #ffbf1b;
-	--bg-footer: #b452;
+	--bg-header: #12fffb;
+	--bg-player: #b452;
 
 
 	--text-primary: #f3f7f6;
@@ -28,16 +28,17 @@
 	--radius-lg: 14px;
 
 	--sidebar-width: 240px;
+	--sidebar-min: 72px;
 	--topbar-height: 64px;
 	--player-height: 88px;
 
 	hanging-punctuation: first last;
 	color-scheme: dark light;
-	scrollbar-gutter: stable;
+	// scrollbar-gutter: stable;
 	box-sizing: border-box;
 
 	button:focus-visible {
-		outline: 7px solid var(--accent-hover);
+		outline: 7px solid var(--bg-player);
 	}
 }
 
@@ -70,9 +71,12 @@ body {
 		grid-row: 1 / -1;
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
-		align-items: center;
+		justify-content: start;
+		align-items: flex-start;
+		max-width: var(--sidebar-width);
 		background-color: var(--bg-sidebar);
+		padding-left: 2rem;
+		
 	}
 
 	#template__header {
@@ -80,12 +84,10 @@ body {
 		grid-row: 1;
 		display: flex;
 		flex-direction: row;
-		justify-content: center;
+		justify-content: space-between;
 		align-items: center;
 		background-color: var(--bg-header);
-		gap: 1em;
-		padding-top: 6em;
-		overflow-x: hidden;
+		max-height: var(--topbar-height);
 	}
 
 	#template__pages {
@@ -97,30 +99,25 @@ body {
 	}
 
 	#template__footer {
-		grid-column: 2;
-		grid-row: 1 / -1;
+		grid-column: 1 / -1;
+		grid-row: 3;
 		margin-block-start: auto;
-		background-color: var(--bg-footer)
+		background-color: var(--bg-player);
+		max-height: var(--player-height);
 	}
 }
 
 @include meta.load-css("layout/_header");
-// @include meta.load-css("_index");
-// @include meta.load-css("_footer");
-// @include meta.load-css("_login");
-// @include meta.load-css("_registration");
-// @include meta.load-css("_error");
-// @include meta.load-css("_settings");
-// @include meta.load-css("_indiv_post");
-// @include meta.load-css("_confirmation");
-// @include meta.load-css("_user_input");
+@include meta.load-css("layout/_sidebar");
+@include meta.load-css("layout/_player");
+@include meta.load-css("layout/_content");
 
 // implement a media query for mobile devices with a max-width of 600px
-@media (max-width: 600px) {
+@media (min-width: 600px) {
 	#template__sidebar {
-		max-width: 3rem;
 		display: flex;
 		flex-direction: column;
+		max-width: var(--sidebar-min);
 	}
 
 	#template__header {
