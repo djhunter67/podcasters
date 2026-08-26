@@ -1,4 +1,4 @@
-#![allow(clippy::empty_enum)]
+#![allow(clippy::empty_enums)]
 use std::time;
 
 use mongodb::options::ClientOptions;
