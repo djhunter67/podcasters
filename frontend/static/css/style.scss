@@ -18,6 +18,17 @@ $frosted-blue: hsla(194, 95%, 76%, 1);
 $pacific-blue: hsla(191, 59%, 55%, 1);
 
 
+:root {
+    --surface-0: ...;
+    --surface-1: ...;
+    --surface-2: ...;
+    --text-primary: ...;
+    --text-secondary: ...;
+    --border-subtle: ...;
+    --accent: ...;
+    --accent-hover: ...;
+}
+
 html {
 	hanging-punctuation: first last;
 	color-scheme: dark light;
@@ -88,13 +99,13 @@ body {
 @include meta.load-css("_header");
 @include meta.load-css("_index");
 @include meta.load-css("_footer");
-@include meta.load-css("_login");
-@include meta.load-css("_registration");
-@include meta.load-css("_error");
-@include meta.load-css("_settings");
-@include meta.load-css("_indiv_post");
-@include meta.load-css("_confirmation");
-@include meta.load-css("_user_input");
+// @include meta.load-css("_login");
+// @include meta.load-css("_registration");
+// @include meta.load-css("_error");
+// @include meta.load-css("_settings");
+// @include meta.load-css("_indiv_post");
+// @include meta.load-css("_confirmation");
+// @include meta.load-css("_user_input");
 
 // implement a media query for mobile devices with a max-width of 600px
 @media (max-width: 600px) {
