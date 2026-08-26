@@ -11,15 +11,7 @@ pub async fn ping(connection_string: &str) -> anyhow::Result<bool> {
         })
         .await?;
 
-    // for result in &results {
-    //     println!("Result: {result:#?}");
-    // }
-
-    if results.contains_key("ok") {
-        return Ok(true);
-    }
-
-    Ok(false)
+    Ok(results.contains_key("ok"))
 }
 
 pub async fn databases(connection_string: &str) -> anyhow::Result<Vec<String>> {

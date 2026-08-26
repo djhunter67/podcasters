@@ -18,15 +18,22 @@ $frosted-blue: hsla(194, 95%, 76%, 1);
 $pacific-blue: hsla(191, 59%, 55%, 1);
 
 
+
 :root {
-    --surface-0: ...;
-    --surface-1: ...;
-    --surface-2: ...;
-    --text-primary: ...;
-    --text-secondary: ...;
-    --border-subtle: ...;
-    --accent: ...;
-    --accent-hover: ...;
+    --color-bg: #0b0f12;
+    --color-surface-1: #11181d;
+    --color-surface-2: #172126;
+
+    --color-text-primary: #f5f7f8;
+    --color-text-secondary: #9aa8ad;
+
+    --color-border: #243238;
+
+    --color-accent: #14b8a6;
+    --color-accent-hover: #2dd4bf;
+    --color-accent-muted: rgba(20, 184, 166, 0.15);
+
+    --color-danger: #ef4444;
 }
 
 html {
