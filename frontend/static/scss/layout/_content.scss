@@ -13,7 +13,7 @@
 		grid-row: 1;
 		gap: 3em;
 		margin-bottom: 1em;
-		
+
 		&__search_bar {
 			position: relative;
 			display: flex;
@@ -66,18 +66,34 @@
 			display: flex;
 			justify-content: space-between;
 			flex-wrap: wrap;
-			gap: 2em;
+			gap: 12em;
+
+			button {
+				border-radius: var(--radius-md);
+				background-color: var(--teal-500);
+				transition: background-color 300ms ease;
+				padding: 0.39rem;
+				// font-size: large;
+				font-weight: 300;
+				max-width: 6rem;
+				color: black;
+
+				&:hover {
+					background-color: var(--teal-500);
+				}
+			}
 		}
 	}
 
 	&__podcasts {
 		grid-row: 2;
 		max-height: 33svh;
+		contain: content;
+		overflow-y: scroll;
 
 		&__container {
-			border: 2px solid white;
 			display: grid;
-			grid-template-columns: repeat(4, 1fr);
+			grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
 			max-height: 33svh;
 			overflow-y: scoll;
 			gap: 1em;

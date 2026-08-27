@@ -13,12 +13,13 @@
 
     button {
 	border-radius: var(--radius-md);
-	background-color: var(--teal-400);
+	background-color: var(--teal-500);
 	transition: background-color 300ms ease;
 	padding: 0.39rem;
 	// font-size: large;
 	font-weight: 300;
 	max-width: 6rem;
+	color: black;
 
 	&:hover {
 	    background-color: var(--teal-500);
