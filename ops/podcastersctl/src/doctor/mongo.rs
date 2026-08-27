@@ -32,7 +32,9 @@ pub async fn databases(connection_string: &str) -> anyhow::Result<Vec<String>> {
 
     let mut return_db_names: Vec<String> = vec![];
     for database in list_databases {
-        return_db_names.push(database);
+        if !(database.eq("config") || database.eq("admin") || database.eq("local")) {
+            return_db_names.push(database);
+        }
     }
 
     Ok(return_db_names)
