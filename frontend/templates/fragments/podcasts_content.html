@@ -1,1 +1,8 @@
-<h2>PODCAST CONTENT</h2>
+<section id="main__podcasts__container">
+  {% for (i, card) in genres.iter().enumerate() %}
+  <div class="card">
+    <h2>{{ card  }}</h2>
+    <img src="/static/rand_images/{{i + 1}}">
+  </div>
+  {% endfor %}
+</section>

@@ -34,11 +34,11 @@
 
 	hanging-punctuation: first last;
 	color-scheme: dark light;
-	// scrollbar-gutter: stable;
+	scrollbar-gutter: stable;
 	box-sizing: border-box;
 
 	button:focus-visible {
-		outline: 7px solid var(--bg-player);
+		outline: 7px solid var(--text-primary);
 	}
 }
 
@@ -76,7 +76,20 @@ body {
 		max-width: var(--sidebar-width);
 		background-color: var(--bg-sidebar);
 		padding-left: 2rem;
-		
+
+	}
+
+	#template__sidebar_mini {
+		grid-column: 1;
+		grid-row: 1 / -1;
+		display: flex;
+		flex-direction: column;
+		justify-content: start;
+		align-items: flex-start;
+		max-width: var(--sidebar-width);
+		background-color: var(--bg-sidebar);
+		padding-left: 2rem;
+
 	}
 
 	#template__header {
@@ -94,8 +107,9 @@ body {
 		grid-column: 2;
 		grid-row: 2;
 		overflow-y: auto;
-		display: grid;
 		background-color: var(--bg-page);
+
+
 	}
 
 	#template__footer {
@@ -111,6 +125,7 @@ body {
 @include meta.load-css("layout/_sidebar");
 @include meta.load-css("layout/_player");
 @include meta.load-css("layout/_content");
+
 
 // implement a media query for mobile devices with a max-width of 600px
 @media (min-width: 600px) {
