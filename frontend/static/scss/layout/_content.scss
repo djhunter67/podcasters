@@ -1,8 +1,7 @@
 #main {
-	background-color: var(-bg-page);
 	display: grid;
 	grid-template-columns: 1fr;
-	grid-template-rows: 0.2fr 1fr;
+	grid-template-rows: 0.2fr auto;
 
 	&__header {
 		display: flex;
@@ -86,9 +85,11 @@
 	}
 
 	&__podcasts {
+	    padding: 0 1em;
+	    margin-bottom: 2rem;
 		grid-row: 2;
-		max-height: 33svh;
-		contain: content;
+		// contain: content;
+		min-height: 60svh;
 		overflow-y: scroll;
 
 		&__container {
@@ -97,7 +98,6 @@
 			max-height: 33svh;
 			overflow-y: scoll;
 			gap: 1em;
-			padding: 1em;
 
 			.card {
 				border-radius: 2rem;

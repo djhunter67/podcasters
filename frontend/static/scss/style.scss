@@ -14,9 +14,7 @@
 	--text-secondary: #98a7a5;
 	--text-muted: #667572;
 
-	--btn-primary: #66550e
-
-	--border: #22302f;
+	--btn-primary: #66550e --border: #22302f;
 
 	--teal-400: #2dd4bf;
 	--teal-500: #14b8a6;
@@ -58,12 +56,12 @@ h6 {
 	text-wrap: balance;
 }
 
-
 body {
 	background-color: var(--bg-page);
 	color: var(--text-primary);
 	display: grid;
-	grid-template-columns: var(--sidebar-width) 1fr;
+	// grid-template-columns: var(--sidebar-width) 1fr;
+	grid-template-columns: 23% 1fr;
 	grid-template-rows: var(--topbar-height) auto var(--player-height);
 	font-family: 'Times New Roman', Times, serif;
 	min-block-size: 100svh;
@@ -81,18 +79,7 @@ body {
 
 	}
 
-	#template__sidebar_mini {
-		grid-column: 1;
-		grid-row: 1 / -1;
-		display: flex;
-		flex-direction: column;
-		justify-content: start;
-		align-items: flex-start;
-		max-width: var(--sidebar-width);
-		background-color: var(--bg-sidebar);
-		padding-left: 2rem;
 
-	}
 
 	#template__header {
 		grid-column: 2;
@@ -108,8 +95,9 @@ body {
 	#template__pages {
 		grid-column: 2;
 		grid-row: 2;
-		overflow-y: auto;
 		background-color: var(--bg-page);
+		// min-height: 60%;
+		// margin-block-start: auto;
 
 
 	}
@@ -129,13 +117,16 @@ body {
 @include meta.load-css("layout/_content");
 
 
-// implement a media query for mobile devices with a max-width of 600px
-@media (min-width: 600px) {
-	#template__sidebar {
-		display: flex;
-		flex-direction: column;
-		max-width: var(--sidebar-min);
-	}
+// implement a media query for mobile devices with a max-width of 800px
+@media (max-width: 799px) {
+	// body {
+	// 	grid-template-columns: var(--sidebar-min) 1fr;
+	// }
+
+	// #template__sidebar {
+	// 	max-width: var(--sidebar-min) !important;
+
+	// }
 
 	#template__header {
 		grid-row: 1 / 2;
