@@ -1,56 +1,56 @@
 <aside id="sidebar">
   <img src="/static/icon-192" alt="Sidebar logo">
   <div id="sidebar__top">
-    <button
+    <a
       hx-get="/"
       hx-target="body"
       hx-swap="outerHTML transition: true"   
       >HOME
-    </button>
-    <button
+    </a>
+    <a
       hx-get="/discover"
       hx-target="#main"
       hx-swap="innerHTML transition:true"
       >DISCOVER
-    </button>
-    <button
+    </a>
+    <a
       hx-get="/podcasts"
       hx-target="#main"
       hx-swap="innerHTML transition:true"
       >PODCASTS
-    </button>
-    <button
+    </a>
+    <a
       hx-get="/episodes"
       hx-target="#main"
       hx-swap="innerHTML transition:true"
       >EPISODES
-    </button>
+    </a>
   </div>
   <div id="sidebar__mid">
-    <button
+    <a
       hx-get="/queue"
       hx-target="#main"
       hx-swap="innerHTML transition:true"
       >QUEUE
-    </button>
-    <button
+    </a>
+    <a
       hx-get="/history"
       hx-target="#main"
       hx-swap="innerHTML transition:true"
       >HISTORY
-    </button>
+    </a>
   </div>
   <div id="sidebar__bottom">
-  <button
+  <a
     hx-get="/playlist"
     hx-target="#main"
     hx-swap="innerHTML transition:true"
     >PLAYLIST
-  </button>
-  <button
+  </a>
+  <a
     hx-get="/profile"
     hx-target="#main"
     hx-swap="innerHTML transition:true"
     >PROFILE
-  </button>  
+  </a>  
 </aside>

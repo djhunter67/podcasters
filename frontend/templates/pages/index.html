@@ -3,30 +3,30 @@
 {% block contents %}
 <div id="main">
   <header id="main__header">    
-    <section id="main__header__search_bar">
-      <input type="text" placeholder="🔍 Search podcasts">
-    </section>
     <section id="main__header__buttons">
       <button
 	hx-get="/podcasts"
-	hx-swap="#main"
-	hx-target="innerHTML"
+	hx-swap="innerHTML transition:true"
+	hx-target="#main"
 	>PODCASTS
       </button>
       <div id="main__header__right">
 	<button
 	  hx-get="/category"
-	  hx-swap="#main"
-	  hx-target="innerHTML"
+	  hx-swap="innerHTML transition:true"
+	  hx-target="#main"
 	  >Category
 	</button>
 	<button
 	  hx-get="/sort"
-	  hx-swap="#main"
-	  hx-target="innerHTML"
+	  hx-swap="innerHTML transition:true"
+	  hx-target="#main"
 	  >SORT
 	</button>
       </div>
+    </section>
+    <section id="main__header__search_bar">
+      <input type="text" placeholder="🔍 Search podcasts">
     </section>
   </header>
   <section id="main__podcasts">    

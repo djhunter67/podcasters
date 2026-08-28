@@ -11,7 +11,7 @@
 	border-radius: 5rem;
     }
 
-    button {
+    a {
 	border-radius: var(--radius-md);
 	background-color: var(--teal-500);
 	transition: background-color 300ms ease;
@@ -20,6 +20,7 @@
 	font-weight: 300;
 	max-width: 6rem;
 	color: black;
+	cursor: pointer;
 
 	&:hover {
 	    background-color: var(--teal-500);

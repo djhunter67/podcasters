@@ -40,11 +40,14 @@
 	button:focus-visible {
 		outline: 7px solid var(--text-primary);
 	}
+	accent-color: var(--teal-600);
+	color-scheme: light dark;
 }
 
 * {
 	margin: 0;
 }
+
 
 
 h1,
@@ -79,8 +82,6 @@ body {
 
 	}
 
-
-
 	#template__header {
 		grid-column: 2;
 		grid-row: 1;
@@ -96,10 +97,7 @@ body {
 		grid-column: 2;
 		grid-row: 2;
 		background-color: var(--bg-page);
-		// min-height: 60%;
-		// margin-block-start: auto;
-
-
+		max-height: fit-content;
 	}
 
 	#template__footer {
@@ -145,4 +143,8 @@ body {
 		grid-column: 1 / -1;
 		text-align: center;
 	}
+
+	// #sidebar {
+	    
+	// }
 }
