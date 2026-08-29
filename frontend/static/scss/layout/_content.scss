@@ -1,123 +1,248 @@
 #main {
-	display: grid;
-	grid-template-columns: 1fr;
-	grid-template-rows: 0.2fr auto;
-	max-height: fit-content;
-
-	&__header {
-		display: flex;
-		flex-direction: column;
-		justify-content: space-evenly;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 0.2fr auto;
+    padding-top: 1rem;
+    
+    &__header {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+	align-items: center;
+	padding: 0 1rem;
+	grid-row: 1;
+	gap: 1em;
+	
+	&__buttons {
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    flex-wrap: wrap;
+	    gap: 1rem;
+	    
+	    .icon { // not working because image is an emoji
+		display: block;
+		
+		// width: 1.1rem;
+		// height: 1.1rem;
+		font-size: 1.1rem;
+		flex: 0 0 1.1rem;
+		
+		// object-fit: contain;
+		
+		opacity: 0.88;
+		
+		transition:
+		    all 180ms ease;
+		
+		&:hover {
+		    opacity: 1;
+		    transform: scale(1.05);		    
+		}
+		
+		
+	    }
+	    
+	    &__podcasts {
+		
+	    }
+	    
+	    &__category {
+		// background-color: black;
+	    }
+	    
+	    &__sort {
+		// background-color: coral;
+	    }
+	    
+	    button {
+		background-color: purple;
+		display: inline-flex;
 		align-items: center;
-		padding: 0 1rem;
-		grid-row: 1;
-		gap: 1em;
-
-		&__buttons {
-			display: flex;
-			justify-content: space-between;
-			flex-wrap: wrap;
-			gap: 2em;
-
-			button {
-				border-radius: var(--radius-md);
-				background-color: var(--teal-500);
-				transition: background-color 300ms ease;
-				padding: 0.39rem;
-				// font-size: large;
-				font-weight: 300;
-				max-width: 6rem;
-				color: black;
-
-				&:hover {
-					background-color: var(--teal-500);
-				}
-			}
+		justify-content: center;
+		gap: 0.65rem;
+		
+		min-height: 3rem;
+		padding: 0.7rem 1.2rem;
+		
+		border: 1px solid var(--button-border);
+		border-radius: var(--radius-md);
+		
+		background:
+		    linear-gradient(
+			180deg,
+			rgba(23, 35, 40, 0.96) 0%,
+			rgba(12, 19, 23, 0.98) 100%
+		    );
+		
+		color: var(--button-text);
+		
+		box-shadow: var(--button-shadow);
+		
+		font-family: inherit;
+		font-size: 0.95rem;
+		font-weight: 600;
+		line-height: 1;
+		letter-spacing: 0.015em;
+		
+		cursor: pointer;
+		
+		transition:
+		    all var(--transition-time) ease;
+		
+		
+		&:hover {
+		    // opacity: 1;
+		    // transform: scale(2.05);
+		    transform: translateY(-3px);
+		    
+		    border-color: var(--teal-400);
+		    
+		    background:
+			linear-gradient(
+			    180deg,
+			    rgba(12, 76, 74, 0.96) 0%,
+			    rgba(8, 46, 47, 0.98) 100%
+			);
+		    
+		    box-shadow:
+			0 0 0 1px rgba(45, 212, 191, 0.18),
+			0 10px 24px rgba(0, 0, 0, 0.32),
+			0 0 20px rgba(20, 184, 166, 0.18);
+		    
+		    
 		}
-
-		&__search_bar {
-			position: relative;
-			display: flex;
-			align-items: center;
-			width: 100%;
-			max-width: 400px;
-
-			input {
-				width: 100%;
-				padding: 12px 22px;
-				font-size: 16px;
-				border: 2px solid #e0e0e0;
-				border-radius: 1rem;
-				background-color: #f9f9f9;
-				transition: all 300ms ease;
-				outline: none;
-				box-sizing: border-box;
-				color: #888;
-
-				&:hover {
-					border-color: #007bff;
-					background-color: #fff;
-				}
-
-				&:focus {
-					border-color: #007bff;
-					background-color: #fff;
-					box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-				}
-
-				&::placeholder {
-					color: #888;
-				}
-
-				&::-webkit-search-cancel-button {
-					-webkit-appearance: none;
-					height: 16px;
-					width: 16px;
-					margin-left: 10px;
-					cursor: pointer;
-					/* Optional: Customize the X icon */
-					background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888'%3E%3Cpath d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3E%3C/svg%3E");
-					background-size: contain;
-					background-repeat: no-repeat;
-				}
-			}
+		
+		&:active {
+		    transform: translateY(0);
 		}
+		
+		&:focus-visible {
+		    outline: none;
+		    border-color: var(--teal-400);
+		    
+		    box-shadow:
+			0 0 0 3px rgba(45, 212, 191, 0.06),
+			0 8px 18px rgba(0, 0, 0, 0.26);
+		}		
+	    }	    
 	}
+	
+	&__search_bar {
+	    // position: relative;
+	    display: flex;
+	    align-items: center;
+	    // width: 100%;
+	    min-width: 50%;
+	    justify-content: space-around;
+	    
+	    input {
+		width: 100%;
+		padding: 12px 22px;
+		font-size: 16px;
+		border: 2px solid #e0e0e0;
+		border-radius: 8rem;
+		transition: all 300ms ease;
+		outline: none;
+		box-sizing: border-box;
+		color: #888;
+		background-color: var(--bg-sidebar);
+		border-color: var(--bg-surface);
+		line-height: 2;
 
-	&__podcasts {
-		padding: 0 1em;
-		grid-row: 2;
-		contain: content;
-		// max-height: 33%;
-
-		&__container {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
-			overscroll-behavior-y: contain;
-			overflow-y: scroll;
-			gap: 6rem;
-			padding: 2em 1rem;
-			max-height: 45svh;
-
-			.card {
-				display: grid;
-				place-items: center;
-				border-radius: 2rem;
-				outline: blue 1px solid;
-				padding: 1em;
-
-				h2 {
-					color: var(--text-muted)
-				}
-
-				img {
-					max-height: 8rem;
-					max-width: 8rem;
-					border-radius: 50%;
-					object-fit: contain;
-					opacity: 0.5;
-				}
-			}
+		transition: all var(--transition-time) ease;
+		
+		&:hover {
+		    border-color: #007bff;
+		    background-color: var(--bg-sidebar);		    
 		}
+		
+		&:focus {
+		    border-color: #007bff;
+		    background-color: var(--bg-surface);
+		    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+		}
+		
+		&::placeholder {
+		    color: #888;
+		}
+		
+		&::-webkit-search-cancel-button {
+		    -webkit-appearance: none;
+		    height: 16px;
+		    width: 16px;
+		    margin-left: 10px;
+		    cursor: pointer;
+		    /* Optional: Customize the X icon */
+		    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23888'%3E%3Cpath d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/%3E%3C/svg%3E");
+		    background-size: contain;
+		    background-repeat: no-repeat;
+		}
+	    }
 	}
+    }
+    
+    &__podcasts {
+	padding: 0 1em;
+	grid-row: 2;
+	// contain: content;
+	// min-height: 100%;
+	
+	
+	&__container {
+	    display: flex;
+	    flex-wrap: wrap;
+	    justify-content: center;
+	    align-items: center;
+	    // grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+	    // overscroll-behavior-y: contain;
+	    overflow-y: auto;
+	    gap: 1rem;
+	    padding: 2em 0.25em;
+	    
+	    .card {
+		display: grid;
+		place-items: center;
+		border-radius: 2rem;
+		outline: blue 1px solid;
+		padding: 1em;
+		cursor: pointer;
+		aspect-ratio: 16 / 9;
+		min-width: 240px;
+
+		&__image {
+		    // background-image: "/static/rand_images/1";
+		    display: none;
+		}
+
+		&__icon {
+		    opacity: 0.8;
+		    filter: grayscale(100%);
+		    border-radius: 50%;
+		}
+		
+		h2 { // Card name
+		    color: var(--text-muted)
+		}
+		
+		img {
+		    max-height: 8rem;
+		    max-width: 8rem;
+		    border-radius: 50%;
+		    object-fit: contain;
+		    opacity: 0.5;
+		    padding: 0;
+		    margin: 0;
+		    transition: all 300ms ease;
+		    
+		    &:hover {
+			opacity: 1;
+		    }
+		}
+		
+		
+		
+	    }
+	}
+    }
 }

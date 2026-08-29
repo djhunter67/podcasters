@@ -1,31 +1,69 @@
 #player {
-	background-color: var(--bg-player);
-
+	// 5 members
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
 	justify-content: space-between;
 	align-items: center;
 	padding: 0.25rem 1rem;
+	min-height: calc(var(--player-height) - 20px);
+	// font-size: 3rem;
 
-	&__art {
+	&__current_play {
+
+		// 4 members
 		img {
 			border-radius: 50%;
 			object-fit: cover;
 			max-height: 19px;
 			max-width: 19px;
 		}
+
+		h5,
+		h6,
+		h4 {
+			color: var(--text-secondary);
+		}
+
+		&__like {
+			// 3 members
+			display: flex;
+			justify-content: space-evenly;
+			gap: 2rem;
+
+			&__dots {
+				transform: rotate(90deg);
+				font-size: .51rem;
+			}
+		}
 	}
 
-	&__title {
-		font-weight: 700;
-		font-size: large;
-		text-align: center;
+	&__controls {
+
+		display: flex;
+		align-items: center;
+		gap: 2rem;
+
+		#rewind,
+		#reset,
+		#skip,
+		#fast-forward {
+			font-size: 1.7rem;
+		}
+
+		#play {
+			font-size: 4rem;
+		}
+
+		a {
+			cursor: pointer;
+		}
 	}
 
 	&__player {
-		background-color: purple;
+		// background-color: purple;
 		color: blue;
+		place-self: center;
 	}
 
 	&__timeline {
@@ -45,13 +83,13 @@
 	}
 
 	&__speed {
-	    span {
-		font-size: large;
-	    }
+		span {
+			font-size: large;
+		}
 	}
 
 	&__fingerprint {
-	    background-color: black;
+		background-color: black;
 	}
 
 	@keyframes fadeIn {

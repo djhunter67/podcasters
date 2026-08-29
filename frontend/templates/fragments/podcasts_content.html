@@ -1,8 +1,14 @@
 <section id="main__podcasts__container">
   {% for (i, card) in genres.iter().enumerate() %}
-  <div class="card">
+  <a class="card">
+    <aside class="card__image">
+      <img src="/static/rand_images/{{i + 1}}" alt="related icon">
+    </aside>
     <h2>{{ card  }}</h2>
-    <img src="/static/rand_images/{{i + 1}}">
-  </div>
+    <aside class="card__icon">
+      <img src="/static/rand_images/{{i + 1}}" alt="placeholder for icon">
+    </aside>
+    <h5>12{{i}} Podcasts</h5>
+  </a>
   {% endfor %}
 </section>

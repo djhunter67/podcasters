@@ -1,15 +1,41 @@
+@use "sass:list";
 #sidebar {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     padding-top: 2rem;
     gap: 2rem;
+    $sidebar_icons:
+		"🏘️",  // Home 1
+		"🛫",  // Discover 2
+		"🗺️",  // Podcasts 3
+		"📺",  // Episodes 4
+		"📬",  // Queue 5
+		"📜",  // History 6
+		"📑",  // Playlist 7
+		"⛺";  // Profile 8
+	    
+	    @each $emoji in $sidebar_icons {
+		$index: list.index($sidebar_icons, $emoji);
+		
+		#icon-#{$index} {
+		    // Using the psuedo-element to insert the emoji
+		    // font-size: 0.2em;
+		    &::before {
+			content: $emoji;
+			font-size: 1rem;
+			padding-right: 2rem;
+			line-height: 2;
+			margin-right: 5px;  // Optional spacing
+		    }
+		}
+	    }
 
-    img {
-	max-height: 19px;
-	max-width: 19px;
-	border-radius: 5rem;
-    }
+    // img {
+    // 	max-height: 19px;
+    // 	max-width: 19px;
+    // 	border-radius: 5rem;
+    // }
 
     a {
 	border-radius: var(--radius-md);

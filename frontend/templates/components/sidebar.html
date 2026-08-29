@@ -1,25 +1,28 @@
 <aside id="sidebar">
-  <img src="/static/icon-192" alt="Sidebar logo">
   <div id="sidebar__top">
     <a
+      id="icon-1"
       hx-get="/"
       hx-target="body"
       hx-swap="outerHTML transition: true"   
       >HOME
     </a>
     <a
+      id="icon-2"
       hx-get="/discover"
       hx-target="#main"
       hx-swap="innerHTML transition:true"
       >DISCOVER
     </a>
     <a
+      id="icon-3"
       hx-get="/podcasts"
       hx-target="#main"
       hx-swap="innerHTML transition:true"
       >PODCASTS
     </a>
     <a
+      id="icon-4"
       hx-get="/episodes"
       hx-target="#main"
       hx-swap="innerHTML transition:true"
@@ -28,12 +31,14 @@
   </div>
   <div id="sidebar__mid">
     <a
+      id="icon-5"
       hx-get="/queue"
       hx-target="#main"
       hx-swap="innerHTML transition:true"
       >QUEUE
     </a>
     <a
+      id="icon-6"
       hx-get="/history"
       hx-target="#main"
       hx-swap="innerHTML transition:true"
@@ -41,16 +46,18 @@
     </a>
   </div>
   <div id="sidebar__bottom">
-  <a
-    hx-get="/playlist"
-    hx-target="#main"
-    hx-swap="innerHTML transition:true"
-    >PLAYLIST
-  </a>
-  <a
-    hx-get="/profile"
-    hx-target="#main"
-    hx-swap="innerHTML transition:true"
-    >PROFILE
-  </a>  
+    <a
+      id="icon-7"
+      hx-get="/playlist"
+      hx-target="#main"
+      hx-swap="innerHTML transition:true"
+      >PLAYLIST
+    </a>
+    <a
+      id="icon-8"
+      hx-get="/profile"
+      hx-target="#main"
+      hx-swap="innerHTML transition:true"
+      >PROFILE
+    </a>  
 </aside>

@@ -1,16 +1,19 @@
-
-#template__header__top {
-    a {
-	cursor: pointer;
-    }
+#template__header__home {
+    grid-column: 1;
+    cursor: pointer;
+    place-self: start;
+    align-self: center;
+    
     img {
-	border-radius: var(--radius-sm);
+	border-radius: var(--radius-lg);
 	object-fit: cover;
-	max-height: 29px;
-	max-width: 29px;
+	max-height: 45px;
+	max-width: 45px;	
     }
 }
 
 #template__header__logo {
-    color: grey;
+    grid-column: 2;
+    place-self: end;
+    align-self: center;
 }

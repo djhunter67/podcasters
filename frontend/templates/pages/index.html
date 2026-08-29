@@ -5,28 +5,35 @@
   <header id="main__header">    
     <section id="main__header__buttons">
       <button
+	id="main__header__buttons__podcasts"
 	hx-get="/podcasts"
 	hx-swap="innerHTML transition:true"
 	hx-target="#main"
-	>PODCASTS
+	>
+	<span class="icon">🎤</span>
+	<span class="btn-text">PODCASTS</span>
       </button>
-      <div id="main__header__right">
-	<button
-	  hx-get="/category"
-	  hx-swap="innerHTML transition:true"
-	  hx-target="#main"
-	  >Category
-	</button>
-	<button
-	  hx-get="/sort"
-	  hx-swap="innerHTML transition:true"
-	  hx-target="#main"
-	  >SORT
-	</button>
-      </div>
+      <button
+	id="main__header__buttons__category"
+	hx-get="/category"
+	hx-swap="innerHTML transition:true"
+	hx-target="#main"
+	>
+	<span class="icon">🧮</span>
+	<span>Category</span>
+      </button>
+      <button
+	id="main__header__buttons__sort"
+	hx-get="/sort"
+	hx-swap="innerHTML transition:true"
+	hx-target="#main"
+	>
+	<span class="icon">🔝</span>
+	<span>SORT</span>
+      </button>
     </section>
     <section id="main__header__search_bar">
-      <input type="text" placeholder="🔍 Search podcasts">
+      <input type="text" placeholder="🔍 Search podcasts, categories, or episodes...">
     </section>
   </header>
   <section id="main__podcasts">    
@@ -34,4 +41,3 @@
   </section>
 </div>
 {% endblock %}
-
