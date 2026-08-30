@@ -56,7 +56,7 @@
 	
 	hanging-punctuation: first last;
 	color-scheme: dark light;
-	// scrollbar-gutter: stable;
+	scrollbar-gutter: stable;
 	box-sizing: border-box;
 	
 	button:focus-visible {
@@ -89,7 +89,7 @@ body {
 	// grid-template-columns: var(--sidebar-width) 1fr;
 	grid-template-columns: var(--sidebar-width) auto;
 	grid-template-rows: var(--topbar-height) auto var(--player-height);
-	font-family: 'Times New Roman', Times, serif;
+	// font-family: 'Times New Roman', Times, serif;
 	min-block-size: 100svh;
 
 	#template__sidebar {
@@ -102,8 +102,8 @@ body {
 		max-width: var(--sidebar-width);
 		// background-color: var(--bg-sidebar);
 		background-image: linear-gradient(120deg, black 10%, var(--bg-sidebar) 100%);
-		padding-left: 2rem;
-		border: 1px white solid;
+		// padding-left: 2rem;
+		border: 1px var(--border) solid;
 	}
 
 	#template__header {
@@ -114,6 +114,7 @@ body {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		padding: 0 1rem;
+		border: 1px var(--border) solid;
 	}
 
 	#template__pages {
@@ -193,7 +194,8 @@ body {
 
 	#sidebar {
 	    margin: 0 auto;
-	    gap: 0.1em;
+	    // gap: 0.1em;
+	    padding-top: 1em;
 	    
 	    $sidebar_icons:
 		"🏘️",  // Home 1

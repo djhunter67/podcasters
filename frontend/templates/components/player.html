@@ -1,13 +1,15 @@
 <aside id="player">
   <aside id="player__current_play">
-    <img src="/static/icon-192" alt="player icon">
-    <h5>The Daily Curious</h5>
-    <section id="player__current_play__like">
-      <h4>The Hidden Patterns of Everyday Life</h4>
-      <span>❤️</span>
-      <span id="player__current_play__like__dots">▫️▫️▫️</span>
-    </section>
-    <h6>Episode 27</h6>
+    <img src="/static/icon-512" alt="player icon">
+    <section id="player__current_play__text">
+      <h5>The Daily Curious</h5>
+      <section id="player__current_play__text__like">
+	<h4>The Hidden Patterns of Everyday Life</h4>
+	<span>❤️</span>
+	<span id="player__current_play__text__like__dots">▫️▫️▫️</span>
+      </section>
+      <h4>Episode 27</h4>
+    </section>    
   </aside>
   <aside id="player__controls">
     <a href="#" id="rewind">⏳</a>
@@ -17,9 +19,10 @@
     <a href="#" id="fast-forward">⌛</a>
   </aside>
   <aside id="player__timeline">
-    <h5>15:30</h5>
-    <span> ━━━━━━━ </span>
-    <h5>30:45</h5>
+    <h5 id="current_time">15:30</h5>
+    
+    <span id="timeline"><span id="orb"></span> ━━━━━━━ </span>
+    <h5 id="play_time">30:45</h5>
   </aside>
   <div id="player__speed">
     <span>1x</span>

@@ -1,77 +1,63 @@
 @use "sass:list";
+
 #sidebar {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding-top: 2rem;
-    gap: 2rem;
-    $sidebar_icons:
-		"🏘️",  // Home 1
-		"🛫",  // Discover 2
-		"🗺️",  // Podcasts 3
-		"📺",  // Episodes 4
-		"📬",  // Queue 5
-		"📜",  // History 6
-		"📑",  // Playlist 7
-		"⛺";  // Profile 8
-	    
-	    @each $emoji in $sidebar_icons {
+	display: grid;
+	grid-template-rows: repeat(auto-fit, minmax(min(100%, 35px), 1fr));
+	// flex-direction: column;
+	// align-items: flex-start;
+	// justify-content: space-around;
+	gap: 2rem;
+	place-self: center;
+	$sidebar_icons: "🏘️", // Home 1
+		"🛫", // Discover 2
+		"🗺️", // Podcasts 3
+		"📺", // Episodes 4
+		"📬", // Queue 5
+		"📜", // History 6
+		"📑", // Playlist 7
+		"⛺"; // Profile 8
+
+	@each $emoji in $sidebar_icons {
 		$index: list.index($sidebar_icons, $emoji);
-		
+
 		#icon-#{$index} {
-		    // Using the psuedo-element to insert the emoji
-		    // font-size: 0.2em;
-		    &::before {
-			content: $emoji;
-			font-size: 1rem;
-			padding-right: 2rem;
-			line-height: 2;
-			margin-right: 5px;  // Optional spacing
-		    }
+
+			// Using the psuedo-element to insert the emoji
+			// font-size: 0.2em;
+			&::before {
+				content: $emoji;
+				font-size: 1.6rem;
+				padding-right: 2rem;
+				line-height: 2;
+				// margin-right: 5px; // Optional spacing
+			}
 		}
-	    }
-
-    // img {
-    // 	max-height: 19px;
-    // 	max-width: 19px;
-    // 	border-radius: 5rem;
-    // }
-
-    a {
-	border-radius: var(--radius-md);
-	background-color: var(--teal-500);
-	transition: background-color 300ms ease;
-	padding: 0.39rem;
-	// font-size: large;
-	font-weight: 300;
-	max-width: 6rem;
-	color: black;
-	cursor: pointer;
-
-	&:hover {
-	    background-color: var(--teal-500);
 	}
-    }
 
-    &__top {
-	display: flex;
-	flex-direction: column;
-	gap: 2rem;
-	margin-bottom: 2rem;
-    }
-    &__mid {
-	display: flex;
-	flex-direction: column;
-	gap: 2rem;
-	margin-bottom: 2rem;
-    }
-    &__bottom {
-	display: flex;
-	flex-direction: column;
-	gap: 2rem;
-    }
+	a {
+		font-weight: 300;
+		color: var(--text-muted);
+		cursor: pointer;
+		min-width: 100%;
+		border-radius: 10px;
+		transition: all 450ms ease;
+		padding: 0 0.5em;
+		
 
-    
+		span {
+			padding: 1em;
+		}
 
-    
+		&:hover {
+			// border-left: 1px var(--border) double;
+			background-image: linear-gradient(to right, black 0%, var(--teal-600) 20%, black 100%);
+			color: var(--teal-400);
+			// font-weight: 600;
+			border: 1px var(--border) solid;
+
+
+		}
+
+
+	}
 }
