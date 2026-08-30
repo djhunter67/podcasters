@@ -101,19 +101,6 @@
 
 
 		#timeline {
-			// animate a timeline
-			/* Define the animation name and duration */
-			// animation-name: fadeIn;
-			// animation-duration: 2s;
-
-			// /* Repeat indefinitely */
-			// animation-iteration-count: infinite;
-
-			// /* Optional: Loop direction (alternate, reverse, normal) */
-			// animation-direction: alternate;
-
-			// /* Optional: Timing function for smoother transitions */
-			// animation-timing-function: ease-in-out;
 			border: 1px var(--border) solid;
 			border-radius: 16px;
 			padding: 2rem;
@@ -134,15 +121,16 @@
 				animation: player_timeline 5s linear infinite;
 
 				&::after {
-				    content: '';
-				    position: absolute;
-				    top: 50%;
-				    left: 50%;
-				    width: 14rem;
-				    height: 4px;
-				    background: #6366f1;
-				    border-radius: 2px;
-				    // transform: translateY(-50%);
+					content: '';
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					width: 14rem;
+					height: 4px;
+					background: #6366f1;
+					border-radius: 2px;
+					offset-rotate: 0deg;
+					// transform: translateY(-50%);
 				}
 
 			}
