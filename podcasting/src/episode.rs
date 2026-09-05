@@ -1,4 +1,6 @@
-#[derive(Debug)]
+use serde::Deserialize;
+
+#[derive(Debug, Deserialize)]
 pub struct Episode<'a> {
     title: &'a str,
     description: Option<&'a str>,

@@ -1,14 +1,30 @@
-[target.aarch64-unknown-linux-gnu]
-linker = "aarch64-linux-gnu-gcc"
-
 [target.aarch64-unknown-linux-musl]
 linker = "/usr/bin/aarch64-linux-musl-gcc"
 
 [build]
-rustflags = ["-Z", "threads=26"]
+rustflags = ["-Z", "threads=28"]
 
 [unstable]
 codegen-backend = true
 
 [profile.dev]
 codegen-backend = "cranelift"
+
+# Crypto/FFI crates use LLVM because Cranelift can have
+# interoperability issues with aws-lc's native symbols.
+[profile.dev.package.aws-lc-sys]
+codegen-backend = "llvm"
+
+[profile.dev.package.aws-lc-rs]
+codegen-backend = "llvm"
+
+[profile.dev.package.rustls]
+codegen-backend = "llvm"
+
+[env]
+CC_aarch64_unknown_linux_musl = { value = "/usr/bin/aarch64-linux-musl-gcc", force = true }
+
+[alias]
+pi-build = "build --target aarch64-unknown-linux-musl"
+pi-release = "build --release --target aarch64-unknown-linux-musl"
+pi-backend = "build -p backend --release --target aarch64-unknown-linux-musl"
