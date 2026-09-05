@@ -101,47 +101,47 @@
 
 
 		#timeline {
-			border: 1px var(--border) solid;
-			border-radius: 16px;
+			border-radius: 2px;
 			padding: 2rem;
 			cursor: pointer;
-			min-block-size: 100%;
 			position: relative;
 
 			#orb {
 				position: absolute;
-				offset-path: border-box;
-				width: 17px;
+				width: 7px;
 				aspect-ratio: 1;
 				background: white;
 				border: 3px var(--teal-400) solid;
 				border-radius: 50%;
+				offset-path: path("M 0 0 H 100%");
+				offset-distance: 0%;
+				offset-rotate: 0deg;
 				transition: offset-distance 5s;
 
-				animation: player_timeline 5s linear infinite;
+				animation: player_timeline linear 5s paused;
 
-				&::after {
-					content: '';
-					position: absolute;
-					top: 50%;
-					left: 50%;
-					width: 14rem;
-					height: 4px;
-					background: #6366f1;
-					border-radius: 2px;
-					offset-rotate: 0deg;
-					// transform: translateY(-50%);
-				}
+				// &::after {
+				// 	content: '';
+				// 	position: absolute;
+				// 	top: 50%;
+				// 	left: 50%;
+				// 	width: 14rem;
+				// 	height: 4px;
+				// 	background: #6366ff;
+				// 	border-radius: 2px;
+				// 	offset-rotate: 0deg;
+				// 	// transform: translateY(-50%);
+				// }
 
 			}
 		}
 
 		@keyframes player_timeline {
-			0% {
+			from {
 				offset-distance: 0%;
 			}
 
-			100% {
+			to {
 				offset-distance: 100%;
 			}
 		}

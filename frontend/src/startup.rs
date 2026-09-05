@@ -9,8 +9,8 @@ use crate::{
     images,
 };
 
-pub const PARSE_COUNT: u8 = 9;
-pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+pub static PARSE_COUNT: u8 = 9;
+pub static VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[instrument(
     name = "Running the server",
