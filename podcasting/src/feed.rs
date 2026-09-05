@@ -24,7 +24,7 @@ impl<'a> PodcastFeed<'a> {
         if let Some(data) = self.description {
             Cow::Owned(data)
         } else {
-            Cow::Borrowed(&&"None")
+            Cow::Borrowed(&"None")
         }
     }
 
@@ -32,7 +32,7 @@ impl<'a> PodcastFeed<'a> {
         if let Some(data) = self.artwork_url {
             Cow::Owned(data)
         } else {
-            Cow::Borrowed(&&"None")
+            Cow::Borrowed(&"None")
         }
     }
 
@@ -40,8 +40,16 @@ impl<'a> PodcastFeed<'a> {
         if let Some(data) = self.author {
             Cow::Owned(data)
         } else {
-            Cow::Borrowed(&&"None")
+            Cow::Borrowed(&"None")
         }
+    }
+
+    pub const fn get_feed_url(&self) -> Cow<'a, &str> {
+        Cow::Borrowed(&self.feed_url)
+    }
+
+    pub fn get_episode(&self) -> Vec<Episode<'a>> {
+        self.episodes.clone()
     }
 }
 
