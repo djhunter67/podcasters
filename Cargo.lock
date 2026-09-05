@@ -2096,6 +2096,10 @@ dependencies = [
 [[package]]
 name = "podcasting"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "tokio",
+]
 
 [[package]]
 name = "portable-atomic"

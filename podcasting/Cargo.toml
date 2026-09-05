@@ -3,7 +3,6 @@ name = "podcasting"
 version = "0.1.0"
 edition = "2024"
 
-
 [lib]
 name = "podcasting"
 path = "src/lib.rs"
@@ -12,7 +11,13 @@ path = "src/lib.rs"
 name = "podcasting"
 path = "src/main.rs"
 
+[[example]]
+name = "inspect_feed"
+path = "examples/inspect_feed.rs"
+
 [lints]
 workspace = true
 
 [dependencies]
+anyhow = "1.0.104"
+tokio = { version = "1.53.1", default-features = false, features = ["full", "rt-multi-thread"] }
