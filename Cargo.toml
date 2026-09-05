@@ -34,6 +34,10 @@ enum_glob_use = "deny"
 nursery = { level = "deny", priority = 1 }
 unwrap_used = "deny"
 
+[workspace.lints.rust]
+unsafe_code = "forbid"
+rust_2024_incompatible_pat = "warn"
+
 [profile.dev]
 overflow-checks = true
 opt-level = 0

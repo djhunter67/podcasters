@@ -4,5 +4,15 @@ version = "0.1.0"
 edition = "2024"
 
 
+[lib]
+name = "podcasting"
+path = "src/lib.rs"
+
+[[bin]]
+name = "podcasting"
+path = "src/main.rs"
+
+[lints]
+workspace = true
 
 [dependencies]
