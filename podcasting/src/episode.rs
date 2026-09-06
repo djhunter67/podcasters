@@ -2,8 +2,8 @@ use std::borrow::Cow;
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename = "rss")]
-pub struct Rss'a, <'da: 'a> {
-    pub channel: Channel<'de, 'a>,
+pub struct Rss<'a, 'de: 'a> {
+    pub channel: Channel<'a>,
 }
 
 #[derive(Debug, Deserialize)]
