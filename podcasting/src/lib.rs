@@ -17,11 +17,11 @@ pub async fn fetch_feed(url: &str) -> anyhow::Result<String> {
     // Get the first 25 characters of the feed to see if it is valid XML from the file 'feed.xml'
     let xml = include_str!("../feed.xml");
 
-    tracing::warn!("FEED: {}", xml.split_at(650).0);
+    // tracing::warn!("FEED: {}", xml.split_at(650).0);
 
     tracing::info!(
         "Count of the word 'channel' in the feed: {}",
-        xml.matches("<rss").count()
+        xml.matches("<item").count()
     );
 
     // let channel_start = xml
