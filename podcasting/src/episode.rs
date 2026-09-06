@@ -2,86 +2,82 @@ use std::borrow::Cow;
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename = "rss")]
-pub struct Rss<'a, 'de: 'a> {
-    pub channel: Channel<'a>,
+pub struct Rss {
+    pub channel: Channel,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Channel<'de, 'a> {
+pub struct Channel {
+    pub version: Option<String>,
     #[serde(rename = "atom:link")]
-    pub atom_link: &'de str,
-    pub title: &'a str,
-    pub language: &'a str,
-    pub copyright: &'a str,
-    pub description: &'a str,
-    pub image: Image<'a>,
-    pub itunes: Itunes<'a>,
-    #[serde(rename = "content:encodedt")]
-    pub content: &'a str,
-    #[serde(default)]
-    pub item: Vec<Item<'a>>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct Itunes<'a> {
-    #[serde(rename = "itunes:explicit")]
-    pub explicit: bool,
-    #[serde(rename = "itunes:type")]
-    r#type: &'a str,
-    #[serde(rename = "itunes:subtitle")]
-    subtitle: &'a str,
-    #[serde(rename = "itunes:author")]
-    author: &'a str,
-    #[serde(rename = "itunes:summary")]
-    summary: &'a str,
-    #[serde(rename = "itunes:owner")]
-    owner: ItunesOwner<'a>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct ItunesOwner<'a> {
-    #[serde(rename = "itunes:name")]
-    name: &'a str,
-    #[serde(rename = "itunes:email")]
-    email: &'a str,
+    pub atom_link: Option<String>,
+    pub title: Option<String>,
+    pub language: Option<String>,
+    pub copyright: Option<String>,
+    pub description: Option<String>,
     #[serde(rename = "itunes:image")]
-    image: &'a str,
-    #[serde(rename = "itunes:category")]
-    category: Option<ItunesCategory<'a>>,
+    pub image: Image,
+    #[serde(rename = "content:encoded")]
+    pub content: Option<String>,
+    #[serde(default)]
+    pub item: Vec<Item>,
+    #[serde(rename = "itunes:explicit")]
+    pub explicit: Option<String>,
+    #[serde(rename = "itunes:type")]
+    r#type: Option<String>,
+    #[serde(rename = "itunes:subtitle")]
+    subtitle: Option<String>,
+    #[serde(rename = "itunes:author")]
+    author: Option<String>,
+    #[serde(rename = "itunes:summary")]
+    summary: Option<String>,
+    #[serde(rename = "itunes:owner")]
+    owner: ItunesOwner,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct ItunesCategory<'a> {
-    text: &'a str,
+pub struct ItunesOwner {
+    #[serde(rename = "itunes:name")]
+    name: Option<String>,
+    #[serde(rename = "itunes:email")]
+    email: Option<String>,
+    #[serde(rename = "itunes:category")]
+    category: Option<ItunesCategory>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ItunesCategory {
+    text: Option<String>,
     #[serde(rename = "itunes:category")]
     category: Box<Option<Self>>,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Image<'a> {
-    pub url: &'a str,
-    pub title: &'a str,
-    pub link: &'a str,
+// #[serde(rename = "href")]
+pub struct Image {
+    pub href: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct Item<'a> {
-    title: &'a str,
-    link: &'a str,
-    description: Option<String>,
-    pubDate: &'a str,
+pub struct Item {
+    pub title: Option<String>,
+    link: Option<String>,
+    pub description: Option<String>,
+    pub pubDate: Option<String>,
     #[serde(rename = "itunes:episodeType")]
-    episode_type: &'a str,
+    episode_type: Option<String>,
     #[serde(rename = "itunes:episode")]
-    episode_number: u16,
+    episode_number: Option<String>,
     #[serde(rename = "itunes:subtitle")]
-    subtitle: &'a str,
+    subtitle: Option<String>,
     #[serde(rename = "itunes:summary")]
-    summary: &'a str,
+    summary: Option<String>,
     #[serde(rename = "itunes:duration")]
-    Duration: u16,
+    duration: Option<String>,
     #[serde(rename = "itunes:explicit")]
-    explicit: bool,
+    explicit: Option<String>,
+    #[serde(rename = "itunes:image")]
+    pub image: Option<Image>,
     #[serde(default)]
     enclosure: Option<Enclosure>,
 }
@@ -89,9 +85,9 @@ pub struct Item<'a> {
 #[derive(Debug, Deserialize)]
 struct Enclosure {
     #[serde(rename = "@url")]
-    url: String,
+    url: Option<String>,
     #[serde(rename = "@type")]
-    r#type: String,
+    r#type: Option<String>,
 }
 
 use serde::Deserialize;
