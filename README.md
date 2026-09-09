@@ -18,13 +18,13 @@ This application Will feature Podcasting 2.0 support.
 - [ ] Resarch how to create an iOS app using Rust
 - [ ] Can I use one source of code for all platforms? Tuari?
 - [ ] Design the mobile interface
-- [ ] Design the web interface
+- [X] Design the web interface
 - [ ] Hello, world! on Android
 - [ ] Hello, world! on iOS
-- [ ] Hello, world! on the web application
-- [ ] Database[s]
-- [ ] Backend started
-- [ ] Frontend started
+- [X] Hello, world! on the web application
+- [X] Database[s]
+- [X] Backend started
+- [X] Frontend started
 - [ ] Self-host initial launch
 - [ ] AI integration in a way that makes sense.
 
