@@ -10,7 +10,7 @@ pub struct Rss {
 pub struct Channel {
     pub version: Option<String>,
     #[serde(rename = "atom:link")]
-    pub atom_link: Option<String>,
+    pub atom_link: Option<AtomLink>,
     pub title: Option<String>,
     pub language: Option<String>,
     pub copyright: Option<String>,
@@ -36,6 +36,14 @@ pub struct Channel {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct AtomLink {
+    href: Option<String>,
+    rel: Option<String>,
+    r#type: Option<String>,
+    xmlns: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct ItunesOwner {
     #[serde(rename = "itunes:name")]
     name: Option<String>,
@@ -53,7 +61,6 @@ pub struct ItunesCategory {
 }
 
 #[derive(Debug, Deserialize)]
-// #[serde(rename = "href")]
 pub struct Image {
     pub href: Option<String>,
 }
