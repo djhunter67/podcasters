@@ -1,5 +1,5 @@
 #![allow(clippy::empty_enums)]
-use std::time;
+use std::{fmt, time};
 
 use mongodb::options::ClientOptions;
 use redis::aio::{self, ConnectionManagerConfig};
@@ -25,6 +25,20 @@ struct _PlayList {}
 struct _Bookmarks {}
 struct _BillingCustomers {}
 struct _Entitlements {}
+
+pub enum DataBases {
+    PodCast,
+    User,
+}
+
+impl fmt::Display for DataBases {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::PodCast => write!(f, "podcasts"),
+            Self::User => write!(f, "users"),
+        }
+    }
+}
 
 /// # Errors
 ///

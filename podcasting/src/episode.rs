@@ -1,4 +1,9 @@
+use mongodb::{
+    bson::{oid, to_document},
+    options::UpdateModifications,
+};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
+use redis::FromRedisValue;
 use serde::{Deserialize, Serialize};
 
 use crate::feed::fetch_feed;
@@ -77,7 +82,8 @@ pub struct Item {
     pub title: Option<String>,
     link: Option<String>,
     pub description: Option<String>,
-    pub pubDate: Option<String>,
+    #[serde(rename = "pubDate")]
+    pub pub_date: Option<String>,
     #[serde(rename = "itunes:episodeType")]
     episode_type: Option<String>,
     #[serde(rename = "itunes:episode")]
@@ -106,6 +112,8 @@ struct Enclosure {
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Podcast {
+    #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
+    id: Option<mongodb::bson::oid::ObjectId>,
     title: Option<String>,
     description: Option<String>,
     artwork_url: Option<String>,
@@ -113,6 +121,13 @@ pub struct Podcast {
     episode_count: u16,
     episodes: Vec<Episode>,
     error: Option<String>,
+}
+
+impl From<Podcast> for UpdateModifications {
+    fn from(value: Podcast) -> Self {
+        let doc = to_document(&value).expect("failed to serialize Podcast");
+        Self::Document(doc)
+    }
 }
 
 impl Podcast {
@@ -141,7 +156,7 @@ impl Podcast {
                         Episode {
                             title: epi.title.clone(),
                             description: epi.description.clone(),
-                            guid: epi
+                            media_type: epi
                                 .enclosure
                                 .first()
                                 .expect("")
@@ -157,13 +172,14 @@ impl Podcast {
                                 .expect("")
                                 .url
                                 .clone(),
-                            published_at: epi.pubDate.clone(),
+                            published_at: epi.pub_date.clone(),
                             duration: epi.duration.clone(),
                         }
                     })
                     .collect();
 
                 Self {
+                    id: None,
                     title: feed.title,
                     description: feed.description,
                     artwork_url: feed.image.href,
@@ -190,10 +206,33 @@ impl Podcast {
     }
 
     #[must_use = "Show any error"]
-    pub fn error(error: &anyhow::Error) -> Self {
+    pub fn error(error: &str) -> Self {
         Self {
             error: Some(error.to_string()),
             ..Default::default()
+        }
+    }
+
+    pub fn get_title(&self) -> String {
+        self.title
+            .as_ref()
+            .map_or_else(|| String::from("Not Found"), String::from)
+    }
+
+    #[must_use = "Get the OID when a cache misses"]
+    pub const fn get_id(&self) -> Option<oid::ObjectId> {
+        self.id
+    }
+
+    /// # Errors
+    ///
+    /// No OID found in the passed in Option
+    pub fn set_id(&mut self, id: Option<oid::ObjectId>) -> anyhow::Result<()> {
+        if let Some(oid) = id {
+            self.id = Some(oid);
+            Ok(())
+        } else {
+            Err(anyhow::anyhow!("Unable to set the OID: {id:#?}"))
         }
     }
 }
@@ -202,7 +241,7 @@ impl Podcast {
 pub struct Episode {
     title: Option<String>,
     description: Option<String>,
-    guid: Option<String>,
+    media_type: Option<String>,
     audio_url: Option<String>,
     published_at: Option<String>,
     duration: Option<String>,
@@ -221,8 +260,8 @@ pub struct Episode {
 //         }
 //     }
 
-//     pub const fn get_guid(&self) -> Cow<'a, &str> {
-//         if let Some(data) = self.guid {
+//     pub const fn get_media_type(&self) -> Cow<'a, &str> {
+//         if let Some(data) = self.media_type {
 //             Cow::Owned(data)
 //         } else {
 //             Cow::Borrowed(&"None")

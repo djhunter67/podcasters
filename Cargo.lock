@@ -417,8 +417,10 @@ dependencies = [
  "dotenvy",
  "hex",
  "models",
+ "mongodb",
  "podcasting",
  "rand 0.10.2",
+ "redis 1.7.0",
  "reqwest",
  "rstest",
  "serde",
@@ -675,9 +677,9 @@ checksum = "1d07550c9036bf2ae0c684c4297d503f838287c83c53686d05370d0e139ae570"
 
 [[package]]
 name = "combine"
-version = "4.6.7"
+version = "4.6.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba5a308b75df32fe02788e748662718f03fde005016435c444eea572398219fd"
+checksum = "cfc320937d09e6de266b31b9afb480f197d7a861be86be7cb2ea7e5d1bfffc5e"
 dependencies = [
  "bytes",
  "futures-core",
@@ -2063,9 +2065,9 @@ checksum = "851fac73f7fe22f6a3ab87f720ce509cae7c9fd08e7dd27866cc232dee07ccf4"
 
 [[package]]
 name = "mongodb"
-version = "3.8.1"
+version = "3.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "99a95f3a5e3b3912e93f10d6784cd641a70a94d7ffe15561a2c89891d1bf85fd"
+checksum = "fd64784a1fdbcf2a334717446edc583061159067a2e7cc326ee567ecf035f07b"
 dependencies = [
  "base64 0.22.1",
  "bitflags",
@@ -2109,9 +2111,9 @@ dependencies = [
 
 [[package]]
 name = "mongodb-internal-macros"
-version = "3.8.1"
+version = "3.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a503007cb8ae06f77fbc111136222565e377d9e3f14230998950d2caaabaeeba"
+checksum = "f243f9039382cd06378f13980b79700236468b6fb22f24abfa99783e9569f1a3"
 dependencies = [
  "macro_magic",
  "proc-macro2",
@@ -2319,7 +2321,7 @@ dependencies = [
  "clap",
  "mongodb",
  "predicates",
- "redis 1.6.0",
+ "redis 1.7.0",
  "rstest",
  "serde_json",
  "shared",
@@ -2333,7 +2335,9 @@ dependencies = [
  "anyhow",
  "async-trait",
  "futures",
+ "mongodb",
  "rayon",
+ "redis 1.7.0",
  "reqwest",
  "serde",
  "serde-xml-rs",
@@ -2615,9 +2619,9 @@ dependencies = [
 
 [[package]]
 name = "redis"
-version = "1.6.0"
+version = "1.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e37a4ca5c6ca42aa3e6df2fd32b987a65d32a4c2159a6f3fe0fd1df306a2658f"
+checksum = "2acbc41a996f7652b2ddd9dfd98cc4ff602cfd742ae35382f07f608405ab50ed"
 dependencies = [
  "arc-swap",
  "arcstr",

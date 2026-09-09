@@ -19,7 +19,10 @@ async fn run(
     settings: settings::Settings,
 ) -> Result<actix_web::dev::Server, std::io::Error> {
     let (redis_pool, mongo_pool) = match models::init_db().await {
-        Ok((red, mong)) => (red, mong),
+        Ok((red, mong)) => {
+            tracing::info!("Database connection established");
+            (red, mong)
+        }
         Err(err) => {
             tracing::error!(err);
             panic!("Unable to init the app due to the lack of a DB connection");
@@ -28,7 +31,7 @@ async fn run(
 
     // Connect to the MongoDB database
     let db_redis = web::Data::new(redis_pool);
-    let db_mongo = web::Data::new(mongo_pool);
+    let db_mongo: web::Data<mongodb::Client> = web::Data::new(mongo_pool);
     tracing::info!("Processed DB & Cache connection pool for distribution");
 
     let server = HttpServer::new(move || {
@@ -40,7 +43,8 @@ async fn run(
             .app_data(db_mongo.clone())
             .service(
                 web::scope("/v1")
-                    .service(api::v1::podcasts_bz::preview)
+                    .service(api::v1::podcasts::preview)
+                    .service(api::v1::podcasts::podcast)
                     .service(api::health),
             )
     })

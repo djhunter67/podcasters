@@ -110,7 +110,7 @@ impl TryFrom<String> for Environment {
 pub fn get() -> Result<Settings, config::ConfigError> {
     // eprintln because during startup `tracing` doesn't work
 
-    eprintln!("Getting the system config settings");
+    // eprintln!("Getting the system config settings");
     // let manual_path = std::env::current_dir();
     // eprint!("\n\nThe home dir: {manual_path:#?}");
 
@@ -121,9 +121,9 @@ pub fn get() -> Result<Settings, config::ConfigError> {
             panic!("Application cannot find the current directory to load the settings")
         }
     };
-    eprintln!("The base path is {base_path:?}");
+    // eprintln!("The base path is {base_path:?}");
     let setting_directory = base_path.join("settings");
-    eprintln!("The setting directory is {setting_directory:?}");
+    // eprintln!("The setting directory is {setting_directory:?}");
 
     let environment: Environment = match env::var("APP_ENVIRONMENT")
         .unwrap_or_else(|_| "development".into())
@@ -132,13 +132,13 @@ pub fn get() -> Result<Settings, config::ConfigError> {
         Ok(env) => env,
         Err(err) => return Err(config::ConfigError::Message(err)),
     };
-    eprintln!("The environment is {:#?}", environment.as_str());
+    // eprintln!("The environment is {:#?}", environment.as_str());
     let environment_filename = format!("{}.yaml", environment.as_str());
 
-    eprintln!(
-        "Building the settings for the {} environment",
-        environment.as_str()
-    );
+    // eprintln!(
+    // "Building the settings for the {} environment",
+    // environment.as_str()
+    // );
     let settings: Config = match Config::builder()
         .add_source(File::from(setting_directory.join("base.yaml")))
         .add_source(File::from(setting_directory.join(environment_filename)))
@@ -152,14 +152,14 @@ pub fn get() -> Result<Settings, config::ConfigError> {
         .build()
     {
         Ok(settings) => {
-            eprintln!(
-                "Successfully loaded the settings: {:#?}",
-                settings
-                    .clone()
-                    .try_deserialize::<Settings>()
-                    .expect("Failed to deserialize the settings")
-                    .mongo
-            );
+            // eprintln!(
+            //     "Successfully loaded the settings: {:#?}",
+            //     settings
+            //         .clone()
+            //         .try_deserialize::<Settings>()
+            //         .expect("Failed to deserialize the settings")
+            //         .mongo
+            // );
 
             settings
         }
