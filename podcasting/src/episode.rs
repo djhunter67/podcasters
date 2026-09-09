@@ -31,7 +31,7 @@ pub struct Channel {
     author: Option<String>,
     #[serde(rename = "itunes:summary")]
     summary: Option<String>,
-    #[serde(rename = "itunes:owner")]
+    #[serde(rename = "itunes:owner", default)]
     owner: ItunesOwner,
 }
 
@@ -47,14 +47,14 @@ pub struct AtomLink {
     media_type: Option<String>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Default)]
 pub struct ItunesOwner {
     #[serde(rename = "itunes:name")]
     name: Option<String>,
     #[serde(rename = "itunes:email")]
     email: Option<String>,
     #[serde(rename = "itunes:category")]
-    category: Vec<Option<ItunesCategory>>,
+    category: Option<ItunesCategory>,
 }
 
 #[derive(Debug, Deserialize, Default)]
@@ -90,7 +90,7 @@ pub struct Item {
     #[serde(rename = "itunes:image")]
     pub image: Option<Image>,
     #[serde(default)]
-    enclosure: Option<Enclosure>,
+    enclosure: Vec<Option<Enclosure>>,
 }
 
 #[derive(Debug, Deserialize)]

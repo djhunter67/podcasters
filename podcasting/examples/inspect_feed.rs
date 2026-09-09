@@ -13,38 +13,115 @@ async fn main() -> anyhow::Result<()> {
         .with(filter)
         .init();
 
-    // get_xml_data().await?;
-
     let xml_list: Vec<String> = vec![
-        String::from("https://feeds.megaphone.fm/hubermanlab"),
-        String::from("https://api.substack.com/feed/podcast/1136839.rss"),
-        String::from("https://lexfridman.com/feed/podcast/"),
-        String::from("https://coder.show/rss"),
-        String::from("https://feeds.npr.org/510289/podcast.xml"),
-        String::from("https://letscast.fm/podcasts/rust-in-production-82281512/feed"),
-        String::from("http://feeds.libsyn.com/110110/rss"),
-        String::from("https://anchor.fm/s/f39e007c/podcast/rss"),
-        String::from("https://feeds.transistor.fm/fork-around-and-find-out"),
-        String::from("https://feeds.feedburner.com/dancarlin/history?format=xml"),
-        String::from("http://feeds.wnyc.org/radiolab"),
-        String::from("https://feeds.megaphone.fm/replyall"),
-        String::from("https://feeds.simplecast.com/gvtxUiIf"),
-        String::from("https://feeds.megaphone.fm/vergecast"),
-        String::from("https://feeds.megaphone.fm/revisionisthistory"),
-        String::from("https://feeds.npr.org/510308/podcast.xml"),
-        String::from("https://feeds.simplecast.com/dLRotFGk"),
-        String::from("https://thewomenintechshow.com/category/podcast/feed/"),
-        String::from("https://feeds.megaphone.fm/GLT1412515089"),
-        String::from("https://feeds.simplecast.com/qm_9xx0g"),
-        String::from("http://rss.art19.com/the-daily"),
-        String::from("https://feeds.simplecast.com/mKn_QmLS"),
-        String::from("https://feeds.megaphone.fm/thispastweekend"),
-        String::from("https://podcastfeeds.nbcnews.com/dateline-nbc"),
-        String::from("https://www.thisamericanlife.org/podcast/rss.xml"),
-        String::from("https://feeds.simplecast.com/6Qp23t6h"),
-        String::from("https://rss.art19.com/smartless"),
-        String::from("https://feeds.megaphone.fm/newheights"),
+        // Changelog / developer
+        String::from("https://changelog.com/podcast/feed"),
+        String::from("https://changelog.com/gotime/feed"),
+        String::from("https://changelog.com/practicalai/feed"),
+        String::from("https://changelog.com/shipit/feed"),
+        String::from("https://changelog.com/jsparty/feed"),
+        String::from("https://changelog.com/founderstalk/feed"),
+        String::from("https://linuxunplugged.com/rss"),
+        String::from("https://selfhosted.show/rss"),
+        String::from("https://2.5admins.com/feed/podcast"),
+        String::from("https://latenightlinux.com/feed/mp3"),
+        String::from("https://talkpython.fm/episodes/rss"),
+        String::from("https://pythonbytes.fm/episodes/rss"),
+        String::from("https://realpython.com/podcasts/rpp/feed"),
+        String::from("https://softwareengineeringdaily.com/feed/podcast/"),
+        String::from("https://feeds.transistor.fm/oxide-and-friends"),
+        String::from("https://atp.fm/rss"),
+        // TWiT
+        String::from("https://feeds.twit.tv/twit.xml"),
+        String::from("https://feeds.twit.tv/sn.xml"),
+        String::from("https://feeds.twit.tv/mbw.xml"),
+        String::from("https://feeds.twit.tv/ww.xml"),
+        String::from("https://feeds.twit.tv/floss.xml"),
+        String::from("https://feeds.twit.tv/aaa.xml"),
+        String::from("https://feeds.twit.tv/tnw.xml"),
+        String::from("https://feeds.twit.tv/twig.xml"),
+        String::from("https://feeds.twit.tv/twiet.xml"),
+        String::from("https://feeds.twit.tv/twil.xml"),
+        String::from("https://feeds.twit.tv/kh.xml"),
+        String::from("https://feeds.twit.tv/tri.xml"),
+        String::from("https://feeds.twit.tv/htg.xml"),
+        String::from("https://feeds.twit.tv/hop.xml"),
+        // NPR
+        String::from("https://feeds.npr.org/510318/podcast.xml"),
+        String::from("https://feeds.npr.org/510310/podcast.xml"),
+        String::from("https://feeds.npr.org/510325/podcast.xml"),
+        String::from("https://feeds.npr.org/510282/podcast.xml"),
+        String::from("https://feeds.npr.org/510298/podcast.xml"),
+        String::from("https://feeds.npr.org/510317/podcast.xml"),
+        String::from("https://feeds.npr.org/510313/podcast.xml"),
+        String::from("https://feeds.npr.org/344098539/podcast.xml"),
+        String::from("https://feeds.npr.org/510307/podcast.xml"),
+        // ART19 — raw RSS endpoints, NOT /shows/...
+        String::from("https://rss.art19.com/business-movers"),
+        String::from("https://rss.art19.com/business-wars"),
+        String::from("https://rss.art19.com/business-wars-daily"),
+        String::from("https://rss.art19.com/history-daily"),
+        String::from("https://rss.art19.com/tides-of-history"),
+        String::from("https://rss.art19.com/the-fall-of-rome-podcast"),
+        String::from("https://rss.art19.com/once-upon-a-crime"),
+        String::from("https://rss.art19.com/true-crime-all-the-time"),
+        String::from("https://rss.art19.com/generation-why-podcast"),
+        String::from("https://rss.art19.com/suspect"),
+        String::from("https://rss.art19.com/perfect-person"),
+        String::from("https://rss.art19.com/handsome"),
+        String::from("https://rss.art19.com/british-scandal"),
+        String::from("https://rss.art19.com/this-is-actually-happening-podcast"),
+        String::from("https://rss.art19.com/diss-and-tell"),
+        String::from("https://rss.art19.com/project-bluebook"),
+        String::from("https://rss.art19.com/colony-the-official-podcast"),
+        String::from("https://rss.art19.com/the-here-we-go-podcast"),
+        String::from("https://rss.art19.com/inside-voices"),
+        String::from("https://rss.art19.com/london-is-blue"),
+        String::from("https://rss.art19.com/common-sense-with-dr-ben-carson"),
+        String::from("https://rss.art19.com/not-another-d-and-d-podcast"),
+        String::from("https://rss.art19.com/man-school-202"),
+        String::from("https://rss.art19.com/tig-and-cheryl-true-story"),
+        String::from("https://rss.art19.com/last-week-in-ai"),
+        String::from("https://rss.art19.com/escaping-the-drift"),
+        String::from("https://rss.art19.com/lizness-school"),
+        String::from("https://rss.art19.com/business-game-changers"),
+        String::from("https://rss.art19.com/the-stephen-mansfield-podcast"),
+        String::from("https://rss.art19.com/sup-doc-podcast"),
+        String::from("https://rss.art19.com/never-not-funny"),
+        String::from("https://rss.art19.com/the-ai-xr-podcast"),
+        String::from("https://rss.art19.com/watch-what-happens-live-with-andy-cohen"),
+        String::from("https://rss.art19.com/late-night-with-seth-meyers-podcast"),
+        String::from("https://rss.art19.com/dr-death"),
+        String::from("https://rss.art19.com/american-scandal"),
+        String::from("https://rss.art19.com/american-history-tellers"),
+        String::from("https://rss.art19.com/against-the-odds"),
+        String::from("https://rss.art19.com/over-my-dead-body"),
+        String::from("https://rss.art19.com/the-shrink-next-door"),
+        String::from("https://rss.art19.com/dying-for-sex"),
+        String::from("https://rss.art19.com/even-the-rich"),
+        String::from("https://rss.art19.com/imagined-life"),
+        String::from("https://rss.art19.com/life-is-short-with-justin-long"),
+        String::from("https://rss.art19.com/scamfluencers"),
+        String::from("https://rss.art19.com/the-next-big-idea"),
+        // Additional independent feeds
+        String::from("https://risky.biz/feeds/risky-business"),
+        String::from("https://www.sciencefriday.com/feed/podcast/"),
+        String::from("https://www.quantamagazine.org/feed/podcast/"),
+        String::from("https://feeds.megaphone.fm/darknetdiaries"),
+        // More ART19 feeds useful for malformed/legacy-feed testing
+        String::from("https://rss.art19.com/en-la-sala"),
+        String::from("https://rss.art19.com/not-a-very-good-murderer"),
+        String::from(
+            "https://rss.art19.com/jackass-the-podcast-with-johnny-knoxville-and-jeff-tremaine",
+        ),
+        String::from("https://rss.art19.com/the-stephen-mansfield-podcast"),
+        String::from("https://rss.art19.com/the-ai-xr-podcast"),
+        String::from("https://rss.art19.com/last-week-in-ai"),
+        String::from("https://rss.art19.com/escaping-the-drift"),
+        String::from("https://rss.art19.com/lizness-school"),
+        String::from("https://rss.art19.com/business-game-changers"),
     ];
+    // get_xml_data(xml_list).await?;
 
     parse_xml(&Devel::Xml, xml_list).await;
 
@@ -59,7 +136,7 @@ enum Devel {
 async fn parse_xml(path_forward: &Devel, xml_list: Vec<String>) {
     match path_forward {
         Devel::Xml => {
-            let res: Vec<JoinHandle<()>> = (0..27)
+            let res: Vec<JoinHandle<()>> = (0..xml_list.len())
                 .map(|i| {
                     tokio::spawn(async move {
                         let mut file = tokio::fs::File::open(format!("pod_feed_{i}.xml"))
@@ -146,39 +223,9 @@ async fn parse_xml(path_forward: &Devel, xml_list: Vec<String>) {
 }
 
 // #[cfg(feature = "get_xml")]
-async fn _get_xml_data() -> anyhow::Result<()> {
+async fn get_xml_data(xml_list: Vec<String>) -> anyhow::Result<()> {
     use futures::future::join_all;
     use reqwest::Client;
-    let xml_list = [
-        "https://feeds.megaphone.fm/hubermanlab",
-        "https://api.substack.com/feed/podcast/1136839.rss",
-        "https://lexfridman.com/feed/podcast/",
-        "https://coder.show/rss",
-        "https://feeds.npr.org/510289/podcast.xml",
-        "https://letscast.fm/podcasts/rust-in-production-82281512/feed",
-        "http://feeds.libsyn.com/110110/rss",
-        "https://anchor.fm/s/f39e007c/podcast/rss",
-        "https://feeds.transistor.fm/fork-around-and-find-out",
-        "https://feeds.feedburner.com/dancarlin/history?format=xml",
-        "http://feeds.wnyc.org/radiolab",
-        "https://feeds.megaphone.fm/replyall",
-        "https://feeds.simplecast.com/gvtxUiIf",
-        "https://feeds.megaphone.fm/vergecast",
-        "https://feeds.megaphone.fm/revisionisthistory",
-        "https://feeds.npr.org/510308/podcast.xml",
-        "https://feeds.simplecast.com/dLRotFGk",
-        "https://thewomenintechshow.com/category/podcast/feed/",
-        "https://feeds.megaphone.fm/GLT1412515089",
-        "https://feeds.simplecast.com/qm_9xx0g",
-        "http://rss.art19.com/the-daily",
-        "https://feeds.simplecast.com/mKn_QmLS",
-        "https://feeds.megaphone.fm/thispastweekend",
-        "https://podcastfeeds.nbcnews.com/dateline-nbc",
-        "https://www.thisamericanlife.org/podcast/rss.xml",
-        "https://feeds.simplecast.com/6Qp23t6h",
-        "https://rss.art19.com/smartless",
-        "https://feeds.megaphone.fm/newheights",
-    ];
 
     let client = Client::new();
 
@@ -188,7 +235,7 @@ async fn _get_xml_data() -> anyhow::Result<()> {
         async move {
             tracing::warn!("Getting URL: {}", url);
             let body = client
-                .get(*url)
+                .get(url)
                 .send()
                 .await
                 .expect("Fail to await")
@@ -196,7 +243,7 @@ async fn _get_xml_data() -> anyhow::Result<()> {
                 .await
                 .expect("Fail to await");
 
-            Ok::<(String, String), reqwest::Error>((url.to_string(), body))
+            Ok::<(String, String), reqwest::Error>((url.clone(), body))
         }
     }))
     .await;
