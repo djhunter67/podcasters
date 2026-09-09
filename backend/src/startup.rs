@@ -1,4 +1,4 @@
-use crate::api;
+use crate::api::{self};
 use actix_web::{self, App, HttpServer, http::KeepAlive, middleware, web};
 use models;
 use shared::settings;
@@ -38,7 +38,11 @@ async fn run(
             .wrap(middleware::DefaultHeaders::new().add(("X-Version", env!("CARGO_PKG_VERSION")))) // Security consideration
             .app_data(db_redis.clone())
             .app_data(db_mongo.clone())
-            .service(web::scope("/v1").service(api::health))
+            .service(
+                web::scope("/v1")
+                    .service(api::v1::podcasts_bz::preview)
+                    .service(api::health),
+            )
     })
     .keep_alive(KeepAlive::Os) // Keep the connection alive; OS handled
     .disable_signals() // Disable the signals to allow the OS to handle the signals

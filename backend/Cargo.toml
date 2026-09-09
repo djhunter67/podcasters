@@ -18,6 +18,8 @@ config = "0.15.25"
 hex = "0.4.3"
 dotenvy = "0.15.7"
 shared = { version = "0.1.0", path = "../shared" }
+reqwest = "0.13.5"
+podcasting = { version = "0.1.0", path = "../podcasting" }
 
 [dev-dependencies]
 rstest = "0.26.1"

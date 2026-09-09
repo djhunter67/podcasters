@@ -1,6 +1,7 @@
 use std::fs;
 
 use futures::future::join_all;
+use podcasting::feed::fetch_feed;
 use tokio::{io::AsyncReadExt, task::JoinHandle};
 use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
 
@@ -149,7 +150,7 @@ async fn parse_xml(path_forward: &Devel, xml_list: Vec<String>) {
                         // convert the Vec<u8> to a String
                         let xml = String::from_utf8(xml).expect("Fail to convert to String");
 
-                        match podcasting::fetch_feed(&xml).await {
+                        match fetch_feed(&xml).await {
                             Ok(feed) => {
                                 tracing::info!("pod_feed_{i}.xml");
                                 tracing::warn!(
@@ -191,7 +192,7 @@ async fn parse_xml(path_forward: &Devel, xml_list: Vec<String>) {
                             .await
                             .expect("Fail to get XML from the web");
 
-                        match podcasting::fetch_feed(&xml).await {
+                        match fetch_feed(&xml).await {
                             Ok(feed) => {
                                 tracing::info!("xml url: {url}");
                                 tracing::warn!(

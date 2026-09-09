@@ -1,4 +1,7 @@
-use std::borrow::Cow;
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
+use serde::{Deserialize, Serialize};
+
+use crate::feed::fetch_feed;
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename = "rss")]
@@ -101,60 +104,152 @@ struct Enclosure {
     r#type: Option<String>,
 }
 
-use serde::Deserialize;
-
-#[derive(Debug, Deserialize, Clone)]
-pub struct Episode<'a> {
-    title: &'a str,
-    description: Option<&'a str>,
-    guid: Option<&'a str>,
-    audio_url: Option<&'a str>,
-    published_at: Option<&'a str>,
-    duration: Option<&'a str>,
+#[derive(Serialize, Debug, Default)]
+pub struct Podcast {
+    title: Option<String>,
+    description: Option<String>,
+    artwork_url: Option<String>,
+    feed_url: Option<String>,
+    episode_count: u16,
+    episodes: Vec<Episode>,
+    error: Option<String>,
 }
 
-impl<'a> Episode<'a> {
-    pub const fn get_title(&self) -> Cow<'a, &str> {
-        Cow::Borrowed(&self.title)
+impl Podcast {
+    /// # Panics
+    ///
+    /// This function will panic if the ``reqwest`` fail to acquire a ``200 OK``
+    /// # Errors
+    ///
+    /// This function returns an error if any of the ``Podcast`` values are `None`
+    pub async fn new(uri: &str) -> anyhow::Result<Self> {
+        let xml = reqwest::get(uri)
+            .await
+            .expect("Fail to GET")
+            .text()
+            .await
+            .expect("Fail to get XML from the web");
+
+        let pod: Self = match fetch_feed(&xml).await {
+            Ok(feed) => {
+                let feed = feed.channel;
+
+                let episodes: Vec<Episode> = feed
+                    .item
+                    .par_iter()
+                    .map(|epi| -> Episode {
+                        Episode {
+                            title: epi.title.clone(),
+                            description: epi.description.clone(),
+                            guid: epi
+                                .enclosure
+                                .first()
+                                .expect("")
+                                .as_ref()
+                                .expect("")
+                                .r#type
+                                .clone(),
+                            audio_url: epi
+                                .enclosure
+                                .first()
+                                .expect("")
+                                .as_ref()
+                                .expect("")
+                                .url
+                                .clone(),
+                            published_at: epi.pubDate.clone(),
+                            duration: epi.duration.clone(),
+                        }
+                    })
+                    .collect();
+
+                Self {
+                    title: feed.title,
+                    description: feed.description,
+                    artwork_url: feed.image.href,
+                    feed_url: feed
+                        .atom_links
+                        .first()
+                        .expect("No Atom:Link found")
+                        .href
+                        .clone(),
+                    episode_count: u16::try_from(
+                        feed.item.len().to_string().parse::<usize>().unwrap_or(0),
+                    )
+                    .expect("u16 overflow for the number of episodes"),
+                    episodes,
+                    error: None,
+                }
+            }
+            Err(err) => {
+                tracing::error!("Error: {err:#?}");
+                return Err(anyhow::anyhow!("{err:#?}"));
+            }
+        };
+        Ok(pod)
     }
 
-    pub const fn get_description(&self) -> Cow<'a, &str> {
-        if let Some(data) = self.description {
-            Cow::Owned(data)
-        } else {
-            Cow::Borrowed(&"None")
-        }
-    }
-
-    pub const fn get_guid(&self) -> Cow<'a, &str> {
-        if let Some(data) = self.guid {
-            Cow::Owned(data)
-        } else {
-            Cow::Borrowed(&"None")
-        }
-    }
-
-    pub const fn get_audio_url(&self) -> Cow<'a, &str> {
-        if let Some(data) = self.audio_url {
-            Cow::Owned(data)
-        } else {
-            Cow::Borrowed(&"None")
-        }
-    }
-
-    pub const fn get_published_at(&self) -> Cow<'a, &str> {
-        if let Some(data) = self.published_at {
-            Cow::Owned(data)
-        } else {
-            Cow::Borrowed(&"None")
-        }
-    }
-
-    pub const fn get_duration(&self) -> Cow<'a, &str> {
-        if let Some(data) = self.duration {
-            Cow::Owned(data)
-        } else {
-            Cow::Borrowed(&"None")
+    #[must_use = "Show any error"]
+    pub fn error(error: &anyhow::Error) -> Self {
+        Self {
+            error: Some(error.to_string()),
+            ..Default::default()
         }
     }
 }
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct Episode {
+    title: Option<String>,
+    description: Option<String>,
+    guid: Option<String>,
+    audio_url: Option<String>,
+    published_at: Option<String>,
+    duration: Option<String>,
+}
+
+// impl Episode {
+//     pub const fn get_title(&self) -> Cow<'static, &str> {
+//         Cow::Borrowed(self.title)
+//     }
+
+//     pub const fn get_description(&self) -> Cow<'a, &str> {
+//         if let Some(data) = self.description {
+//             Cow::Owned(data)
+//         } else {
+//             Cow::Borrowed(&"None")
+//         }
+//     }
+
+//     pub const fn get_guid(&self) -> Cow<'a, &str> {
+//         if let Some(data) = self.guid {
+//             Cow::Owned(data)
+//         } else {
+//             Cow::Borrowed(&"None")
+//         }
+//     }
+
+//     pub const fn get_audio_url(&self) -> Cow<'a, &str> {
+//         if let Some(data) = self.audio_url {
+//             Cow::Owned(data)
+//         } else {
+//             Cow::Borrowed(&"None")
+//         }
+//     }
+
+//     pub const fn get_published_at(&self) -> Cow<'a, &str> {
+//         if let Some(data) = self.published_at {
+//             Cow::Owned(data)
+//         } else {
+//             Cow::Borrowed(&"None")
+//         }
+//     }
+
+//     pub const fn get_duration(&self) -> Cow<'a, &str> {
+//         if let Some(data) = self.duration {
+//             Cow::Owned(data)
+//         } else {
+//             Cow::Borrowed(&"None")
+//         }
+//     }
+// }

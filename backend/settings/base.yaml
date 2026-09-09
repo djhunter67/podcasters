@@ -1,5 +1,5 @@
 application:
-  port: 8123
+  port: 3000
 
 mongo:
  uri: ""
