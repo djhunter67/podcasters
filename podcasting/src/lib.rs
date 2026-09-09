@@ -12,9 +12,11 @@ mod podcast;
 /// This function will error if the XML is malformed
 #[instrument(name = "fetch the feed from URL", level = "debug")]
 pub async fn fetch_feed(xml: &str) -> anyhow::Result<Rss> {
-    if xml.matches("<item").count().eq(&0) {
-        return Err(anyhow::Error::msg(
-            "No XML data found or XML data is malformed",
+    let looks_like_feed = xml.contains("<rss") || xml.contains("<feed");
+
+    if !looks_like_feed {
+        return Err(anyhow::anyhow!(
+            "Input does not appear to be an RSS or Atom feed",
         ));
     }
 
@@ -31,7 +33,10 @@ pub async fn fetch_feed(xml: &str) -> anyhow::Result<Rss> {
 
     let normalized = normalize_feed_xml(xml);
 
-    let feed: Rss = serde_xml_rs::from_reader(&mut normalized.as_bytes())
+    // let feed: Rss = serde_xml_rs::from_reader(&mut normalized.as_bytes())
+    let feed: Rss = serde_xml_rs::SerdeXml::new()
+        .overlapping_sequences(true)
+        .from_reader(normalized.as_bytes())
         .map_err(|err| anyhow::anyhow!("Unable to parse XML: {err:#?}"))?;
     // Ok(val) => val,
     // Err(err) => {

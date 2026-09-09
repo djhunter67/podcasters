@@ -9,13 +9,13 @@ pub struct Rss {
 #[derive(Debug, Deserialize)]
 pub struct Channel {
     pub version: Option<String>,
-    #[serde(rename = "atom:link")]
-    pub atom_link: Option<AtomLink>,
+    #[serde(rename = "atom:link", default)]
+    pub atom_links: Vec<AtomLink>,
     pub title: Option<String>,
     pub language: Option<String>,
     pub copyright: Option<String>,
     pub description: Option<String>,
-    #[serde(rename = "itunes:image")]
+    #[serde(rename = "itunes:image", default)]
     pub image: Image,
     #[serde(rename = "content:encoded")]
     pub content: Option<String>,
@@ -37,10 +37,14 @@ pub struct Channel {
 
 #[derive(Debug, Deserialize)]
 pub struct AtomLink {
+    #[serde(rename = "@href")]
     href: Option<String>,
+    #[serde(rename = "@rel")]
     rel: Option<String>,
+    #[serde(rename = "@type")]
     r#type: Option<String>,
     xmlns: Option<String>,
+    media_type: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -50,17 +54,17 @@ pub struct ItunesOwner {
     #[serde(rename = "itunes:email")]
     email: Option<String>,
     #[serde(rename = "itunes:category")]
-    category: Option<ItunesCategory>,
+    category: Vec<Option<ItunesCategory>>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Default)]
 pub struct ItunesCategory {
     text: Option<String>,
     #[serde(rename = "itunes:category")]
     category: Box<Option<Self>>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Default)]
 pub struct Image {
     pub href: Option<String>,
 }
