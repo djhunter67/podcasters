@@ -104,7 +104,7 @@ struct Enclosure {
     r#type: Option<String>,
 }
 
-#[derive(Serialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct Podcast {
     title: Option<String>,
     description: Option<String>,
