@@ -13,7 +13,6 @@ async fn main() -> anyhow::Result<()> {
         .with(filter)
         .init();
 
-    // #[cfg(feature = "get_xml")]
     // get_xml_data().await?;
 
     let xml_list: Vec<String> = vec![
@@ -47,18 +46,7 @@ async fn main() -> anyhow::Result<()> {
         String::from("https://feeds.megaphone.fm/newheights"),
     ];
 
-    // for (val, xml) in xml_list.iter().enumerate() {
-    //     tracing::info!("Checking file: pod_feed_{val}.xml");
-    //     // let xml = format!("pod_feed_{val}.xml");
-    //     match podcasting::fetch_feed(xml).await {
-    //         Ok(_) => (),
-    //         Err(err) => {
-    //             tracing::error!("Error: {err:#?}");
-    //         }
-    //     }
-    // }
-
-    parse_xml(&Devel::Url, xml_list).await;
+    parse_xml(&Devel::Xml, xml_list).await;
 
     Ok(())
 }
@@ -103,6 +91,7 @@ async fn parse_xml(path_forward: &Devel, xml_list: Vec<String>) {
                                 });
                             }
                             Err(err) => {
+                                tracing::info!("pod_feed_{i}.xml -> Error");
                                 tracing::error!("Error: {err:#?}");
                             }
                         }
@@ -127,7 +116,7 @@ async fn parse_xml(path_forward: &Devel, xml_list: Vec<String>) {
 
                         match podcasting::fetch_feed(&xml).await {
                             Ok(feed) => {
-                                tracing::info!("xml: {url}");
+                                tracing::info!("xml url: {url}");
                                 tracing::warn!(
                                     "Podcast: {}",
                                     feed.channel.title.unwrap_or_else(|| "None".to_string())

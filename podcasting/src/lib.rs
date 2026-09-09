@@ -29,90 +29,88 @@ pub async fn fetch_feed(xml: &str) -> anyhow::Result<Rss> {
     // tracing::warn!("CHANNEL BLOCK: {channel_block:#?}");
     // let mut backup_feed: Rss;
 
-    let feed: Rss = match serde_xml_rs::from_reader(&mut xml.as_bytes()) {
-        Ok(val) => val,
-        Err(err) => {
-            // tracing::error!("Unable to parse the feed: {err:#?}");
-            if err.to_string().contains("channel") {
-                tracing::error!("No data was retrieved");
-                return Err(anyhow::Error::msg("Malformed or no Data retrieved"));
-            }
-            // if err.to_string().contains("atom:link") {
-            //     // Move the pointer
-            //     let xml_start: &str = xml.rfind("<atom:link").map_or("None", |i| &xml[(i - 1)..]);
+    let normalized = normalize_feed_xml(xml);
 
-            //     // tracing::info!("XML: {}", xml.chars().take(150).collect::<String>());
-            //     tracing::info!(
-            //         "XML start: {}",
-            //         xml_start.chars().take(180).collect::<String>()
-            //     );
-            //     match serde_xml_rs::from_reader(&mut xml_start.as_bytes()) {
-            //         Ok(fed) => return Ok(fed),
-            //         Err(err) => {
-            //             tracing::info!("Second Pass: {err:#?}");
-            //             return Err(anyhow::Error::msg(format!("{err}")));
-            //         }
-            //     }
-            // }
-            // modify the file to remove the malformed data
-            let mut new_xml = String::new();
-            // let mut offending_line = String::new();
-            // let mut removed_count = 0;
-            for line in xml.lines() {
-                if line.contains("<atom:link") {
-                    // Remove the line from the file
-                    // tracing::warn!("The offending line has been found: {line}");
-                    // offending_line = line.trim().to_string();
-                    // removed_count += offending_line.len();
-                    // removed_count += 1;
-                    // tracing::info!(
-                    //     "REMOVED COUNT: {removed_count}; Val: {}",
-                    //     line[0..15].to_string().trim()
-                    // );
-                } else {
-                    new_xml.push_str(line);
-                }
-            }
+    let feed: Rss = serde_xml_rs::from_reader(&mut normalized.as_bytes())
+        .map_err(|err| anyhow::anyhow!("Unable to parse XML: {err:#?}"))?;
+    // Ok(val) => val,
+    // Err(err) => {
+    //     if err.to_string().contains("channel") {
+    //         tracing::error!("No data was retrieved");
+    //         return Err(anyhow::Error::msg("Malformed or no Data retrieved"));
+    //     }
 
-            // tracing::info!("new XML len: {}", new_xml.len());
-            // tracing::info!("XML len: {}", xml.len());
-            // let amt_removed = xml.len() - new_xml.len();
-            // let char_count = offending_line.chars().count();
-            // let count_of_dup_field = new_xml.matches("<atom:link").count();
+    //     // Duplicate <atom:link error workaround
+    //     let mut new_xml = String::new();
+    //     // Recreate the file without the duplicates
+    //     for line in xml.lines() {
+    //         if line.contains("<atom:link")
+    //             || line.starts_with('x')
+    //             || line.contains("media:thumbnail")
+    //             || line.contains("podcast:meduim")
+    //             || line.contains("media:content")
+    //         {
+    //         } else {
+    //             new_xml.push_str(line);
+    //         }
+    //     }
 
-            // tracing::info!("equal?: diff count: {amt_removed}");
-            // tracing::info!("equal?: char count: {char_count}");
-            // tracing::info!("Count of removed chars: {removed_count}");
-            // tracing::info!("Count of duplicate 'atom:link': {}", count_of_dup_field);
-            // tracing::warn!("Offending Line: {offending_line}");
-
-            match serde_xml_rs::from_reader(&mut new_xml.as_bytes()) {
-                Ok(data) => return Ok(data),
-                Err(err) => {
-                    tracing::error!("Different Error: {err:#?}");
-                    return Err(anyhow::Error::msg(format!(
-                        "Unable to parse the XML: {err:#?}"
-                    )));
-                } // tracing::info!("Second attempt succesful");
-            }
-        }
-    };
-
-    // let var_name = &"None".to_string();
-    // let err_ret = String::from("None");
-    // tracing::warn!(
-    //     "Podcast: {}",
-    //     feed.channel.title.as_ref().unwrap_or(var_name)
-    // );
-    // feed.channel.item.iter().take(1).for_each(|entry| {
-    //     tracing::warn!("title: {}", entry.title.as_ref().unwrap_or(&err_ret));
-    //     tracing::info!(
-    //         "Published: {:#?}",
-    //         entry.pubDate.as_ref().unwrap_or(&err_ret)
-    //     );
-    // });
+    //     if !err.to_string().contains("atom:link") {
+    //         tracing::error!("Error prior to retry: {err:#?}");
+    //     }
+    //     match serde_xml_rs::from_reader(&mut new_xml.as_bytes()) {
+    //         Ok(data) => return Ok(data),
+    //         Err(err) => {
+    //             return Err(anyhow::Error::msg(format!(
+    //                 "Unable to parse the XML: {err:#?}"
+    //             )));
+    //         }
+    //     }
+    // }
+    // };
 
     Ok(feed)
+}
+
+fn normalize_feed_xml(xml: &str) -> String {
+    const NAMESPACES: &[(&str, &str)] = &[
+        ("media", "http://search.yahoo.com/mrss/"),
+        ("atom", "http://www.w3.org/2005/Atom"),
+        ("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd"),
+        ("podcast", "https://podcastindex.org/namespace/1.0"),
+    ];
+
+    let mut normalized = xml.to_owned();
+
+    for (prefix, uri) in NAMESPACES {
+        let usage = format!("<{prefix}:");
+
+        let declaration = format!("xmlns:{prefix}=");
+
+        if normalized.contains(&usage) && !normalized.contains(&declaration) {
+            normalized = add_namespace(normalized, prefix, uri);
+        }
+    }
+
+    normalized
+}
+
+fn add_namespace(mut xml: String, prefix: &str, uri: &str) -> String {
+    let Some(start) = xml.find("<rss") else {
+        return xml;
+    };
+
+    let Some(relative_end) = xml[start..].find('>') else {
+        return xml;
+    };
+
+    let end = start + relative_end;
+
+    let declaration = format!(r#" xmlns:{prefix}="{uri}""#);
+
+    xml.insert_str(end, &declaration);
+
+    xml
 }
 
 #[async_trait]
