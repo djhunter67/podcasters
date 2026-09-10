@@ -1,9 +1,9 @@
+#![allow(dead_code)]
 use mongodb::{
     bson::{oid, to_document},
     options::UpdateModifications,
 };
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
-use redis::FromRedisValue;
 use serde::{Deserialize, Serialize};
 
 use crate::feed::fetch_feed;
@@ -114,6 +114,7 @@ struct Enclosure {
 pub struct Podcast {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     id: Option<mongodb::bson::oid::ObjectId>,
+    uri: String,
     title: Option<String>,
     description: Option<String>,
     artwork_url: Option<String>,
@@ -137,15 +138,8 @@ impl Podcast {
     /// # Errors
     ///
     /// This function returns an error if any of the ``Podcast`` values are `None`
-    pub async fn new(uri: &str) -> anyhow::Result<Self> {
-        let xml = reqwest::get(uri)
-            .await
-            .expect("Fail to GET")
-            .text()
-            .await
-            .expect("Fail to get XML from the web");
-
-        let pod: Self = match fetch_feed(&xml).await {
+    pub async fn new(xml: &str) -> anyhow::Result<Self> {
+        let pod: Self = match fetch_feed(xml).await {
             Ok(feed) => {
                 let feed = feed.channel;
 
@@ -180,6 +174,7 @@ impl Podcast {
 
                 Self {
                     id: None,
+                    uri: String::new(),
                     title: feed.title,
                     description: feed.description,
                     artwork_url: feed.image.href,
@@ -234,6 +229,15 @@ impl Podcast {
         } else {
             Err(anyhow::anyhow!("Unable to set the OID: {id:#?}"))
         }
+    }
+
+    pub fn set_uri(&mut self, uri: &str) {
+        self.uri = String::from(uri);
+    }
+
+    #[must_use = "Required to get the URI"]
+    pub fn get_uri(&self) -> String {
+        self.uri.clone()
     }
 }
 
