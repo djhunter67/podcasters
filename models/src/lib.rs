@@ -47,7 +47,7 @@ impl fmt::Display for DataBases {
 ///
 ///   - Panic if no connection are available for outside connections
 pub async fn init_db()
--> Result<(aio::ConnectionManager, mongodb::Client), Box<dyn std::error::Error>> {
+-> Result<(redis::aio::MultiplexedConnection, mongodb::Client), Box<dyn std::error::Error>> {
     let settings = match settings::get() {
         Ok(sets) => sets,
         Err(err) => {
@@ -79,6 +79,8 @@ pub async fn init_db()
                 panic!("Application cannot start: {err:#?}")
             }
         };
+
+    // let redis_pool: redis::aio::MultiplexedConnection = redis::Client;
 
     let mongo_options: ClientOptions = match ClientOptions::parse(&settings.mongo.uri).await {
         Ok(mut conn) => {

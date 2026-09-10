@@ -62,13 +62,34 @@ pub async fn podcast(
     uri = cache_check(&mut redis_client, &cache_key, uri).await;
 
     if let Some(_id) = uri.id {
+        tracing::warn!("CACHE HIT!");
+        // No GUARANTEE THAT THIS KEY EXISTS IN THE DB
+        return HttpResponse::Ok().json(web::Json(uri));
+    }
+    tracing::warn!("Cache layer MISS");
+
+    uri = db_check(mongo_client.as_ref().clone(), uri).await;
+
+    if let Some(_id) = uri.id {
+        tracing::warn!("DB CACHE HIT!");
+        let _ = redis_client
+            .set_ex(
+                &cache_key,
+                uri.id.expect("Fail to retrieve OID").to_string(),
+                86_400,
+            )
+            .await
+            .map_err(|err| {
+                tracing::error!("Failure to cache oid for Podcast: {err}");
+                HttpResponse::InternalServerError().json(web::Json(err.to_string()))
+            });
+
         return HttpResponse::Ok().json(web::Json(uri));
     }
 
-    uri = db_check(mongo_client.as_ref().clone(), uri).await;
-    if let Some(_id) = uri.id {
-        return HttpResponse::Ok().json(web::Json(uri));
-    }
+    tracing::warn!("DB layer MISS");
+
+    // Never before seen URI
     let xml = reqwest::get(&uri.uri)
         .await
         .expect("Fail to GET")
@@ -88,8 +109,6 @@ pub async fn podcast(
 
     pod.set_uri(&uri.0.uri);
 
-    uri.0.uri = pod.get_title();
-
     // Save the podcast to the database
     let conn = mongo_client
         .database(&DataBases::PodCast.to_string())
@@ -107,12 +126,10 @@ pub async fn podcast(
         Ok(id) => {
             tracing::info!("Saved the podcast to the DB");
             let oid = id.inserted_id.as_object_id();
-            tracing::warn!("The save OID: {oid:#?}");
+            tracing::warn!("The OID saved");
             let _ = pod.set_id(oid);
             uri.id = oid;
             let _ = redis_client
-                // .as_ref()
-                // .clone()
                 .set_ex(
                     &cache_key,
                     oid.expect("Fail to retrieve OID").to_string(),
@@ -123,77 +140,8 @@ pub async fn podcast(
                     tracing::error!("Failure to cache oid for Podcast: {err}");
                     HttpResponse::InternalServerError().json(web::Json(err.to_string()))
                 });
-            tracing::info!("Cache save: {oid:#?}");
+            tracing::info!("Cache layer updated");
         }
-        // // The URI passed in is in the DB
-        // Err(err) if is_dup(&err) => {
-        //     // Alredy inserted
-        //     tracing::info!("Value already found in DB");
-        //     let cache: Option<String> = redis_client
-        //         .get(&cache_key)
-        //         .await
-        //         .map_err(|err| {
-        //             tracing::error!("Failure to cache oid for Podcast: {err}");
-        //             err.to_string()
-        //         })
-        //         .expect("Failure to get cacched value");
-        //     tracing::warn!("cache key: {cache:#?}");
-
-        //     match cache {
-        //         // The DB oid is in the cache layer
-        //         Some(oid) => {
-        //             tracing::warn!("Cache-Hit!");
-        //             tracing::debug!("Returning an OID {oid:#?}");
-        //             let _ = pod.set_id(ObjectId::from_str(&oid).ok());
-        //             uri.id = ObjectId::from_str(&oid).ok();
-        //             return HttpResponse::Ok().json(web::Json(uri));
-        //         }
-        //         // The DB has the Podcast but the cache layer doesnt
-        //         None => {
-        //             tracing::warn!("Cache Miss!");
-        //             let existing: Option<Podcast> = match mongo_client
-        //                 .database(&DataBases::PodCast.to_string())
-        //                 .collection::<Podcast>(&DataBases::PodCast.to_string())
-        //                 .find_one(doc! {
-        //                     "title": pod.get_title(),
-        //                 })
-        //                 .await
-        //             {
-        //                 Ok(res) => {
-        //                     tracing::warn!("Found item in the DB");
-        //                     res
-        //                 }
-        //                 Err(err) => {
-        //                     tracing::error!("Cache error: {err:#?}");
-        //                     return HttpResponse::InternalServerError()
-        //                         .json(web::Json(err.to_string()));
-        //                 }
-        //             };
-
-        //             let oid = match existing {
-        //                 Some(data) => {
-        //                     tracing::debug!("Existing Podcast: {}", data.get_title());
-        //                     data.get_id().expect("Failed to get IOD")
-        //                 }
-        //                 None => {
-        //                     tracing::error!("Failed to get existing Podcast");
-        //                     return HttpResponse::InternalServerError()
-        //                         .json(web::Json(err.to_string()));
-        //                 }
-        //             };
-
-        //             let _: () = redis_client
-        //                 .set_ex(cache_key, oid.to_string(), 86_400)
-        //                 .await
-        //                 .map_err(|err| err.to_string())
-        //                 .expect("Failure to reset cache");
-
-        //             uri.id = Some(oid);
-
-        //             return HttpResponse::Ok().json(web::Json(uri));
-        //         }
-        //     }
-        // }
         Err(err) => {
             tracing::error!("Unable to insert the podcast in the databse: {err:#?}");
             return HttpResponse::AlreadyReported().json(web::Json(uri));
@@ -218,6 +166,7 @@ async fn cache_check(
     cache_key: &str,
     mut uri: web::Json<PreviewQuery>,
 ) -> web::Json<PreviewQuery> {
+    tracing::debug!("cache check");
     let cache: Option<String> = redis_client
         .get(cache_key)
         .await
@@ -225,7 +174,7 @@ async fn cache_check(
             tracing::error!("Failure to cache oid for Podcast: {err}");
             err.to_string()
         })
-        .expect("Failure to get cacched value");
+        .expect("Failure to get cached value");
 
     if let Some(found) = cache {
         uri.id = ObjectId::from_str(&found).ok();
@@ -238,6 +187,7 @@ async fn db_check(
     mongo_client: mongodb::Client,
     mut uri: web::Json<PreviewQuery>,
 ) -> web::Json<PreviewQuery> {
+    tracing::debug!("db cache check");
     let conn = mongo_client
         .database(&DataBases::PodCast.to_string())
         .collection::<Podcast>(&DataBases::PodCast.to_string());
@@ -250,7 +200,6 @@ async fn db_check(
         .await
         && let Some(pod) = cache_podcast
     {
-        tracing::warn!("PRE-CACHE HIT");
         uri.id = pod.get_id();
     }
     uri
