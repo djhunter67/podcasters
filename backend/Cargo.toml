@@ -22,6 +22,7 @@ reqwest = "0.13.5"
 podcasting = { version = "0.1.0", path = "../podcasting" }
 mongodb = "3.9.0"
 redis = { version = "1.7.0", features = ["connection-manager", "aio", "tokio-comp"] }
+actix-cors = "0.7.2"
 
 [dev-dependencies]
 rstest = "0.26.1"

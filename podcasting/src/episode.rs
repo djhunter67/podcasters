@@ -121,7 +121,6 @@ pub struct Podcast {
     feed_url: Option<String>,
     episode_count: u16,
     episodes: Vec<Episode>,
-    error: Option<String>,
 }
 
 impl From<Podcast> for UpdateModifications {
@@ -189,7 +188,6 @@ impl Podcast {
                     )
                     .expect("u16 overflow for the number of episodes"),
                     episodes,
-                    error: None,
                 }
             }
             Err(err) => {
@@ -198,14 +196,6 @@ impl Podcast {
             }
         };
         Ok(pod)
-    }
-
-    #[must_use = "Show any error"]
-    pub fn error(error: &str) -> Self {
-        Self {
-            error: Some(error.to_string()),
-            ..Default::default()
-        }
     }
 
     pub fn get_title(&self) -> String {
@@ -238,6 +228,19 @@ impl Podcast {
     #[must_use = "Required to get the URI"]
     pub fn get_uri(&self) -> String {
         self.uri.clone()
+    }
+
+    #[must_use = "limit the number of episode"]
+    pub fn limit_episode(mut self, limit: u16) -> Self {
+        if !limit.eq(&0) {
+            // self.episodes = *self
+            //     .episodes
+            //     .iter()
+            //     .take(limit.into())
+            //     .collect::<Vec<Episode>>()
+            //     .to_vec();
+        }
+        self
     }
 }
 

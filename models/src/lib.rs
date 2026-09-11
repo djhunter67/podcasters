@@ -2,7 +2,7 @@
 use std::{fmt, time};
 
 use mongodb::options::ClientOptions;
-use redis::aio::{self, ConnectionManagerConfig};
+
 use shared::settings;
 
 pub mod billing;
@@ -46,8 +46,7 @@ impl fmt::Display for DataBases {
 /// # Panics
 ///
 ///   - Panic if no connection are available for outside connections
-pub async fn init_db()
--> Result<(redis::aio::MultiplexedConnection, mongodb::Client), Box<dyn std::error::Error>> {
+pub async fn init_db() -> Result<mongodb::Client, Box<dyn std::error::Error>> {
     let settings = match settings::get() {
         Ok(sets) => sets,
         Err(err) => {
@@ -55,32 +54,6 @@ pub async fn init_db()
             return Err(format!("Unable to acquire the settings: {err:#?}").into());
         }
     };
-
-    let redis_client: redis::Client = match redis::Client::open(settings.redis.uri.clone()) {
-        Ok(conn) => conn,
-        Err(err) => {
-            tracing::error!("Unable to connect to the cache layer: {err:#?}");
-            panic!("Application cannot start: {err:#?}")
-            // try to connect to a locally running instance of redis
-        }
-    };
-
-    let redis_config = ConnectionManagerConfig::new()
-        .set_connection_timeout(Some(time::Duration::from_secs(2))) // Time to establish TCP connection
-        .set_response_timeout(Some(time::Duration::from_secs(1))) // Time to wait for command response
-        .set_exponent_base(2.) // Exponential backoff base
-        .set_number_of_retries(3); // Max retries before failing
-
-    let redis_pool: redis::aio::ConnectionManager =
-        match aio::ConnectionManager::new_with_config(redis_client, redis_config).await {
-            Ok(conn) => conn,
-            Err(err) => {
-                tracing::error!("Unable to connect to the cache layer: {err:#?}");
-                panic!("Application cannot start: {err:#?}")
-            }
-        };
-
-    // let redis_pool: redis::aio::MultiplexedConnection = redis::Client;
 
     let mongo_options: ClientOptions = match ClientOptions::parse(&settings.mongo.uri).await {
         Ok(mut conn) => {
@@ -109,5 +82,5 @@ pub async fn init_db()
         }
     };
 
-    Ok((redis_pool, mongo_pool))
+    Ok(mongo_pool)
 }

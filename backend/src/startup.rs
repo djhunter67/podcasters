@@ -1,8 +1,13 @@
 use crate::api::{self};
-use actix_web::{self, App, HttpServer, http::KeepAlive, middleware, web};
+use actix_cors::Cors;
+use actix_web::{
+    self, App, HttpResponse, HttpServer, error,
+    http::{KeepAlive, header},
+    middleware, web,
+};
 use models;
 use shared::settings;
-use std::net;
+use std::{net, time};
 use tracing::{instrument, warn};
 
 pub const PARSE_COUNT: u8 = 9;
@@ -18,10 +23,10 @@ async fn run(
     listener: std::net::TcpListener,
     settings: settings::Settings,
 ) -> Result<actix_web::dev::Server, std::io::Error> {
-    let (redis_pool, mongo_pool) = match models::init_db().await {
-        Ok((red, mong)) => {
+    let mongo_pool = match models::init_db().await {
+        Ok(mong) => {
             tracing::info!("Database connection established");
-            (red, mong)
+            mong
         }
         Err(err) => {
             tracing::error!(err);
@@ -29,22 +34,62 @@ async fn run(
         }
     };
 
+    let redis_client: redis::Client = match redis::Client::open(settings.redis.uri.clone()) {
+        Ok(conn) => conn,
+        Err(err) => {
+            tracing::error!("Unable to connect to the cache layer: {err:#?}");
+            panic!("Application cannot start: {err:#?}")
+            // try to connect to a locally running instance of redis
+        }
+    };
+
+    let redis_config = redis::aio::ConnectionManagerConfig::new()
+        .set_connection_timeout(Some(time::Duration::from_secs(2))) // Time to establish TCP connection
+        .set_response_timeout(Some(time::Duration::from_secs(1))) // Time to wait for command response
+        .set_exponent_base(2.) // Exponential backoff base
+        .set_number_of_retries(3); // Max retries before failing
+
+    let redis_pool: redis::aio::ConnectionManager =
+        match redis::aio::ConnectionManager::new_with_config(redis_client, redis_config).await {
+            Ok(conn) => conn,
+            Err(err) => {
+                tracing::error!("Unable to connect to the cache layer: {err:#?}");
+                panic!("Application cannot start: {err:#?}")
+            }
+        };
+
     // Connect to the MongoDB database
-    let db_redis = web::Data::new(redis_pool);
+    let db_redis: web::Data<redis::aio::ConnectionManager> = web::Data::new(redis_pool);
     let db_mongo: web::Data<mongodb::Client> = web::Data::new(mongo_pool);
     tracing::info!("Processed DB & Cache connection pool for distribution");
 
     let server = HttpServer::new(move || {
+        let cors = Cors::default()
+            // .allowed_origin("https://app.example.com")
+            .allow_any_origin()
+            .allowed_methods(vec!["GET", "POST"])
+            .allowed_headers(vec![header::AUTHORIZATION, header::CONTENT_TYPE])
+            .max_age(3600);
+
+        let json_config = web::JsonConfig::default()
+            .limit(409)
+            .error_handler(|err, _req| {
+                // create custom error response
+                error::InternalError::from_response(err, HttpResponse::Conflict().finish()).into()
+            });
         App::new()
             .wrap(middleware::Logger::default())
             .wrap(middleware::Compress::default())
             .wrap(middleware::DefaultHeaders::new().add(("X-Version", env!("CARGO_PKG_VERSION")))) // Security consideration
+            .wrap(cors)
+            .app_data(json_config)
             .app_data(db_redis.clone())
             .app_data(db_mongo.clone())
             .service(
                 web::scope("/v1")
                     .service(api::v1::podcasts::preview)
-                    .service(api::v1::podcasts::podcast)
+                    .service(api::v1::podcasts::set_podcast)
+                    .service(api::v1::podcasts::get_podcast)
                     .service(api::health),
             )
     })
