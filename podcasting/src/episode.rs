@@ -110,7 +110,7 @@ struct Enclosure {
     r#type: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Default)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct Podcast {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     id: Option<mongodb::bson::oid::ObjectId>,
@@ -166,7 +166,19 @@ impl Podcast {
                                 .url
                                 .clone(),
                             published_at: epi.pub_date.clone(),
-                            duration: epi.duration.clone(),
+                            duration: match epi
+                                .duration
+                                .as_ref()
+                                .expect("Unable to acquire the duration")
+                                .clone()
+                                .parse::<u16>()
+                            {
+                                Ok(num) => Some(num),
+                                Err(err) => {
+                                    tracing::error!("The duration is not in seconds: {err:#?}");
+                                    None
+                                }
+                            },
                         }
                     })
                     .collect();
@@ -230,17 +242,20 @@ impl Podcast {
         self.uri.clone()
     }
 
-    #[must_use = "limit the number of episode"]
-    pub fn limit_episode(mut self, limit: u16) -> Self {
+    pub fn limit_episode(&mut self, limit: u16) {
         if !limit.eq(&0) {
-            // self.episodes = *self
-            //     .episodes
-            //     .iter()
-            //     .take(limit.into())
-            //     .collect::<Vec<Episode>>()
-            //     .to_vec();
+            let episodes = self
+                .episodes
+                .iter()
+                .take(limit.into())
+                .collect::<Vec<&Episode>>();
+
+            self.episodes = episodes
+                .iter()
+                .map(|episode| episode.clone().clone())
+                .inspect(|val| tracing::info!("Episode: {:#?}", val.published_at))
+                .collect::<Vec<Episode>>();
         }
-        self
     }
 }
 
@@ -251,7 +266,7 @@ pub struct Episode {
     media_type: Option<String>,
     audio_url: Option<String>,
     published_at: Option<String>,
-    duration: Option<String>,
+    duration: Option<u16>,
 }
 
 // impl Episode {

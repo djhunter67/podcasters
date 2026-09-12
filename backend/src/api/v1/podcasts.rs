@@ -81,6 +81,7 @@ pub async fn set_podcast(
 
     tracing::warn!("DB layer MISS");
 
+    tracing::info!("Querying the uri endpoint");
     // Never before seen URI
     let xml = reqwest::get(&uri.uri)
         .await
@@ -183,10 +184,10 @@ pub async fn get_podcast(
     {
         Ok(find_one) => {
             tracing::info!("query performed");
-            if let Some(pod_cast) = find_one {
-                if !json.limit.eq(&0) {
+            if let Some(mut pod_cast) = find_one {
+                    if !json.limit.eq(&0) {
                     tracing::info!("Limiting the number of episodes: {}", json.limit);
-                    // pod_cast
+                    pod_cast.limit_episode(json.limit);
                 }
                 tracing::warn!("Information found");
                 return HttpResponse::Ok().json(web::Json(pod_cast));
@@ -205,15 +206,15 @@ pub async fn get_podcast(
 #[instrument(
     name = "Episode Getter",
     level = "info",
-    target = "Get an Episode",
+    target = "Podcasting",
     skip(mongo_client)
 )]
-#[actix_web::get("/episode/{id}")]
+#[actix_web::get("/episode")]
 pub async fn get_episode(
     mongo_client: web::Data<mongodb::Client>,
-    json: web::Path<Getter>,
+    json: web::Query<Getter>,
 ) -> HttpResponse {
-    tracing::info!("querying for a podcast");
+    tracing::info!("querying for a podcast episode");
     let conn = mongo_client
         .database(&DataBases::PodCast.to_string())
         .collection::<Podcast>(&DataBases::PodCast.to_string());
@@ -234,10 +235,7 @@ pub async fn get_episode(
     {
         Ok(find_one) => {
             tracing::info!("query performed");
-            if let Some(pod_cast) = find_one {
-                if !json.limit.eq(&0) {
-                    tracing::info!("will limiting the number of episodes: {}", json.limit);
-                }
+            if let Some(pod_cast) = find_one {                
                 tracing::warn!("Information found");
                 return HttpResponse::Ok().json(web::Json(pod_cast));
             } else {

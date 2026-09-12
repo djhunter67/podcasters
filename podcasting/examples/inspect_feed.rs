@@ -121,10 +121,12 @@ async fn main() -> anyhow::Result<()> {
         String::from("https://rss.art19.com/escaping-the-drift"),
         String::from("https://rss.art19.com/lizness-school"),
         String::from("https://rss.art19.com/business-game-changers"),
+        // Huberman Lab
+        String::from("https://feeds.megaphone.fm/hubermanlab"),
     ];
     // get_xml_data(xml_list).await?;
 
-    parse_xml(&Devel::Xml, xml_list).await;
+    parse_xml(&Devel::Url, xml_list).await;
 
     Ok(())
 }
@@ -164,7 +166,7 @@ async fn parse_xml(path_forward: &Devel, xml_list: Vec<String>) {
                                     );
                                     tracing::info!(
                                         "Published: {:#?}",
-                                        entry.pubDate.as_ref().map_or("None", |v| v)
+                                        entry.pub_date.as_ref().map_or("None", |v| v)
                                     );
                                 });
                             }
@@ -206,7 +208,7 @@ async fn parse_xml(path_forward: &Devel, xml_list: Vec<String>) {
                                     );
                                     tracing::info!(
                                         "Published: {:#?}",
-                                        entry.pubDate.as_ref().map_or("None", |v| v)
+                                        entry.pub_date.as_ref().map_or("None", |v| v)
                                     );
                                 });
                             }

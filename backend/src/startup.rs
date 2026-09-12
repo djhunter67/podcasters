@@ -90,6 +90,7 @@ async fn run(
                     .service(api::v1::podcasts::preview)
                     .service(api::v1::podcasts::set_podcast)
                     .service(api::v1::podcasts::get_podcast)
+                    .service(api::v1::podcasts::get_episode)
                     .service(api::health),
             )
     })
