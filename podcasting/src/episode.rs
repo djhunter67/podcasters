@@ -244,22 +244,23 @@ impl Podcast {
 
     pub fn limit_episode(&mut self, limit: u16) {
         if !limit.eq(&0) {
-            let episodes = self
-                .episodes
-                .iter()
-                .take(limit.into())
-                .collect::<Vec<&Episode>>();
-
-            self.episodes = episodes
-                .iter()
-                .map(|episode| episode.clone().clone())
-                .inspect(|val| tracing::info!("Episode: {:#?}", val.published_at))
-                .collect::<Vec<Episode>>();
+            self.episodes = episode_lim(&self.episodes, limit).to_vec();
         }
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+fn episode_lim(epis: &[Episode], limit: u16) -> &[Episode] {
+    // epis.iter()
+    // .take(limit.into())
+    // .cloned()
+    // .collect::<Vec<Episode>>()
+
+    let limit = usize::from(limit).min(epis.len());
+
+    &epis[..limit]
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
 pub struct Episode {
     title: Option<String>,
     description: Option<String>,
@@ -269,48 +270,98 @@ pub struct Episode {
     duration: Option<u16>,
 }
 
-// impl Episode {
-//     pub const fn get_title(&self) -> Cow<'static, &str> {
-//         Cow::Borrowed(self.title)
-//     }
+#[cfg(test)]
+mod tests {
+    use crate::episode;
 
-//     pub const fn get_description(&self) -> Cow<'a, &str> {
-//         if let Some(data) = self.description {
-//             Cow::Owned(data)
-//         } else {
-//             Cow::Borrowed(&"None")
-//         }
-//     }
+    use super::*;
 
-//     pub const fn get_media_type(&self) -> Cow<'a, &str> {
-//         if let Some(data) = self.media_type {
-//             Cow::Owned(data)
-//         } else {
-//             Cow::Borrowed(&"None")
-//         }
-//     }
+    fn episode(title: &str) -> Episode {
+        Episode {
+            title: Some(title.to_string()),
+            description: Some(format!("Description for {title}")),
+            media_type: Some("audio/mpeg".to_string()),
+            audio_url: Some(format!("https://example.com/{title}.mp3")),
+            published_at: Some("2026-09-12".to_string()),
+            duration: Some(120),
+        }
+    }
 
-//     pub const fn get_audio_url(&self) -> Cow<'a, &str> {
-//         if let Some(data) = self.audio_url {
-//             Cow::Owned(data)
-//         } else {
-//             Cow::Borrowed(&"None")
-//         }
-//     }
+    #[test]
+    fn episode_lim_returns_requested_number_of_episodes() {
+        let episodes = vec![episode("one"), episode("two"), episode("three")];
 
-//     pub const fn get_published_at(&self) -> Cow<'a, &str> {
-//         if let Some(data) = self.published_at {
-//             Cow::Owned(data)
-//         } else {
-//             Cow::Borrowed(&"None")
-//         }
-//     }
+        let result = episode_lim(&episodes, 2);
 
-//     pub const fn get_duration(&self) -> Cow<'a, &str> {
-//         if let Some(data) = self.duration {
-//             Cow::Owned(data)
-//         } else {
-//             Cow::Borrowed(&"None")
-//         }
-//     }
-// }
+        assert_eq!(result.len(), 2);
+        assert_eq!(result[0].title.as_deref(), Some("one"));
+        assert_eq!(result[1].title.as_deref(), Some("two"));
+    }
+
+    #[test]
+    fn episode_lim_returns_all_when_limit_equals_length() {
+        let episodes = vec![episode("one"), episode("two"), episode("three")];
+
+        let result = episode_lim(&episodes, 3);
+
+        assert_eq!(result.len(), 3);
+    }
+
+    #[test]
+    fn episode_lim_returns_all_when_limit_exceeds_length() {
+        let episodes = vec![episode("one"), episode("two")];
+
+        let result = episode_lim(&episodes, 10);
+
+        assert_eq!(result.len(), 2);
+    }
+
+    #[test]
+    fn episode_lim_returns_empty_vec_when_limit_is_zero() {
+        let episodes = vec![episode("one"), episode("two")];
+
+        let result = episode_lim(&episodes, 0);
+
+        assert_eq!(result, [] as [episode::Episode; 0]);
+    }
+
+    #[test]
+    fn episode_lim_returns_empty_vec_for_empty_input() {
+        let episodes: Vec<Episode> = Vec::new();
+
+        let result = episode_lim(&episodes, 5);
+
+        assert_eq!(result, [] as [episode::Episode; 0]);
+    }
+
+    #[test]
+    fn episode_lim_preserves_episode_order() {
+        let episodes = vec![episode("first"), episode("second"), episode("third")];
+
+        let result = episode_lim(&episodes, 3);
+
+        assert_eq!(result[0].title.as_deref(), Some("first"));
+        assert_eq!(result[1].title.as_deref(), Some("second"));
+        assert_eq!(result[2].title.as_deref(), Some("third"));
+    }
+
+    #[test]
+    fn episode_lim_returns_first_two_episodes() {
+        let episodes = vec![episode("one"), episode("two"), episode("three")];
+
+        let expected = vec![episode("one"), episode("two")];
+
+        assert_eq!(episode_lim(&episodes, 2), expected);
+    }
+
+    #[test]
+    fn episode_lim_returns_requested_slice() {
+        let episodes = vec![episode("one"), episode("two"), episode("three")];
+
+        let result = episode_lim(&episodes, 2);
+
+        assert_eq!(result.len(), 2);
+        assert_eq!(result[0].title.as_deref(), Some("one"));
+        assert_eq!(result[1].title.as_deref(), Some("two"));
+    }
+}

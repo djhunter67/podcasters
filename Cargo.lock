@@ -1152,6 +1152,7 @@ dependencies = [
  "config",
  "dotenvy",
  "models",
+ "redis 1.7.0",
  "serde",
  "serde_json",
  "shared",

@@ -1,4 +1,4 @@
-use std::net;
+use std::{net, time};
 
 use actix_web::{self, App, HttpServer, http::KeepAlive, middleware, web};
 use shared::settings;
@@ -19,13 +19,37 @@ async fn run(
     listener: std::net::TcpListener,
     settings: settings::Settings,
 ) -> Result<actix_web::dev::Server, std::io::Error> {
-    let (redis_pool, mongo_pool) = match models::init_db().await {
-        Ok((red, mong)) => (red, mong),
+    let mongo_pool = match models::init_db().await {
+        Ok(mong) => mong,
         Err(err) => {
             tracing::error!(err);
             panic!("Unable to init the app due to the lack of a DB connection");
         }
     };
+
+    let redis_client: redis::Client = match redis::Client::open(settings.redis.uri.clone()) {
+        Ok(conn) => conn,
+        Err(err) => {
+            tracing::error!("Unable to connect to the cache layer: {err:#?}");
+            panic!("Application cannot start: {err:#?}")
+            // try to connect to a locally running instance of redis
+        }
+    };
+
+    let redis_config = redis::aio::ConnectionManagerConfig::new()
+        .set_connection_timeout(Some(time::Duration::from_secs(2))) // Time to establish TCP connection
+        .set_response_timeout(Some(time::Duration::from_secs(1))) // Time to wait for command response
+        .set_exponent_base(2.) // Exponential backoff base
+        .set_number_of_retries(3); // Max retries before failing
+
+    let redis_pool: redis::aio::ConnectionManager =
+        match redis::aio::ConnectionManager::new_with_config(redis_client, redis_config).await {
+            Ok(conn) => conn,
+            Err(err) => {
+                tracing::error!("Unable to connect to the cache layer: {err:#?}");
+                panic!("Application cannot start: {err:#?}")
+            }
+        };
 
     // Connect to the MongoDB database
     let db_redis = web::Data::new(redis_pool);

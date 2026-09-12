@@ -1,17 +1,17 @@
 application:
-  port: 3000
+  port: 8125
 
 mongo:
  uri: ""
  db: "personal_blog"
- collection: "Users"
+ collection: "Podcast"
  require_auth: true
  pool_size: 1
  connection_timeout: 1
 
 redis:
   uri: ""
-  key: "session:"
+  key: "podcast:"
   pool_size: 1
   pool_max_open: 16
   pool_max_idle: 8
