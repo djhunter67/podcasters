@@ -145,7 +145,7 @@ pub async fn set_podcast(
 }
 
 #[derive(Debug, Deserialize)]
-struct Getter {
+struct PodGetter {
     #[serde(rename = "id")]
     podcast_id: String,
     #[serde(default)]
@@ -161,7 +161,7 @@ struct Getter {
 #[actix_web::get("/podcast")]
 pub async fn get_podcast(
     mongo_client: web::Data<mongodb::Client>,
-    json: web::Query<Getter>,
+    json: web::Query<PodGetter>,
 ) -> HttpResponse {
     tracing::info!("querying for a podcast");
     let conn = mongo_client
@@ -185,7 +185,7 @@ pub async fn get_podcast(
         Ok(find_one) => {
             tracing::info!("query performed");
             if let Some(mut pod_cast) = find_one {
-                    if !json.limit.eq(&0) {
+                if !json.limit.eq(&0) {
                     tracing::info!("Limiting the number of episodes: {}", json.limit);
                     pod_cast.limit_episode(json.limit);
                 }
@@ -203,6 +203,14 @@ pub async fn get_podcast(
     }
 }
 
+#[derive(Debug, Deserialize)]
+struct EpisodeGetter {
+    #[serde(rename = "id")]
+    podcast_id: String,
+    #[serde(rename = "episode-id", default)]
+    podcast_episode: u16,
+}
+
 #[instrument(
     name = "Episode Getter",
     level = "info",
@@ -212,7 +220,7 @@ pub async fn get_podcast(
 #[actix_web::get("/episode")]
 pub async fn get_episode(
     mongo_client: web::Data<mongodb::Client>,
-    json: web::Query<Getter>,
+    json: web::Query<EpisodeGetter>,
 ) -> HttpResponse {
     tracing::info!("querying for a podcast episode");
     let conn = mongo_client
@@ -235,8 +243,12 @@ pub async fn get_episode(
     {
         Ok(find_one) => {
             tracing::info!("query performed");
-            if let Some(pod_cast) = find_one {                
+            if let Some(mut pod_cast) = find_one {
                 tracing::warn!("Information found");
+                if !json.podcast_episode.eq(&0) {
+                    tracing::warn!("The episode ID selected is ID: {}", json.podcast_episode);
+                    pod_cast.get_episode_by_id(json.0.podcast_episode);
+                }
                 return HttpResponse::Ok().json(web::Json(pod_cast));
             } else {
                 tracing::warn!("Podcast not found");

@@ -247,20 +247,38 @@ impl Podcast {
             self.episodes = episode_lim(&self.episodes, limit).to_vec();
         }
     }
+
+    /// Placeholder
+    ///
+    /// This function is a placeholder for an actual episode ID
+    pub fn get_episode_by_id(&mut self, id: u16) {
+        // Episodes are not ID'd
+
+        if usize::from(id) > self.episodes.len() {
+            self.episodes = vec![];
+            return;
+        }
+
+        let mut episode: Episode = Episode::default();
+        for (i, pod) in self.episodes.iter().enumerate() {
+            if i.eq(&<u16 as Into<usize>>::into(id)) {
+                episode = pod.clone();
+
+                break;
+            }
+        }
+
+        self.episodes = [episode].to_vec();
+    }
 }
 
 fn episode_lim(epis: &[Episode], limit: u16) -> &[Episode] {
-    // epis.iter()
-    // .take(limit.into())
-    // .cloned()
-    // .collect::<Vec<Episode>>()
-
     let limit = usize::from(limit).min(epis.len());
 
     &epis[..limit]
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq, Default)]
 pub struct Episode {
     title: Option<String>,
     description: Option<String>,
