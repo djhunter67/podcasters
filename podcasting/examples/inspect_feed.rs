@@ -5,6 +5,7 @@ use podcasting::feed::fetch_feed;
 use tokio::{io::AsyncReadExt, task::JoinHandle};
 use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
 
+#[allow(clippy::too_many_lines)]
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
@@ -133,12 +134,12 @@ async fn main() -> anyhow::Result<()> {
 
 enum Devel {
     Url,
-    Xml,
+    _Xml,
 }
 
 async fn parse_xml(path_forward: &Devel, xml_list: Vec<String>) {
     match path_forward {
-        Devel::Xml => {
+        Devel::_Xml => {
             let res: Vec<JoinHandle<()>> = (0..xml_list.len())
                 .map(|i| {
                     tokio::spawn(async move {
@@ -226,7 +227,7 @@ async fn parse_xml(path_forward: &Devel, xml_list: Vec<String>) {
 }
 
 // #[cfg(feature = "get_xml")]
-async fn get_xml_data(xml_list: Vec<String>) -> anyhow::Result<()> {
+async fn _get_xml_data(xml_list: Vec<String>) -> anyhow::Result<()> {
     use futures::future::join_all;
     use reqwest::Client;
 

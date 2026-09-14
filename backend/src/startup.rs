@@ -6,9 +6,9 @@ use actix_web::{
     middleware, web,
 };
 use models;
-use shared::settings;
-use std::{net, time};
-use tracing::{instrument, warn};
+use shared::settings::{self, Settings};
+use std::net;
+use tracing::instrument;
 
 pub const PARSE_COUNT: u8 = 9;
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -44,8 +44,8 @@ async fn run(
     };
 
     let redis_config = redis::aio::ConnectionManagerConfig::new()
-        .set_connection_timeout(Some(time::Duration::from_secs(2))) // Time to establish TCP connection
-        .set_response_timeout(Some(time::Duration::from_secs(1))) // Time to wait for command response
+        .set_connection_timeout(Some(std::time::Duration::from_secs(2))) // Time to establish TCP connection
+        .set_response_timeout(Some(std::time::Duration::from_secs(1))) // Time to wait for command response
         .set_exponent_base(2.) // Exponential backoff base
         .set_number_of_retries(3); // Max retries before failing
 
@@ -61,7 +61,17 @@ async fn run(
     // Connect to the MongoDB database
     let db_redis: web::Data<redis::aio::ConnectionManager> = web::Data::new(redis_pool);
     let db_mongo: web::Data<mongodb::Client> = web::Data::new(mongo_pool);
+
     tracing::info!("Processed DB & Cache connection pool for distribution");
+
+    // let debug = settings.debug.clone();
+    let settings: web::Data<Settings> = web::Data::new(settings);
+
+    if settings.debug {
+        tracing::warn!("Debug mode");
+    } else {
+        tracing::warn!("Production mode");
+    }
 
     let server = HttpServer::new(move || {
         let cors = Cors::default()
@@ -85,12 +95,14 @@ async fn run(
             .app_data(json_config)
             .app_data(db_redis.clone())
             .app_data(db_mongo.clone())
+            .app_data(settings.clone())
             .service(
                 web::scope("/v1")
                     .service(api::v1::podcasts::preview)
                     .service(api::v1::podcasts::set_podcast)
                     .service(api::v1::podcasts::get_podcast)
                     .service(api::v1::podcasts::get_episode)
+                    .service(api::v1::search::podcast_search)
                     .service(api::health),
             )
     })
@@ -100,12 +112,6 @@ async fn run(
     .shutdown_timeout(3)
     .listen(listener)?
     .run();
-
-    if settings.debug {
-        warn!("Debug mode");
-    } else {
-        warn!("Production mode");
-    }
 
     Ok(server)
 }

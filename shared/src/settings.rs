@@ -25,7 +25,7 @@ pub struct Secret {
 #[derive(Deserialize, Clone, Debug)]
 pub struct Redis {
     pub uri: String,
-    pub key: String,
+    pub namespace: String,
     pub pool_size: u32,
     pub pool_max_open: u32,
     pub pool_max_idle: u32,

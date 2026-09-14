@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+use async_trait::async_trait;
 use mongodb::{
     bson::{oid, to_document},
     options::UpdateModifications,
@@ -122,6 +123,13 @@ pub struct Podcast {
     episode_count: u16,
     episodes: Vec<Episode>,
 }
+
+#[async_trait]
+trait SearchProvider {
+    async fn search_podcast(&self, query: &str) -> anyhow::Result<Vec<PodcastSearchResult>>;
+}
+
+struct PodcastSearchResult {}
 
 impl From<Podcast> for UpdateModifications {
     fn from(value: Podcast) -> Self {

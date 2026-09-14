@@ -9,6 +9,32 @@ pub struct UserSession {
     pub oid: String,
 }
 
+pub struct RedisKeys<'a> {
+    namespace: &'a str,
+}
+
+impl<'a> RedisKeys<'a> {
+    #[must_use = "Create a cache key instance from which several cache keys can be made"]
+    pub const fn new(namespace: &'a str) -> Self {
+        Self { namespace }
+    }
+
+    #[must_use = "Create the cache key for user sessions"]
+    pub fn session(&self, session_id: &str) -> String {
+        format!("{}:session:{session_id}", self.namespace)
+    }
+
+    #[must_use = "Create the cache key for the podcast session"]
+    pub fn podcast(&self, podcast_id: &str) -> String {
+        format!("{}:podcast:{podcast_id}", self.namespace)
+    }
+
+    #[must_use = "Create the cache key for the user sessions"]
+    pub fn user_auth(&self, email: &str) -> String {
+        format!("{}:user:auth:{email}", self.namespace)
+    }
+}
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum AuthenticationError {
     MissingSession,

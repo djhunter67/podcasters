@@ -11,7 +11,7 @@ mongo:
 
 redis:
   uri: ""
-  key: "session:"
+  namespace: "frontend:"
   pool_size: 1
   pool_max_open: 16
   pool_max_idle: 8

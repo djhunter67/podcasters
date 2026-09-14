@@ -10,6 +10,7 @@ use mongodb::{
 use podcasting::episode::Podcast;
 use redis::AsyncTypedCommands;
 use serde::{Deserialize, Serialize};
+use shared::settings::Settings;
 use tracing::instrument;
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -37,16 +38,17 @@ pub async fn preview(uri: web::Json<PreviewQuery>) -> HttpResponse {
     name = "Save a podcast to the DB",
     level = "info",
     target = "Podcasting",
-    skip(uri, mongo_client, redis_client)
+    skip(uri, mongo_client, redis_client, settings)
 )]
 pub async fn set_podcast(
     mut uri: web::Json<PreviewQuery>,
     mongo_client: web::Data<mongodb::Client>,
     redis_client: web::Data<redis::aio::ConnectionManager>,
+    settings: web::Data<Settings>,
 ) -> HttpResponse {
     tracing::info!("Save a podcast at uri: {}", uri.uri);
 
-    let cache_key: String = format!("podcast:{}", uri.uri);
+    let cache_key: String = format!("{}:podcast:{}", settings.redis.namespace, uri.uri);
 
     // Check the cache layer for the uri
     uri = cache_check(&mut redis_client.as_ref().clone(), &cache_key, uri).await;
@@ -150,6 +152,26 @@ struct PodGetter {
     podcast_id: String,
     #[serde(default)]
     limit: u16,
+    _category: Option<String>,
+    _sort: Option<SortType>,
+}
+
+#[derive(Debug, Deserialize)]
+enum SortType {
+    /// Based on the Podcast's rating
+    Popular,
+    /// New to Old (default) or Old to New
+    ReleaseDate,
+    /// Shortest to longest or longest to shortest
+    Duration,
+    /// Sequential, first to last
+    Serial,
+    /// Any order, newest first
+    Episodic,
+    /// User follow time
+    Subscription,
+    /// User tagged sort method
+    Tag(()),
 }
 
 #[instrument(
@@ -164,6 +186,7 @@ pub async fn get_podcast(
     json: web::Query<PodGetter>,
 ) -> HttpResponse {
     tracing::info!("querying for a podcast");
+
     let conn = mongo_client
         .database(&DataBases::PodCast.to_string())
         .collection::<Podcast>(&DataBases::PodCast.to_string());

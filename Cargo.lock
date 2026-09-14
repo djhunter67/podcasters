@@ -441,6 +441,7 @@ dependencies = [
  "rstest",
  "serde",
  "serde_json",
+ "sha1",
  "shared",
  "tracing",
  "tracing-subscriber",
