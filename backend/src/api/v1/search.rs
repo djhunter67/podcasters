@@ -1,11 +1,8 @@
-use std::{
-    str::FromStr,
-    time::{SystemTime, UNIX_EPOCH},
-};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use actix_web::{HttpResponse, web};
 use models::{DataBases, redis_conf::RedisKeys};
-use mongodb::bson::{doc, oid::ObjectId};
+use mongodb::bson::doc;
 use podcasting::episode::Podcast;
 use redis::AsyncTypedCommands;
 use serde::Deserialize;
@@ -72,18 +69,26 @@ pub async fn search_podcasts(
 
     let cache_key = RedisKeys::new(&settings.redis.namespace).podcast(&settings.redis.namespace);
 
+    tracing::debug!("Get the cache key");
+
     // Search the cache layer (cache-hit)
     let _cache: Option<String> = redis_client.get(cache_key).await.map_err(|err| {
         tracing::error!("Failure to cache oid for Podcast: {err}");
         anyhow::anyhow!(err.to_string())
     })?;
 
+    tracing::debug!("Cache client retreived");
+
     // Search the db (db-hit)
     let _conn = mongo_client
         .database(&DataBases::PodCast.to_string())
         .collection::<Podcast>(&DataBases::PodCast.to_string());
 
-    let _oid = ObjectId::from_str(&criteria.podcast)?;
+    tracing::debug!("Mongo client retreived");
+
+    // let _oid = ObjectId::from_str(&criteria.podcast)?;
+
+    tracing::debug!("OID retreived");
 
     tracing::info!("made it past the db and cache layer instantiation");
     // Search the podcast index
@@ -97,7 +102,7 @@ const PODCAST_INDEX_SEARCH_URL: &str = "https://api.podcastindex.org/api/1.0/sea
 async fn search_index(podcast: &str, limit: u16) -> anyhow::Result<()> {
     tracing::info!("Podcast to show: {podcast}");
     tracing::info!("How many to give: {limit}");
-    let api_key = std::env::var("PODCAST_INDEX_API_KEY");
+    let api_key = std::env::var("PODCAST_INDEX_API_KEY")?;
     tracing::warn!("API KEY: {api_key:#?}");
 
     let api_secret = std::env::var("PODCAST_INDEX_API_SECRET");
@@ -115,21 +120,27 @@ async fn search_index(podcast: &str, limit: u16) -> anyhow::Result<()> {
     hasher.update(auth_input.as_bytes());
 
     let authorization = hex::encode(hasher.finalize());
-    let _client = reqwest::Client::new();
+    let client = reqwest::Client::new();
 
     tracing::info!("Ready to GET: {authorization}");
     tracing::info!("Will search at: {PODCAST_INDEX_SEARCH_URL}");
 
-    // let response = client
-    //     .get(PODCAST_INDEX_SEARCH_URL)
-    //     .query(&[("q", "rust"), ("max", "2")])
-    //     .header(reqwest::header::USER_AGENT, "Podcasters/0.1")
-    //     .header("X-Auth-Key", &api_key)
-    //     .header("X-Auth-Date", &timestamp)
-    //     .header("Authorization", &authorization)
-    //     .send()
-    //     .await?
-    //     .error_for_status()?;
+    let response = client
+        .get(PODCAST_INDEX_SEARCH_URL)
+        .query(&[("q", "rust"), ("max", "2")])
+        .header(reqwest::header::USER_AGENT, "Podcasters/0.1")
+        .header("X-Auth-Key", &api_key)
+        .header("X-Auth-Date", &timestamp)
+        .header("Authorization", &authorization)
+        .send()
+        .await?
+        .error_for_status()?;
+
+    tracing::warn!("Response: {:#?}", response.status());
+
+    let body = response.text().await?;
+
+    tracing::warn!("Body: {body:#?}");
 
     Ok(())
 }
