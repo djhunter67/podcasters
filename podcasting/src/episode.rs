@@ -203,10 +203,12 @@ impl Podcast {
                         .expect("No Atom:Link found")
                         .href
                         .clone(),
-                    episode_count: u16::try_from(
-                        feed.item.len().to_string().parse::<usize>().unwrap_or(0),
-                    )
-                    .expect("u16 overflow for the number of episodes"),
+                    episode_count: feed
+                        .item
+                        .len()
+                        .to_string()
+                        .parse::<u16>()
+                        .expect("u16 overflow for the number of episodes"),
                     episodes,
                 }
             }
