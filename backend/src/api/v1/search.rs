@@ -126,19 +126,19 @@ impl SearchProvider for PodcastIndexProvider {
             .await
             .map_err(|err| SearchError::ResponseError(err.to_string()))?;
 
-        // let json_result: serde_json::Value = serde_json::from_str(&body).expect("No values");
-        // tracing::warn!("Podcast Index result: {json_result:#?}");
+        // let json_pod_index_result: serde_json::Value = serde_json::from_str(&body).expect("No values");
+        // tracing::warn!("Podcast Index pod_index_result: {json_pod_index_result:#?}");
 
         // tracing::warn!("Body: {:#?}", body);
-        let mut result: PodcastSearchResult = serde_json::from_str(&body)
+        let mut pod_index_result: PodcastSearchResult = serde_json::from_str(&body)
             .map_err(|err| SearchError::ResponseError(err.to_string()))?;
-        result.provider = Some(SearchProviderKind::PodcastIndex);
+        pod_index_result.provider = Some(SearchProviderKind::PodcastIndex);
 
-        Ok(vec![result])
+        Ok(vec![pod_index_result])
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct PodcastSearchResult {
     pub provider: Option<SearchProviderKind>,
     status: String,
@@ -214,13 +214,15 @@ pub async fn podcast_search(json: web::Query<SearchQuery>) -> HttpResponse {
     };
     tracing::warn!("The API secret: {api_secret:#?}");
 
-    let searcher = PodcastIndexProvider::new(client, api_key, api_secret);
+    let pod_index_searcher = PodcastIndexProvider::new(client, api_key, api_secret);
 
-    let result = searcher.search_podcasts(&json.podcast, json.limit).await;
+    let pod_index_result = pod_index_searcher
+        .search_podcasts(&json.podcast, json.limit)
+        .await;
 
-    // tracing::warn!("The resulting podcast: {result:#?}");
+    // tracing::warn!("The pod_index_resulting podcast: {pod_index_result:#?}");
 
-    match result {
+    match pod_index_result {
         Ok(res) => {
             tracing::info!("Search Result: {res:#?}");
             return HttpResponse::Accepted().json(web::Json(res));
@@ -231,7 +233,7 @@ pub async fn podcast_search(json: web::Query<SearchQuery>) -> HttpResponse {
         }
     };
 
-    // HttpResponse::Ok().json(web::Json(result))
+    // HttpResponse::Ok().json(web::Json(pod_index_result))
 }
 
 const PODCAST_INDEX_SEARCH_URL: &str = "https://api.podcastindex.org/api/1.0/search/byterm";

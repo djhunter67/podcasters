@@ -103,6 +103,7 @@ async fn run(
                     .service(api::v1::podcasts::get_podcast)
                     .service(api::v1::podcasts::get_episode)
                     .service(api::v1::search::podcast_search)
+                    .service(api::v1::subscription::subscribe)
                     .service(api::health),
             )
     })

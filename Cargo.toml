@@ -7,8 +7,10 @@ members = [
 	"models",
 	"ops/bump_version",
 	"ops/podcastersctl",
-	"podcasting",
-	"shared"
+  "podcasting",
+  "shared",
+  "security"
+  
 	]
 resolver = "3"
 
