@@ -1,3 +1,4 @@
+mod errors;
 pub mod v1;
 
 #[actix_web::get("/health")]

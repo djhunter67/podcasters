@@ -9,7 +9,7 @@ members = [
 	"ops/podcastersctl",
   "podcasting",
   "shared",
-  "security"
+  "users"
   
 	]
 resolver = "3"
