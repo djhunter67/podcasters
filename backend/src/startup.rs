@@ -105,6 +105,7 @@ async fn run(
                     .service(api::v1::search::podcast_search)
                     .service(api::v1::subscription::subscribe)
                     .service(api::v1::auth::register_user)
+                    .service(api::v1::auth::login_user)
                     .service(api::health),
             )
     })

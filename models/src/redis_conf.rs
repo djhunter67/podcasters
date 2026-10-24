@@ -1,5 +1,8 @@
+use std::fmt;
+
+use actix_web::http::StatusCode;
 use mongodb::bson::oid::ObjectId;
-use redis::{AsyncCommands, aio};
+use redis::AsyncCommands;
 use serde::{Deserialize, Serialize};
 
 use crate::mongo_conf;
@@ -42,12 +45,22 @@ pub enum AuthenticationError {
     Redis,
 }
 
+impl fmt::Display for AuthenticationError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::InvalidSession => write!(f, "{}", StatusCode::INTERNAL_SERVER_ERROR),
+            Self::MissingSession => write!(f, "{}", StatusCode::NOT_FOUND),
+            Self::Redis => write!(f, "{}", StatusCode::FAILED_DEPENDENCY),
+        }
+    }
+}
+
 fn session_key(session_cookie: &str) -> String {
     format!("session:{session_cookie}")
 }
 
 fn user_auth_key(email: &str) -> String {
-    format!("user:auth:{email}")
+    format!("podcasts:user:auth:{email}")
 }
 
 fn parse_cached_user_session(value: &str) -> Result<ObjectId, AuthenticationError> {
@@ -65,7 +78,7 @@ fn parse_cached_user_session(value: &str) -> Result<ObjectId, AuthenticationErro
 pub async fn authenticated_user_id(
     session_cookie: &str,
     mongo_client: &mongodb::Client,
-    redis_client: &mut aio::ConnectionManager,
+    redis_client: &mut redis::aio::ConnectionManager,
 ) -> Result<ObjectId, AuthenticationError> {
     let user_session = session_key(session_cookie);
 

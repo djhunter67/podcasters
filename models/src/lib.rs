@@ -12,6 +12,7 @@ pub mod device;
 pub mod episode;
 pub mod indexes;
 pub mod mongo_conf;
+pub mod rate_limit;
 pub mod redis_conf;
 
 struct _Users {}

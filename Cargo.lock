@@ -431,6 +431,7 @@ dependencies = [
  "chacha20",
  "config",
  "dotenvy",
+ "futures",
  "hex",
  "models",
  "mongodb",
@@ -2035,6 +2036,7 @@ dependencies = [
 name = "models"
 version = "0.1.0"
 dependencies = [
+ "actix-web",
  "anyhow",
  "config",
  "mongodb",
@@ -3799,6 +3801,7 @@ version = "0.1.0"
 dependencies = [
  "redis 1.7.1",
  "rstest",
+ "serde",
  "tracing",
  "tracing-subscriber",
 ]

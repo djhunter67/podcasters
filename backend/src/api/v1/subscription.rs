@@ -1,4 +1,5 @@
-use actix_web::{HttpResponse, web};
+use actix_web::{HttpRequest, HttpResponse, web};
+use models::redis_conf::authenticated_user_id;
 use mongodb::bson::oid::ObjectId;
 use podcasting::episode::Podcast;
 use serde::{Deserialize, Serialize};
@@ -69,16 +70,41 @@ impl SubscriptionRepository for Subscriptions {
     skip(mongo_client, redis_client, settings)
 )]
 pub async fn subscribe(
-    mut subscript: web::Json<Subscriptions>,
+    mut subscribe: web::Json<Subscriptions>,
     mongo_client: web::Data<mongodb::Client>,
     redis_client: web::Data<redis::aio::ConnectionManager>,
     settings: web::Data<Settings>,
+    req: HttpRequest,
 ) -> HttpResponse {
     tracing::info!(
         "subscribing a user: {} to a podcast: {}",
-        subscript.user_id,
-        subscript.podcast_id
+        subscribe.user_id,
+        subscribe.podcast_id
     );
 
-    HttpResponse::Ok().json(web::Json(subscript))
+    let session_cookie = if let Some(cookie) = req.cookie("session_id") {
+        cookie.value().to_string()
+    } else {
+        tracing::error!("User cookie not found: {:#?}", req.connection_info());
+
+        return HttpResponse::NotFound().json(web::Json(format!(
+            "Potential illicit connection from: {}",
+            req.connection_info().peer_addr().expect("No IP found")
+        )));
+    };
+
+    tracing::warn!("{session_cookie:#?}");
+
+    // authenticate the user
+    // let var_name = &mut redis_client.as_ref().clone();
+    // let oid: ObjectId = match authenticated_user_id(&session_cookie, &mongo_client, var_name).await
+    // {
+    //     Ok(id) => id,
+    //     Err(err) => {
+    //         tracing::error!("Authentication Error: {err}");
+    //         return HttpResponse::InternalServerError().json(web::Json(err.to_string()));
+    //     }
+    // };
+
+    HttpResponse::Ok().json(web::Json(subscribe))
 }
