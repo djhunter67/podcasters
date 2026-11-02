@@ -195,14 +195,13 @@ pub async fn login_user(
             }
             None => {
                 tracing::error!("User not found");
-                return HttpResponse::NotFound().json(web::Json("Potential query issues"));
+                return HttpResponse::NotFound().json(web::Json("Username not found"));
             }
         }
     } else {
         tracing::warn!("cache-hit");
 
         tracing::warn!("The cache: {cached_data}");
-
         // let oid: String = serde_json::from_str(&cached_data.to_string()).expect("Unable to get");
 
         // let filter = mongodb::bson::doc! {

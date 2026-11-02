@@ -42,19 +42,18 @@ pub async fn get_user(
 
     tracing::info!("Checking the cache-missed info against the db: {filter}");
 
-    let user = match db.find_one(filter).await {
+    match db.find_one(filter).await {
         Ok(user) => {
-            let user: Users = user.unwrap_or_default();
-            tracing::info!("user data queried: {user}");
+            let user: Option<Users> = user;
+            tracing::info!("user data queried: {user:#?}");
+            user.as_ref()?;
             user
         }
         Err(err) => {
             tracing::error!("No query possible: {err}");
-            users::Users::default()
+            None
         }
-    };
-
-    Some(user)
+    }
 }
 
 #[cfg(test)]
