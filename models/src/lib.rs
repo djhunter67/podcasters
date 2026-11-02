@@ -14,6 +14,7 @@ pub mod indexes;
 pub mod mongo_conf;
 pub mod rate_limit;
 pub mod redis_conf;
+pub mod user;
 
 struct _Users {}
 struct _AuthSession {}

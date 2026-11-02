@@ -1,5 +1,4 @@
 use actix_web::{HttpRequest, HttpResponse, web};
-use models::redis_conf::authenticated_user_id;
 use mongodb::bson::oid::ObjectId;
 use podcasting::episode::Podcast;
 use serde::{Deserialize, Serialize};

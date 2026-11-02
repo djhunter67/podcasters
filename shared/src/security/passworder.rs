@@ -1,13 +1,14 @@
 use std::fmt::Display;
 
 use base64::{Engine, engine::general_purpose};
-use chacha20::{ChaCha20, KeyIvInit, cipher::StreamCipher};
+use chacha20::{ChaCha20, ChaCha20Rng, KeyIvInit, cipher::StreamCipher};
+use rand::{Rng, SeedableRng};
 use tracing::instrument;
 
 use crate::security::PEPPER;
 
 /// Encryption Logic
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct PassWorder {
     pw: String,
 }
@@ -18,6 +19,14 @@ impl Display for PassWorder {
     // }
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.pw)
+    }
+}
+
+impl From<&String> for PassWorder {
+    fn from(value: &String) -> Self {
+        Self {
+            pw: value.to_owned(),
+        }
     }
 }
 
@@ -64,6 +73,7 @@ impl PassWorder {
 
         // tracing::warn!("The generated cipher: {}", hex::encode(&cipher_text));
         self.pw = hex::encode(&cipher_text);
+        // tracing::warn!("The generated cipher: {}", self.pw);
         self
     }
 
@@ -76,15 +86,15 @@ impl PassWorder {
     #[must_use = "Salt encrypted passwords"]
     pub fn salt(mut self) -> Self {
         tracing::debug!("Salting");
-        // let seed: [u8; 32] = [42u8; 32];
+        let seed: [u8; 32] = [42u8; 32];
 
-        // let mut random_salt: [u8; 16] = [0; 16];
+        let mut random_salt: [u8; 16] = [0; 16];
 
-        // let mut seed_core: ChaCha20Rng = ChaCha20Rng::from_seed(seed);
+        let mut seed_core: ChaCha20Rng = ChaCha20Rng::from_seed(seed);
 
-        // seed_core.fill_bytes(&mut random_salt);
+        seed_core.fill_bytes(&mut random_salt);
 
-        let random_salt: [u8; 16] = rand::random();
+        // let random_salt: [u8; 16] = rand::random();
 
         self.pw
             .insert_str(0, &format!("{}$", hex::encode(random_salt)));
@@ -131,7 +141,11 @@ impl PassWorder {
 
         match general_purpose::STANDARD.decode(
             self.pw
-                .split_at(self.pw.len() - general_purpose::STANDARD.encode(PEPPER).len())
+                .split_at(
+                    self.pw
+                        .len()
+                        .saturating_sub(general_purpose::STANDARD.encode(PEPPER).len()),
+                )
                 .1,
         ) {
             Ok(pepper) => (

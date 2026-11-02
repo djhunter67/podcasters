@@ -1,8 +1,9 @@
 //! Initialize and return a connection to the MongoDB database.
 
 use tracing::instrument;
+use users::Users;
 
-use crate::settings;
+use crate::{DataBases, settings};
 
 #[must_use]
 pub fn database_from_name(manager: &mongodb::Client, database_name: &str) -> mongodb::Database {
@@ -26,6 +27,34 @@ pub async fn establish_connection(manager: &mongodb::Client) -> anyhow::Result<m
     // .expect("Application settings are unavailable");
 
     Ok(database_from_name(manager, &settings.mongo.db))
+}
+
+/// # Errors
+///
+///   - This function will error if the database query fails
+pub async fn get_user(
+    filter: mongodb::bson::Document,
+    mongo_client: &mongodb::Client,
+) -> Option<users::Users> {
+    let db: mongodb::Collection<Users> = mongo_client
+        .database(&DataBases::PodCast.to_string())
+        .collection::<Users>("users");
+
+    tracing::info!("Checking the cache-missed info against the db: {filter}");
+
+    let user = match db.find_one(filter).await {
+        Ok(user) => {
+            let user: Users = user.unwrap_or_default();
+            tracing::info!("user data queried: {user}");
+            user
+        }
+        Err(err) => {
+            tracing::error!("No query possible: {err}");
+            users::Users::default()
+        }
+    };
+
+    Some(user)
 }
 
 #[cfg(test)]
