@@ -422,7 +422,7 @@ This application Will feature Podcasting 2.0 support.
   - [X] Mongo connection.
   - [X] Redis connection.
   - [ ] Error model.
-  - [ ] API version routing.
+  - [X] API version routing.
   - [ ] Authentication integration.
   - [X] Health endpoint.
 - First useful endpoint:

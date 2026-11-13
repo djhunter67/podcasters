@@ -8,7 +8,7 @@ use mongodb::bson::{doc, oid};
 use redis::{AsyncTypedCommands, aio};
 use serde::{Deserialize, Serialize};
 use shared::security::passworder::PassWorder;
-use std::fmt;
+use std::{fmt, str::FromStr};
 use tracing::instrument;
 use users::{Login, Users};
 
@@ -231,13 +231,24 @@ pub async fn login_user(
         .salt()
         .pepper();
 
-    if let Ok(authed) = user_auth.pw_verify(
-        &user_pw.to_string(), // &user_to_login.0.password,
-    ) && authed
+    if let Ok(authed) = user_auth.pw_verify(&user_pw.to_string())
+        && authed
     {
         tracing::warn!("PASSWORD VERIFIED! -> True");
-        let oid: oid::ObjectId = serde_json::from_str(&cached_data).unwrap_or_default();
+
+        // tracing::warn!("The user auth passed as an oid: {:#?}", var_name);
+        // let oid: oid::ObjectId = match oid::ObjectId::from_str(user_auth.get_oid().as_ref()) {
+        //     Ok(oid) => oid
+        //     Err(err) => {
+        //         tracing::error!("Converting the user OID to an oid::ObjectOid: {err:#?}");
+        //         return HttpResponse::NotFound().json(web::Json("Username not found"));
+        //     }
+        // };
+
+        // This line bypassing validating the database OID.  It is not known at this time if that is ok.
+        let oid: String = user_auth.get_oid().to_string();
         return HttpResponse::Accepted().json(web::Json(oid));
+        // return HttpResponse::Accepted().json(web::Json(String::from("Testing temp login")));
     }
 
     // THIS RETURN VAL IS TEMPORARY

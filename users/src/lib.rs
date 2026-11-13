@@ -1,11 +1,13 @@
 use std::fmt;
 
+use mongodb::bson::oid;
 use serde::{Deserialize, Serialize};
 use shared::security::passworder;
 use tracing::instrument;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Users {
+    _id: Option<oid::ObjectId>,
     email: String,
     password: String,
     subscriptions: Vec<String>, // To be Episode ID's
@@ -23,6 +25,7 @@ impl Users {
             email: email.to_string(),
             password,
             subscriptions: vec![],
+            _id: None,
         }
     }
 
@@ -36,6 +39,16 @@ impl Users {
 
     pub fn set_pw(&mut self, pw: passworder::PassWorder) {
         self.password = pw.to_string();
+    }
+
+    pub fn get_oid(self) -> String {
+        match self._id {
+            Some(id) => id.to_string(),
+            None => {
+                tracing::error!("Unable to get the OID of the user");
+                String::from("None")
+            }
+        }
     }
 
     /// # Errors
@@ -75,8 +88,9 @@ impl fmt::Display for Users {
         let has_some = !self.subscriptions.is_empty();
         write!(
             f,
-            "\nEmail: {}\nPassword: ********\nSubscriptions: {has_some}",
-            self.get_email()
+            "\nEmail: {}\nPassword: ********\nSubscriptions: {has_some}\noid: {:#?}",
+            self.get_email(),
+            self._id
         )
     }
 }
@@ -87,6 +101,7 @@ impl Default for Users {
             email: String::from("default_email@default_user.com"),
             password: String::from("**default**"),
             subscriptions: Default::default(),
+            _id: None,
         }
     }
 }
@@ -97,6 +112,7 @@ impl From<&Login> for Users {
             email: value.email.clone(),
             password: value.password.clone(),
             subscriptions: vec![],
+            _id: None,
         }
     }
 }
