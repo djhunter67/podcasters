@@ -1,3 +1,5 @@
+pub mod auth;
+
 use std::fmt;
 
 use mongodb::bson::oid;
@@ -11,12 +13,22 @@ pub struct Users {
     email: String,
     password: String,
     subscriptions: Vec<String>, // To be Episode ID's
+    status: AccountStatus,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Login {
+pub enum AccountStatus {
+    PendingVerification,
+    Active,
+    Suspended,
+    Deleted,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Auth {
     pub email: String,
-    pub password: String,
+    pub password: Option<String>,
+    pub oid: Option<String>,
 }
 
 impl Users {
@@ -26,6 +38,7 @@ impl Users {
             password,
             subscriptions: vec![],
             _id: None,
+            status: AccountStatus::PendingVerification,
         }
     }
 
@@ -41,7 +54,7 @@ impl Users {
         self.password = pw.to_string();
     }
 
-    pub fn get_oid(self) -> String {
+    pub fn get_oid(&self) -> String {
         match self._id {
             Some(id) => id.to_string(),
             None => {
@@ -49,6 +62,10 @@ impl Users {
                 String::from("None")
             }
         }
+    }
+
+    pub fn get_status(&self) -> String {
+        self.status.to_string()
     }
 
     /// # Errors
@@ -102,17 +119,30 @@ impl Default for Users {
             password: String::from("**default**"),
             subscriptions: Default::default(),
             _id: None,
+            status: AccountStatus::PendingVerification,
         }
     }
 }
 
-impl From<&Login> for Users {
-    fn from(value: &Login) -> Self {
+impl From<&Auth> for Users {
+    fn from(value: &Auth) -> Self {
         Self {
             email: value.email.clone(),
-            password: value.password.clone(),
+            password: value.password.clone().expect("password not passed"),
             subscriptions: vec![],
             _id: None,
+            status: AccountStatus::PendingVerification,
+        }
+    }
+}
+
+impl std::fmt::Display for AccountStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Active => write!(f, "Active"),
+            Self::Suspended => write!(f, "Suspended"),
+            Self::PendingVerification => write!(f, "Pending Verification"),
+            Self::Deleted => write!(f, "Deleted"),
         }
     }
 }

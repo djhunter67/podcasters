@@ -107,7 +107,9 @@ async fn run(
                     .service(
                         web::scope("/auth")
                             .service(api::v1::auth::register_user)
-                            .service(api::v1::auth::login_user),
+                            .service(api::v1::auth::login_user)
+                            .service(api::v1::auth::logout_user)
+                            .service(api::v1::auth::refresh_cache),
                     )
                     .service(api::health),
             )

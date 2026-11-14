@@ -423,7 +423,7 @@ This application Will feature Podcasting 2.0 support.
   - [X] Redis connection.
   - [ ] Error model.
   - [X] API version routing.
-  - [ ] Authentication integration.
+  - [X] Authentication integration.
   - [X] Health endpoint.
 - First useful endpoint:
   - [x] `GET /api/v1/health`

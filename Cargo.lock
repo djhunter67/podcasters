@@ -428,7 +428,6 @@ dependencies = [
  "actix-web",
  "anyhow",
  "base64 0.23.1",
- "chacha20",
  "config",
  "dotenvy",
  "futures",
@@ -3801,6 +3800,8 @@ name = "users"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "chacha20",
+ "hex",
  "mongodb",
  "redis 1.7.1",
  "reqwest",

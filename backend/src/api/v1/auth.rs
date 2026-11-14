@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use shared::security::passworder::PassWorder;
 use std::{fmt, str::FromStr};
 use tracing::instrument;
-use users::{Login, Users};
+use users::{Auth, Users};
 
 use crate::api::errors::RegistrationError;
 
@@ -153,7 +153,7 @@ impl fmt::Display for Registration {
 pub async fn login_user(
     mongo_client: Data<mongodb::Client>,
     redis_client: Data<aio::ConnectionManager>,
-    user_to_login: web::Json<Login>,
+    user_to_login: web::Json<Auth>,
     req: HttpRequest,
 ) -> HttpResponse {
     tracing::info!("Logiging in a user_to_register: {user_to_login:#?}");
@@ -195,7 +195,7 @@ pub async fn login_user(
             }
             None => {
                 tracing::error!("User not found");
-                return HttpResponse::NotFound().json(web::Json("Username not found"));
+                return HttpResponse::NotFound().json(web::Json("Invalid login"));
             }
         }
     } else {
@@ -226,7 +226,7 @@ pub async fn login_user(
         new_user
     };
 
-    let user_pw = PassWorder::new(&user_to_login.0.password)
+    let user_pw = PassWorder::new(&user_to_login.0.password.expect("No pw available"))
         .encrypt()
         .salt()
         .pepper();
@@ -245,14 +245,91 @@ pub async fn login_user(
         //     }
         // };
 
+        let mut return_hash_map: std::collections::HashMap<String, String> =
+            std::collections::HashMap::new();
+
+        return_hash_map.insert(user_auth.get_oid(), user_auth.get_status());
+
         // This line bypassing validating the database OID.  It is not known at this time if that is ok.
-        let oid: String = user_auth.get_oid().to_string();
-        return HttpResponse::Accepted().json(web::Json(oid));
-        // return HttpResponse::Accepted().json(web::Json(String::from("Testing temp login")));
+        // let oid: String = user_auth.get_oid().to_string();
+        // return HttpResponse::Accepted().json(web::Json(oid));
+
+        return HttpResponse::Accepted().json(web::Json(return_hash_map));
     }
 
     // THIS RETURN VAL IS TEMPORARY
     tracing::error!("PASSWORD INCORRECT");
 
     HttpResponse::Unauthorized().json("User login Invalid")
+}
+
+#[instrument(
+    name = "Logout a User",
+    level = "info",
+    target = "Podcasting",
+    skip(user_to_logout, redis_client, req)
+)]
+#[post("/logout")]
+pub async fn logout_user(
+    user_to_logout: web::Json<Auth>,
+    redis_client: Data<aio::ConnectionManager>,
+    req: HttpRequest,
+) -> HttpResponse {
+    tracing::warn!("The req: {req:#?}");
+    tracing::info!("The user to logout: {user_to_logout:#?}");
+    let oid: oid::ObjectId = oid::ObjectId::from_str(
+        user_to_logout
+            .oid
+            .clone()
+            .as_ref()
+            .expect("Val is not present"),
+    )
+    .expect("Fail to get the OID");
+    tracing::info!("OID passed in {oid:#?}");
+
+    let cache_key = format!("podcasters:user:auth:{0}", user_to_logout.email);
+
+    let remove_cache_key: bool = match redis_client.as_ref().clone().get(cache_key).await {
+        Ok(val) => {
+            tracing::warn!("The data is found: {val:#?}");
+            val.is_some()
+        }
+        Err(err) => {
+            tracing::error!("no cache data found: {err}");
+            false
+        }
+    };
+
+    tracing::info!("The cache key to remove: {remove_cache_key:#?}");
+
+    HttpResponse::Accepted().json(web::Json(String::from("Logout endpoint")))
+}
+
+#[instrument(
+    name = "Refresh the cache timeout",
+    level = "info",
+    target = "Podcasting",
+    skip(user_to_refresh, redis_client)
+)]
+#[post("/refresh")]
+pub async fn refresh_cache(
+    user_to_refresh: web::Json<Auth>,
+    redis_client: Data<aio::ConnectionManager>,
+) -> HttpResponse {
+    let cache_key = format!("podcasters:user:auth:{}", user_to_refresh.email);
+
+    tracing::warn!("The cache key: {cache_key}");
+
+    // redis_client
+    //     .as_ref()
+    //     .clone()
+    //     .set_ex(&cache_key, encrypted_pw.to_string(), 3600) // 1 hour
+    //     .await;
+
+    HttpResponse::Accepted().json(web::Json(
+        user_to_refresh
+            .oid
+            .as_ref()
+            .expect("failure to receive OID"),
+    ))
 }
