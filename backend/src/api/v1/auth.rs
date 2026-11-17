@@ -1,16 +1,19 @@
 use actix_web::{
-    HttpRequest, HttpResponse, post,
+    HttpResponse, post,
     web::{self, Data},
 };
 use futures::TryStreamExt;
-use models::{DataBases, mongo_conf::get_user, rate_limit};
+use models::{DataBases, mongo_conf::get_user};
 use mongodb::bson::{doc, oid};
 use redis::{AsyncTypedCommands, aio};
 use serde::{Deserialize, Serialize};
 use shared::security::passworder::PassWorder;
 use std::{fmt, str::FromStr};
 use tracing::instrument;
-use users::{Auth, Users};
+use users::{
+    Auth, Users,
+    auth::{Authenticated, Token, TokenGenerator, TokenType},
+};
 
 use crate::api::errors::RegistrationError;
 
@@ -25,18 +28,17 @@ pub struct Registration {
     name = "Register a User",
     level = "info",
     target = "Podcasting",
-    skip(user_to_register, mongo_client, redis_client, req)
+    skip(user_to_register, mongo_client, redis_client)
 )]
 #[post("/register")]
 pub async fn register_user(
     mongo_client: Data<mongodb::Client>,
     redis_client: Data<aio::ConnectionManager>,
     user_to_register: web::Json<Registration>,
-    req: HttpRequest,
 ) -> HttpResponse {
     tracing::info!("Attempt to register a user_to_register");
 
-    let _rate_limit: bool = rate_limit::rate_limit_check(&req);
+    // let _rate_limit: bool = rate_limit::rate_limit_check(&req);
 
     // Validate the user_to_register data entered
     let email: String = String::from(&user_to_register.0.email).to_lowercase();
@@ -147,18 +149,17 @@ impl fmt::Display for Registration {
     name = "Login a User",
     level = "info",
     target = "Podcasting",
-    skip(user_to_login, mongo_client, redis_client, req)
+    skip(user_to_login, mongo_client, redis_client)
 )]
 #[post("/login")]
 pub async fn login_user(
     mongo_client: Data<mongodb::Client>,
     redis_client: Data<aio::ConnectionManager>,
     user_to_login: web::Json<Auth>,
-    req: HttpRequest,
 ) -> HttpResponse {
     tracing::info!("Logiging in a user_to_register: {user_to_login:#?}");
 
-    let _rate_limit: bool = rate_limit::rate_limit_check(&req);
+    // let _rate_limit: bool = rate_limit::rate_limit_check(&req);
 
     let user_email: String = user_to_login.0.email.clone();
 
@@ -236,23 +237,41 @@ pub async fn login_user(
     {
         tracing::warn!("PASSWORD VERIFIED! -> True");
 
-        // tracing::warn!("The user auth passed as an oid: {:#?}", var_name);
-        // let oid: oid::ObjectId = match oid::ObjectId::from_str(user_auth.get_oid().as_ref()) {
-        //     Ok(oid) => oid
-        //     Err(err) => {
-        //         tracing::error!("Converting the user OID to an oid::ObjectOid: {err:#?}");
-        //         return HttpResponse::NotFound().json(web::Json("Username not found"));
-        //     }
-        // };
+        let mut access_token: Token = Token::default();
+        for token in TokenType::iter() {
+            tracing::warn!("Token: {token}");
+            let genned_token: Token = match Authenticated::generate_token(token) {
+                Ok(val) => val,
+                Err(err) => {
+                    tracing::error!("The token generation has failed: {err}");
+                    return HttpResponse::InternalServerError().json("{err}");
+                }
+            };
 
-        let mut return_hash_map: std::collections::HashMap<String, String> =
-            std::collections::HashMap::new();
+            if token.eq(&TokenType::Access) {
+                access_token = genned_token.clone();
+            }
 
-        return_hash_map.insert(user_auth.get_oid(), user_auth.get_status());
+            if let Err(err) = redis_client
+                .as_ref()
+                .clone()
+                .set_ex(
+                    format!("podcasters:auth:{token}:{}", user_to_login.0.email,),
+                    genned_token.to_string(),
+                    3600,
+                ) // 1 hour
+                .await
+            {
+                tracing::error!("Error saving to the cache layer -> {err:#?}")
+            }
+        }
 
-        // This line bypassing validating the database OID.  It is not known at this time if that is ok.
-        // let oid: String = user_auth.get_oid().to_string();
-        // return HttpResponse::Accepted().json(web::Json(oid));
+        let return_hash_map: std::collections::HashMap<&str, String> =
+            std::collections::HashMap::from([
+                ("state", user_auth.get_status()),
+                ("id", user_auth.get_oid()),
+                ("token", access_token.get()),
+            ]);
 
         return HttpResponse::Accepted().json(web::Json(return_hash_map));
     }
@@ -267,15 +286,13 @@ pub async fn login_user(
     name = "Logout a User",
     level = "info",
     target = "Podcasting",
-    skip(user_to_logout, redis_client, req)
+    skip(user_to_logout, redis_client)
 )]
 #[post("/logout")]
 pub async fn logout_user(
     user_to_logout: web::Json<Auth>,
     redis_client: Data<aio::ConnectionManager>,
-    req: HttpRequest,
 ) -> HttpResponse {
-    tracing::warn!("The req: {req:#?}");
     tracing::info!("The user to logout: {user_to_logout:#?}");
     let oid: oid::ObjectId = oid::ObjectId::from_str(
         user_to_logout
@@ -287,12 +304,16 @@ pub async fn logout_user(
     .expect("Fail to get the OID");
     tracing::info!("OID passed in {oid:#?}");
 
-    let cache_key = format!("podcasters:user:auth:{0}", user_to_logout.email);
+    let cache_key = format!(
+        "podcasters:auth:{}:{}",
+        TokenType::Access,
+        user_to_logout.email
+    );
 
-    let remove_cache_key: bool = match redis_client.as_ref().clone().get(cache_key).await {
+    let remove_cache_key: bool = match redis_client.as_ref().clone().del(&cache_key).await {
         Ok(val) => {
             tracing::warn!("The data is found: {val:#?}");
-            val.is_some()
+            val.eq(&1)
         }
         Err(err) => {
             tracing::error!("no cache data found: {err}");
@@ -302,7 +323,7 @@ pub async fn logout_user(
 
     tracing::info!("The cache key to remove: {remove_cache_key:#?}");
 
-    HttpResponse::Accepted().json(web::Json(String::from("Logout endpoint")))
+    HttpResponse::Accepted().json(web::Json(remove_cache_key))
 }
 
 #[instrument(
@@ -316,20 +337,85 @@ pub async fn refresh_cache(
     user_to_refresh: web::Json<Auth>,
     redis_client: Data<aio::ConnectionManager>,
 ) -> HttpResponse {
-    let cache_key = format!("podcasters:user:auth:{}", user_to_refresh.email);
+    let cache_key = format!(
+        "podcasters:auth:{}:{}",
+        TokenType::Refresh,
+        user_to_refresh.email
+    );
 
     tracing::warn!("The cache key: {cache_key}");
 
-    // redis_client
-    //     .as_ref()
-    //     .clone()
-    //     .set_ex(&cache_key, encrypted_pw.to_string(), 3600) // 1 hour
-    //     .await;
+    let refresh: String = match redis_client.as_ref().clone().get(&cache_key).await {
+        Ok(val) => val.unwrap_or_default(),
+        Err(err) => {
+            tracing::error!("Unable to procure the cache layer: {err}");
+            String::from("Token procurement error")
+            // return HttpResponse::InternalServerError().json(web::Json("Token retrieval error"));
+        }
+    };
 
-    HttpResponse::Accepted().json(web::Json(
-        user_to_refresh
-            .oid
+    tracing::warn!("the refresh token: {refresh}");
+    let mut ret_map: std::collections::HashMap<&str, String> = std::collections::HashMap::new();
+
+    if refresh.is_empty() {
+        return HttpResponse::NoContent().json(web::Json("No refresh token found"));
+    } else {
+        // The refresh token is validated, thus refresh the access token
+        let access_token: Token = match Authenticated::generate_token(TokenType::Access) {
+            Ok(val) => val,
+            Err(err) => {
+                tracing::error!("Access token generation failed while refreshing: {err}");
+                return HttpResponse::InternalServerError().json("{err}");
+            }
+        };
+
+        if let Err(err) = redis_client
             .as_ref()
-            .expect("failure to receive OID"),
-    ))
+            .clone()
+            .set_ex(
+                format!(
+                    "podcasters:auth:{}:{}",
+                    TokenType::Access,
+                    user_to_refresh.0.email,
+                ),
+                access_token.to_string(),
+                3600,
+            ) // 30 days
+            .await
+        {
+            tracing::error!("Error saving to the cache layer -> {err:#?}")
+        }
+
+        let refresh_token: Token = match Authenticated::generate_token(TokenType::Refresh) {
+            Ok(val) => val,
+            Err(err) => {
+                tracing::error!("Refresh token generation failed while refrshing: {err}");
+                return HttpResponse::InternalServerError().json("{err}");
+            }
+        };
+
+        if let Err(err) = redis_client
+            .as_ref()
+            .clone()
+            .set_ex(
+                format!(
+                    "podcasters:auth:{}:{}",
+                    TokenType::Refresh,
+                    user_to_refresh.0.email,
+                ),
+                refresh_token.to_string(),
+                25_920_000,
+            ) // 30 days
+            .await
+        {
+            tracing::error!("Error saving to the cache layer -> {err:#?}")
+        }
+
+        ret_map.insert("access", access_token.to_string());
+        ret_map.insert("refresh", refresh_token.to_string());
+    }
+
+    tracing::warn!("The tokens to return: {ret_map:#?}");
+
+    HttpResponse::Accepted().json(web::Json(ret_map))
 }
