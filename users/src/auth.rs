@@ -2,32 +2,45 @@ use std::time::{self, SystemTime};
 
 use chacha20::{ChaCha20, KeyIvInit, cipher::StreamCipher};
 use hex;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Debug, Clone)]
+#[derive(Serialize, Debug, Clone, Deserialize)]
 pub struct Token {
     opaque: String,
+    expiration: u32,
 }
 
 impl std::fmt::Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.opaque)
+        write!(
+            f,
+            "{}\nExpiration: {:} hr(s)",
+            self.opaque,
+            self.expiration / 3600
+        )
     }
 }
 
 impl Token {
-    pub fn new(opaque: String) -> Self {
-        Self { opaque }
-    }
-
-    pub fn default() -> Token {
-        Self {
-            opaque: String::from("no token created: DEFAULT"),
-        }
+    pub fn new(opaque: String, expiration: u32) -> Self {
+        Self { opaque, expiration }
     }
 
     pub fn get(&self) -> String {
         self.opaque.clone()
+    }
+
+    pub fn expiration(&self) -> u32 {
+        self.expiration
+    }
+}
+
+impl Default for Token {
+    fn default() -> Self {
+        Self {
+            opaque: String::from("no token created: DEFAULT"),
+            expiration: 60,
+        }
     }
 }
 
@@ -35,7 +48,20 @@ pub trait TokenGenerator {
     fn generate_token(token_type: TokenType) -> anyhow::Result<Token> {
         tracing::info!("The token type: {token_type:#?}");
         Ok(match Self::time_generator(&token_type) {
-            Ok(val) => Token { opaque: val },
+            Ok(val) => {
+                let expiration: u32 = match token_type {
+                    // 1 hour
+                    TokenType::Access => 3600,
+                    // 30 days => 1hr * (30 days * 24 hours in a day)
+                    TokenType::Refresh => 3600 * (24 * 30),
+                    // 90 days
+                    TokenType::Session => (3600 * (24 * 30)) * 3,
+                };
+                Token {
+                    opaque: val,
+                    expiration,
+                }
+            }
             Err(err) => {
                 tracing::error!("{err:#?}");
                 Token::default()

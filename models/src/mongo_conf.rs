@@ -1,7 +1,8 @@
 //! Initialize and return a connection to the MongoDB database.
 
+use mongodb::{IndexModel, bson, options};
 use tracing::instrument;
-use users::Users;
+use users::{Users, auth::Token};
 
 use crate::{DataBases, settings};
 
@@ -45,13 +46,101 @@ pub async fn get_user(
     match db.find_one(filter).await {
         Ok(user) => {
             let user: Option<Users> = user;
-            tracing::info!("user data queried: {user:#?}");
+            tracing::info!("user data queried");
             user.as_ref()?;
             user
         }
         Err(err) => {
             tracing::error!("No query possible: {err}");
             None
+        }
+    }
+}
+
+/// # Errors
+///
+///   - Error if the database is unavailble;
+/// # Notes
+///
+///  - Only refresh the session token if it doesn't exist;
+pub async fn set_token(
+    filter: mongodb::bson::Document,
+    mongo_client: &mongodb::Client,
+    session: Token,
+) -> anyhow::Result<()> {
+    let db: mongodb::Collection<users::Users> = mongo_client
+        .database(&DataBases::PodCast.to_string())
+        .collection::<Users>("users");
+
+    let update_doc = mongodb::bson::doc! {
+        "$set": {
+            "session": {
+                "opaque": session.get(),
+                "expiration": session.expiration()
+            }
+        }
+    };
+
+    let idx_ops: options::IndexOptions = options::IndexOptions::builder()
+        // .expire_after(std::time::Duration::from_secs(session.expiration().into()))
+        .expire_after(std::time::Duration::from_secs(120))
+        .unique(Some(true))
+        .build();
+
+    let idx: IndexModel = IndexModel::builder()
+        .keys(bson::doc! {"session": 1})
+        .options(idx_ops)
+        .build();
+
+    match db.create_index(idx).await {
+        Ok(val) => {
+            tracing::info!("ttl set for the session key: {val:#?}");
+        }
+        Err(err) => {
+            tracing::error!("Index creation error: {err}");
+            return Err(err.into());
+        }
+    }
+
+    match db.update_one(filter, update_doc).await {
+        Ok(result) => {
+            // tracing::info!("Key updated: {result:#?}");
+            if result.modified_count.eq(&1) {
+                tracing::info!("update successful!");
+            }
+        }
+        Err(err) => {
+            tracing::error!("Unable to save the new session token: {err}");
+            return Err(anyhow::Error::msg(format!("{err}")));
+        }
+    }
+
+    Ok(())
+}
+
+/// # Errors
+///
+///  - Error if the database is unavailable;
+pub async fn remove_token(
+    filter: mongodb::bson::Document,
+    mongo_client: &mongodb::Client,
+) -> anyhow::Result<()> {
+    let db: mongodb::Collection<users::Users> = mongo_client
+        .database(&DataBases::PodCast.to_string())
+        .collection::<Users>("users");
+
+    let del_token = mongodb::bson::doc! {
+        "$set": {"session": {"opaque": "", "expiration": 0}}
+    };
+
+    match db.update_one(filter, del_token).await {
+        Ok(val) => {
+            tracing::info!("Update result: {val:#?}");
+            Ok(())
+        }
+        Err(err) => {
+            tracing::error!("Delete token error: {err}");
+            Err(anyhow::Error::msg(format!("{err}")))
         }
     }
 }

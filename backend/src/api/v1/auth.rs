@@ -3,15 +3,18 @@ use actix_web::{
     web::{self, Data},
 };
 use futures::TryStreamExt;
-use models::{DataBases, mongo_conf::get_user};
+use models::{
+    DataBases,
+    mongo_conf::{get_user, remove_token, set_token},
+};
 use mongodb::bson::{doc, oid};
-use redis::{AsyncTypedCommands, aio};
+use redis::{AsyncTypedCommands, aio, streams::StreamConfigOptions};
 use serde::{Deserialize, Serialize};
 use shared::security::passworder::PassWorder;
 use std::{fmt, str::FromStr};
 use tracing::instrument;
 use users::{
-    Auth, Users,
+    AccountStatus, Auth, Users,
     auth::{Authenticated, Token, TokenGenerator, TokenType},
 };
 
@@ -22,6 +25,13 @@ pub struct Registration {
     pub email: String,
     pub password: String,
     pub password_2: String,
+}
+
+#[derive(Serialize, Debug)]
+pub struct LoginReturn {
+    user_state: String,
+    id: String,
+    new_access_token: String,
 }
 
 #[instrument(
@@ -203,22 +213,6 @@ pub async fn login_user(
         tracing::warn!("cache-hit");
 
         tracing::warn!("The cache: {cached_data}");
-        // let oid: String = serde_json::from_str(&cached_data.to_string()).expect("Unable to get");
-
-        // let filter = mongodb::bson::doc! {
-        //     "_id":  ObjectId::parse_str(oid).expect("no parse availabe")
-        // };
-
-        // match get_user(filter, &mongo_client).await {
-        //     Some(user) => {
-        //         tracing::info!("User found");
-        //         user
-        //     }
-        //     None => {
-        //         tracing::error!("User not found");
-        //         return HttpResponse::NotFound().json(web::Json("Potential query issues"));
-        //     }
-        // }
 
         let mut new_user: users::Users = users::Users::from(&user_to_login.0);
 
@@ -237,9 +231,10 @@ pub async fn login_user(
     {
         tracing::warn!("PASSWORD VERIFIED! -> True");
 
-        let mut access_token: Token = Token::default();
+        let mut new_access_token: Token = Token::default();
         for token in TokenType::iter() {
             tracing::warn!("Token: {token}");
+
             let genned_token: Token = match Authenticated::generate_token(token) {
                 Ok(val) => val,
                 Err(err) => {
@@ -247,33 +242,49 @@ pub async fn login_user(
                     return HttpResponse::InternalServerError().json("{err}");
                 }
             };
+            tracing::warn!("Token: {token} -> {genned_token}");
 
-            if token.eq(&TokenType::Access) {
-                access_token = genned_token.clone();
-            }
+            if token.eq(&TokenType::Session) {
+                // Save to Mongodb the session token
+                let session_filter = mongodb::bson::doc! {
+                    "email": user_email.clone(),
+                    "session.opaque": "",
+                    "session.expiration": 0
+                };
 
-            if let Err(err) = redis_client
-                .as_ref()
-                .clone()
-                .set_ex(
-                    format!("podcasters:auth:{token}:{}", user_to_login.0.email,),
-                    genned_token.to_string(),
-                    3600,
-                ) // 1 hour
-                .await
-            {
-                tracing::error!("Error saving to the cache layer -> {err:#?}")
+                tracing::warn!("Session being saved to DB: {session_filter:#?}");
+
+                match set_token(session_filter, &mongo_client, genned_token).await {
+                    Ok(()) => tracing::info!("Token set"),
+                    Err(err) => return HttpResponse::InternalServerError().json(format!("{err}")),
+                }
+            } else {
+                if token.eq(&TokenType::Access) {
+                    new_access_token = genned_token.clone();
+                }
+
+                if let Err(err) = redis_client
+                    .as_ref()
+                    .clone()
+                    .set_ex(
+                        format!("podcasters:auth:{token}:{}", user_to_login.0.email,),
+                        genned_token.to_string(),
+                        genned_token.expiration().into(),
+                    )
+                    .await
+                {
+                    tracing::error!("Error saving to the cache layer -> {err:#?}")
+                }
             }
         }
 
-        let return_hash_map: std::collections::HashMap<&str, String> =
-            std::collections::HashMap::from([
-                ("state", user_auth.get_status()),
-                ("id", user_auth.get_oid()),
-                ("token", access_token.get()),
-            ]);
+        let return_data = LoginReturn {
+            new_access_token: new_access_token.get(),
+            id: user_auth.get_oid(),
+            user_state: user_auth.get_status(),
+        };
 
-        return HttpResponse::Accepted().json(web::Json(return_hash_map));
+        return HttpResponse::Accepted().json(web::Json(return_data));
     }
 
     // THIS RETURN VAL IS TEMPORARY
@@ -286,12 +297,13 @@ pub async fn login_user(
     name = "Logout a User",
     level = "info",
     target = "Podcasting",
-    skip(user_to_logout, redis_client)
+    skip(user_to_logout, redis_client, mongo_client)
 )]
 #[post("/logout")]
 pub async fn logout_user(
     user_to_logout: web::Json<Auth>,
     redis_client: Data<aio::ConnectionManager>,
+    mongo_client: Data<mongodb::Client>,
 ) -> HttpResponse {
     tracing::info!("The user to logout: {user_to_logout:#?}");
     let oid: oid::ObjectId = oid::ObjectId::from_str(
@@ -310,58 +322,128 @@ pub async fn logout_user(
         user_to_logout.email
     );
 
-    let remove_cache_key: bool = match redis_client.as_ref().clone().del(&cache_key).await {
+    match redis_client.as_ref().clone().del(&cache_key).await {
         Ok(val) => {
             tracing::warn!("The data is found: {val:#?}");
-            val.eq(&1)
+            // val.eq(&1)
+            // return HttpResponse::Accepted().into();
         }
         Err(err) => {
             tracing::error!("no cache data found: {err}");
-            false
+            return HttpResponse::InternalServerError().json("{err}");
         }
     };
 
-    tracing::info!("The cache key to remove: {remove_cache_key:#?}");
+    let filter = mongodb::bson::doc! {
+        "email": user_to_logout.email.clone()
+    };
 
-    HttpResponse::Accepted().json(web::Json(remove_cache_key))
+    match remove_token(filter, &mongo_client).await {
+        Ok(()) => return HttpResponse::Accepted().into(),
+        Err(err) => {
+            tracing::error!("remove session token: {err}");
+            return HttpResponse::InternalServerError().json("{err}");
+        }
+    }
 }
 
 #[instrument(
     name = "Refresh the cache timeout",
     level = "info",
     target = "Podcasting",
-    skip(user_to_refresh, redis_client)
+    skip(redis_client, user_to_refresh, mongo_client)
 )]
 #[post("/refresh")]
 pub async fn refresh_cache(
     user_to_refresh: web::Json<Auth>,
     redis_client: Data<aio::ConnectionManager>,
+    mongo_client: Data<mongodb::Client>,
 ) -> HttpResponse {
-    let cache_key = format!(
+    // BROKEN
+    if AccountStatus::Active.to_string().eq(&user_to_refresh
+        .0
+        .user_state
+        .clone()
+        .unwrap_or_default()
+        .to_lowercase())
+    {
+        tracing::error!("User account not activated");
+        return HttpResponse::Locked().json("User account not activated");
+    }
+
+    // Security consideration; Should not continue if the access is still valid
+    let access_key: String = format!(
+        "podcasters:auth:{}:{}",
+        TokenType::Access,
+        user_to_refresh.email
+    );
+
+    let refresh_key = format!(
         "podcasters:auth:{}:{}",
         TokenType::Refresh,
         user_to_refresh.email
     );
+    tracing::debug!("The refresh key to check: {refresh_key}");
 
-    tracing::warn!("The cache key: {cache_key}");
+    let session_key: String = format!(
+        "podcasters:auth:{}:{}",
+        TokenType::Session,
+        user_to_refresh.email
+    );
 
-    let refresh: String = match redis_client.as_ref().clone().get(&cache_key).await {
-        Ok(val) => val.unwrap_or_default(),
+    tracing::debug!("The refresh key to check: {session_key}");
+
+    match redis_client.as_ref().clone().get(&access_key).await {
+        Ok(val) => {
+            tracing::warn!("potentially found an existing access key");
+            if val.is_some() {
+                tracing::error!("Access Exists!: {val:#?}");
+                // return HttpResponse::NotAcceptable().json("Access key still valid");
+            }
+        }
         Err(err) => {
-            tracing::error!("Unable to procure the cache layer: {err}");
-            String::from("Token procurement error")
-            // return HttpResponse::InternalServerError().json(web::Json("Token retrieval error"));
+            tracing::error!("Unable to query the access key: {err}");
+            // false
+            return HttpResponse::InternalServerError().json(format!("{err}"));
         }
     };
 
-    tracing::warn!("the refresh token: {refresh}");
-    let mut ret_map: std::collections::HashMap<&str, String> = std::collections::HashMap::new();
+    // Check if the session is still active
+    let filter = mongodb::bson::doc! {
+        "email": user_to_refresh.email.clone()
+    };
 
-    if refresh.is_empty() {
-        return HttpResponse::NoContent().json(web::Json("No refresh token found"));
+    let session: bool = match get_user(filter, &mongo_client).await {
+        Some(val) => {
+            tracing::info!("token validated: {}", val.get_token());
+            !val.get_token().get().is_empty()
+        }
+        None => {
+            tracing::error!("Error validating session token");
+            return HttpResponse::InternalServerError().json("No user found");
+        }
+    };
+
+    let refresh: bool = match redis_client.as_ref().clone().get(&refresh_key).await {
+        Ok(val) => {
+            tracing::info!("Found the refresh key");
+            val.is_some()
+        }
+        Err(err) => {
+            tracing::error!("Unable to procure the cache layer: {err}");
+            // String::from("Token procurement error")
+            // return HttpResponse::InternalServerError().json(web::Json("Token retrieval error"));
+            false
+        }
+    };
+
+    let mut token_return: TokenReturn = TokenReturn::default();
+
+    if !session || !refresh {
+        return HttpResponse::Forbidden().json(web::Json("Login required"));
     } else {
-        // The refresh token is validated, thus refresh the access token
-        let access_token: Token = match Authenticated::generate_token(TokenType::Access) {
+        // The refresh and session tokens are validated, thus refresh the access token
+        let new_access_token: Token = match Authenticated::generate_token(TokenType::Access) {
             Ok(val) => val,
             Err(err) => {
                 tracing::error!("Access token generation failed while refreshing: {err}");
@@ -378,9 +460,9 @@ pub async fn refresh_cache(
                     TokenType::Access,
                     user_to_refresh.0.email,
                 ),
-                access_token.to_string(),
+                new_access_token.to_string(),
                 3600,
-            ) // 30 days
+            ) // 1 hr
             .await
         {
             tracing::error!("Error saving to the cache layer -> {err:#?}")
@@ -411,11 +493,17 @@ pub async fn refresh_cache(
             tracing::error!("Error saving to the cache layer -> {err:#?}")
         }
 
-        ret_map.insert("access", access_token.to_string());
-        ret_map.insert("refresh", refresh_token.to_string());
+        token_return.access = new_access_token.get();
+        token_return.refresh = refresh_token.get();
     }
 
-    tracing::warn!("The tokens to return: {ret_map:#?}");
+    tracing::warn!("The tokens to return: {token_return:#?}");
 
-    HttpResponse::Accepted().json(web::Json(ret_map))
+    HttpResponse::Accepted().json(token_return)
+}
+
+#[derive(Serialize, Debug, Default)]
+pub struct TokenReturn {
+    access: String,
+    refresh: String,
 }

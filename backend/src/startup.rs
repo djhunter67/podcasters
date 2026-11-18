@@ -82,7 +82,7 @@ async fn run(
             .max_age(3600);
 
         let json_config = web::JsonConfig::default()
-            .limit(409)
+            .limit(409) // Maximum payload size
             .error_handler(|err, _req| {
                 // create custom error response
                 error::InternalError::from_response(err, HttpResponse::Conflict().finish()).into()

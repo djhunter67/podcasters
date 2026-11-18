@@ -7,6 +7,8 @@ use serde::{Deserialize, Serialize};
 use shared::security::passworder;
 use tracing::instrument;
 
+use crate::auth::Token;
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Users {
     _id: Option<oid::ObjectId>,
@@ -14,9 +16,10 @@ pub struct Users {
     password: String,
     subscriptions: Vec<String>, // To be Episode ID's
     status: AccountStatus,
+    session: Option<Token>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
 pub enum AccountStatus {
     PendingVerification,
     Active,
@@ -29,6 +32,7 @@ pub struct Auth {
     pub email: String,
     pub password: Option<String>,
     pub oid: Option<String>,
+    pub user_state: Option<String>, // AccountStatus
 }
 
 impl Users {
@@ -39,6 +43,7 @@ impl Users {
             subscriptions: vec![],
             _id: None,
             status: AccountStatus::PendingVerification,
+            session: None,
         }
     }
 
@@ -62,6 +67,10 @@ impl Users {
                 String::from("None")
             }
         }
+    }
+
+    pub fn get_token(&self) -> Token {
+        self.session.clone().unwrap_or_default()
     }
 
     pub fn get_status(&self) -> String {
@@ -120,6 +129,7 @@ impl Default for Users {
             subscriptions: Default::default(),
             _id: None,
             status: AccountStatus::PendingVerification,
+            session: None,
         }
     }
 }
@@ -132,6 +142,7 @@ impl From<&Auth> for Users {
             subscriptions: vec![],
             _id: None,
             status: AccountStatus::PendingVerification,
+            session: None,
         }
     }
 }
@@ -139,10 +150,10 @@ impl From<&Auth> for Users {
 impl std::fmt::Display for AccountStatus {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Active => write!(f, "Active"),
-            Self::Suspended => write!(f, "Suspended"),
-            Self::PendingVerification => write!(f, "Pending Verification"),
-            Self::Deleted => write!(f, "Deleted"),
+            Self::Active => write!(f, "active"),
+            Self::Deleted => write!(f, "deleted"),
+            Self::PendingVerification => write!(f, "pending_verification"),
+            Self::Suspended => write!(f, "suspended"),
         }
     }
 }
