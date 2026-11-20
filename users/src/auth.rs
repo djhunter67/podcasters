@@ -1,28 +1,26 @@
 use std::time::{self, SystemTime};
 
 use chacha20::{ChaCha20, KeyIvInit, cipher::StreamCipher};
+use chrono::Utc;
 use hex;
+use mongodb::bson;
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
 
 #[derive(Serialize, Debug, Clone, Deserialize)]
 pub struct Token {
     opaque: String,
-    expiration: u32,
+    expiration: bson::DateTime,
 }
 
 impl std::fmt::Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}\nExpiration: {:} hr(s)",
-            self.opaque,
-            self.expiration / 3600
-        )
+        write!(f, "{}\nExpiration: {:} hr(s)", self.opaque, self.expiration)
     }
 }
 
 impl Token {
-    pub fn new(opaque: String, expiration: u32) -> Self {
+    pub fn new(opaque: String, expiration: bson::DateTime) -> Self {
         Self { opaque, expiration }
     }
 
@@ -30,8 +28,25 @@ impl Token {
         self.opaque.clone()
     }
 
-    pub fn expiration(&self) -> u32 {
+    pub fn expiration(&self) -> bson::DateTime {
         self.expiration
+    }
+    pub fn expiration_secs(&self) -> u64 {
+        // get the time delta from now
+        let dt = bson::DateTime::now();
+        let delta: Option<time::Duration> = dt.checked_duration_since(self.expiration);
+
+        if let Some(data) = delta {
+            if data.as_secs() <= 3600 {
+                tracing::warn!("Expiration: 1 hour");
+                3600
+            } else {
+                tracing::warn!("Expiration: 30 days");
+                3600 * (24 * 30)
+            }
+        } else {
+            360
+        }
     }
 }
 
@@ -39,23 +54,31 @@ impl Default for Token {
     fn default() -> Self {
         Self {
             opaque: String::from("no token created: DEFAULT"),
-            expiration: 60,
+            expiration: bson::DateTime::now(),
         }
     }
 }
 
 pub trait TokenGenerator {
     fn generate_token(token_type: TokenType) -> anyhow::Result<Token> {
+        let current_time = Utc::now();
         tracing::info!("The token type: {token_type:#?}");
         Ok(match Self::time_generator(&token_type) {
             Ok(val) => {
-                let expiration: u32 = match token_type {
+                let expiration: bson::DateTime = match token_type {
                     // 1 hour
-                    TokenType::Access => 3600,
+                    TokenType::Access => bson::DateTime::from_millis(
+                        (current_time + Duration::from_secs(3600)).timestamp_millis(),
+                    ),
                     // 30 days => 1hr * (30 days * 24 hours in a day)
-                    TokenType::Refresh => 3600 * (24 * 30),
+                    TokenType::Refresh => bson::DateTime::from_millis(
+                        (current_time + Duration::from_secs(3600 * (24 * 30))).timestamp_millis(),
+                    ),
                     // 90 days
-                    TokenType::Session => (3600 * (24 * 30)) * 3,
+                    TokenType::Session => bson::DateTime::from_millis(
+                        (current_time + Duration::from_secs((3600 * (24 * 30)) * 3))
+                            .timestamp_millis(),
+                    ),
                 };
                 Token {
                     opaque: val,

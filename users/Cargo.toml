@@ -14,6 +14,7 @@ name = "users"
 [dependencies]
 anyhow = "1.0.104"
 chacha20 = { version = "0.10.2", features = ["xchacha"] }
+chrono = "0.4.45"
 hex = "0.4.3"
 mongodb = "3.9.1"
 redis = { version = "1.7.1", features = ["connection-manager", "aio", "tokio-comp"] }

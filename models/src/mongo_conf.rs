@@ -81,11 +81,8 @@ pub async fn set_token(
         }
     };
 
-    let idx_ops: options::IndexOptions = options::IndexOptions::builder()
-        // .expire_after(std::time::Duration::from_secs(session.expiration().into()))
-        .expire_after(std::time::Duration::from_secs(120))
-        .unique(Some(true))
-        .build();
+    let idx_ops: options::IndexOptions =
+        options::IndexOptions::builder().unique(Some(true)).build();
 
     let idx: IndexModel = IndexModel::builder()
         .keys(bson::doc! {"session": 1})
@@ -130,7 +127,7 @@ pub async fn remove_token(
         .collection::<Users>("users");
 
     let del_token = mongodb::bson::doc! {
-        "$set": {"session": {"opaque": "", "expiration": 0}}
+        "$set": {"session": {"opaque": "", "expiration": bson::DateTime::now()}}
     };
 
     match db.update_one(filter, del_token).await {

@@ -7,8 +7,8 @@ use models::{
     DataBases,
     mongo_conf::{get_user, remove_token, set_token},
 };
-use mongodb::bson::{doc, oid};
-use redis::{AsyncTypedCommands, aio, streams::StreamConfigOptions};
+use mongodb::bson::{self, doc, oid};
+use redis::{AsyncTypedCommands, aio};
 use serde::{Deserialize, Serialize};
 use shared::security::passworder::PassWorder;
 use std::{fmt, str::FromStr};
@@ -249,10 +249,8 @@ pub async fn login_user(
                 let session_filter = mongodb::bson::doc! {
                     "email": user_email.clone(),
                     "session.opaque": "",
-                    "session.expiration": 0
+                    // "session.expiration": bson::DateTime::now()
                 };
-
-                tracing::warn!("Session being saved to DB: {session_filter:#?}");
 
                 match set_token(session_filter, &mongo_client, genned_token).await {
                     Ok(()) => tracing::info!("Token set"),
@@ -269,7 +267,7 @@ pub async fn login_user(
                     .set_ex(
                         format!("podcasters:auth:{token}:{}", user_to_login.0.email,),
                         genned_token.to_string(),
-                        genned_token.expiration().into(),
+                        genned_token.expiration_secs(),
                     )
                     .await
                 {
